@@ -101,7 +101,12 @@ var listOrdersCmd = &cobra.Command{
 			return fmt.Errorf("cannot list orders: %w", err)
 		}
 
-		jsonResponse, err := utils.MarshalJSON(response, cmd.Flags().Lookup(utils.FormatFlag).Changed)
+		shouldFormat, err := utils.CheckFormatFlag(cmd)
+		if err != nil {
+			return err
+		}
+
+		jsonResponse, err := utils.MarshalJSON(response, shouldFormat)
 		if err != nil {
 			return fmt.Errorf("cannot marshal response to JSON: %w", err)
 		}
@@ -122,7 +127,7 @@ func init() {
 	listOrdersCmd.Flags().StringP(utils.OrderSideFlag, "o", "", "Side of orders")
 	listOrdersCmd.Flags().StringP(utils.StartFlag, "s", "", "Start time in RFC3339 format")
 	listOrdersCmd.Flags().StringP(utils.EndFlag, "e", "", "End time in RFC3339 format")
-	listOrdersCmd.Flags().BoolP(utils.FormatFlag, "", false, "Format the JSON output")
+	listOrdersCmd.Flags().StringP(utils.FormatFlag, "z", "false", "Pass true for formatted JSON. Default is false")
 	listOrdersCmd.Flags().StringP(utils.PortfolioIdFlag, "", "", "Portfolio ID. Uses environment variable if blank")
 
 	listOrdersCmd.MarkFlagRequired(utils.StartFlag)

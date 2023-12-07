@@ -44,7 +44,12 @@ var listAssetsCmd = &cobra.Command{
 			return fmt.Errorf("cannot list assets: %w", err)
 		}
 
-		jsonResponse, err := utils.MarshalJSON(response, cmd.Flags().Lookup(utils.FormatFlag).Changed)
+		shouldFormat, err := utils.CheckFormatFlag(cmd)
+		if err != nil {
+			return err
+		}
+
+		jsonResponse, err := utils.MarshalJSON(response, shouldFormat)
 		if err != nil {
 			return fmt.Errorf("cannot marshal response to JSON: %w", err)
 		}
@@ -56,6 +61,6 @@ var listAssetsCmd = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(listAssetsCmd)
 
-	listAssetsCmd.Flags().BoolP(utils.FormatFlag, "", false, "Format the JSON output")
+	listAssetsCmd.Flags().StringP(utils.FormatFlag, "z", "false", "Pass true for formatted JSON. Default is false")
 
 }

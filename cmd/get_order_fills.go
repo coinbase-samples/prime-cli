@@ -56,7 +56,12 @@ var getOrderFillsCmd = &cobra.Command{
 			return fmt.Errorf("cannot get order fills: %w", err)
 		}
 
-		jsonResponse, err := utils.MarshalJSON(response, cmd.Flags().Lookup(utils.FormatFlag).Changed)
+		shouldFormat, err := utils.CheckFormatFlag(cmd)
+		if err != nil {
+			return err
+		}
+
+		jsonResponse, err := utils.MarshalJSON(response, shouldFormat)
 		if err != nil {
 			return fmt.Errorf("cannot marshal response to JSON: %w", err)
 		}
@@ -73,7 +78,7 @@ func init() {
 	getOrderFillsCmd.Flags().StringP(utils.CursorFlag, "c", "", "Pagination cursor")
 	getOrderFillsCmd.Flags().StringP(utils.LimitFlag, "l", utils.LimitDefault, "Pagination limit")
 	getOrderFillsCmd.Flags().StringP(utils.SortDirectionFlag, "d", utils.SortDirectionDefault, "Sort direction")
-	getOrderFillsCmd.Flags().BoolP(utils.FormatFlag, "", false, "Format the JSON output")
+	getOrderFillsCmd.Flags().StringP(utils.FormatFlag, "z", "false", "Pass true for formatted JSON. Default is false")
 	getOrderFillsCmd.Flags().StringP(utils.PortfolioIdFlag, "", "", "Portfolio ID. Uses environment variable if blank")
 
 	getOrderFillsCmd.MarkFlagRequired(utils.OrderIdFlag)

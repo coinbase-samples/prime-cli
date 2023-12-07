@@ -83,7 +83,12 @@ var listInvoicesCmd = &cobra.Command{
 
 		log.Printf("Received response: %+v\n", response)
 
-		jsonResponse, err := utils.MarshalJSON(response, cmd.Flags().Lookup(utils.FormatFlag).Changed)
+		shouldFormat, err := utils.CheckFormatFlag(cmd)
+		if err != nil {
+			return err
+		}
+
+		jsonResponse, err := utils.MarshalJSON(response, shouldFormat)
 		if err != nil {
 			return fmt.Errorf("cannot marshal response to JSON: %w", err)
 		}
@@ -102,5 +107,5 @@ func init() {
 	listInvoicesCmd.Flags().StringSliceP(utils.InvoiceStatesFlag, "s", []string{}, "List of states")
 	listInvoicesCmd.Flags().IntSliceP(utils.InvoiceBillingYear, "y", []int{}, "Billing year")
 	listInvoicesCmd.Flags().IntSliceP(utils.InvoiceBillingMonth, "m", []int{}, "Billing month")
-	listInvoicesCmd.Flags().BoolP(utils.FormatFlag, "", false, "Format the JSON output")
+	listInvoicesCmd.Flags().StringP(utils.FormatFlag, "z", "false", "Pass true for formatted JSON. Default is false")
 }

@@ -63,7 +63,12 @@ var listWalletsCmd = &cobra.Command{
 			return fmt.Errorf("cannot list users: %w", err)
 		}
 
-		jsonResponse, err := utils.MarshalJSON(response, cmd.Flags().Lookup(utils.FormatFlag).Changed)
+		shouldFormat, err := utils.CheckFormatFlag(cmd)
+		if err != nil {
+			return err
+		}
+
+		jsonResponse, err := utils.MarshalJSON(response, shouldFormat)
 		if err != nil {
 			return fmt.Errorf("cannot marshal response to JSON: %w", err)
 		}
@@ -80,7 +85,7 @@ func init() {
 	listWalletsCmd.Flags().StringP(utils.CursorFlag, "c", "", "Pagination cursor")
 	listWalletsCmd.Flags().StringP(utils.LimitFlag, "l", utils.LimitDefault, "Pagination limit")
 	listWalletsCmd.Flags().StringP(utils.SortDirectionFlag, "d", utils.SortDirectionDefault, "Sort direction")
-	listWalletsCmd.Flags().BoolP(utils.FormatFlag, "", false, "Format the JSON output")
+	listWalletsCmd.Flags().StringP(utils.FormatFlag, "z", "false", "Pass true for formatted JSON. Default is false")
 	listWalletsCmd.Flags().StringP(utils.PortfolioIdFlag, "", "", "Portfolio ID. Uses environment variable if blank")
 
 	listWalletsCmd.MarkFlagRequired(utils.TypeFlag)

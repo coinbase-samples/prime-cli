@@ -48,7 +48,12 @@ var getPortfolioCmd = &cobra.Command{
 			return fmt.Errorf("cannot get portfolio: %w", err)
 		}
 
-		jsonResponse, err := utils.MarshalJSON(response, cmd.Flags().Lookup(utils.FormatFlag).Changed)
+		shouldFormat, err := utils.CheckFormatFlag(cmd)
+		if err != nil {
+			return err
+		}
+
+		jsonResponse, err := utils.MarshalJSON(response, shouldFormat)
 		if err != nil {
 			return fmt.Errorf("cannot marshal response to JSON: %w", err)
 		}
@@ -60,7 +65,7 @@ var getPortfolioCmd = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(getPortfolioCmd)
 
-	getPortfolioCmd.Flags().BoolP(utils.FormatFlag, "", false, "Format the JSON output")
+	getPortfolioCmd.Flags().StringP(utils.FormatFlag, "z", "false", "Pass true for formatted JSON. Default is false")
 	getPortfolioCmd.Flags().StringP(utils.PortfolioIdFlag, "", "", "Portfolio ID. Uses environment variable if blank")
 
 }

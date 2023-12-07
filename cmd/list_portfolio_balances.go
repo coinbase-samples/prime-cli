@@ -58,7 +58,12 @@ var listPortfolioBalancesCmd = &cobra.Command{
 			return fmt.Errorf("cannot list portfolio balances: %w", err)
 		}
 
-		jsonResponse, err := utils.MarshalJSON(response, cmd.Flags().Lookup(utils.FormatFlag).Changed)
+		shouldFormat, err := utils.CheckFormatFlag(cmd)
+		if err != nil {
+			return err
+		}
+
+		jsonResponse, err := utils.MarshalJSON(response, shouldFormat)
 		if err != nil {
 			return fmt.Errorf("cannot marshal response to JSON: %w", err)
 		}
@@ -72,6 +77,6 @@ func init() {
 
 	listPortfolioBalancesCmd.Flags().StringArrayP(utils.TypeFlag, "t", []string{}, "Type of balance")
 	listPortfolioBalancesCmd.Flags().StringSliceP(utils.SymbolsFlag, "s", []string{}, "List of symbols")
-	listPortfolioBalancesCmd.Flags().BoolP(utils.FormatFlag, "", false, "Format the JSON output")
+	listPortfolioBalancesCmd.Flags().StringP(utils.FormatFlag, "z", "false", "Pass true for formatted JSON. Default is false")
 	listPortfolioBalancesCmd.Flags().StringP(utils.PortfolioIdFlag, "", "", "Portfolio ID. Uses environment variable if blank")
 }

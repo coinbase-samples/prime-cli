@@ -51,7 +51,12 @@ var getAllocationCmd = &cobra.Command{
 			return fmt.Errorf("cannot get allocation: %w", err)
 		}
 
-		jsonResponse, err := utils.MarshalJSON(response, cmd.Flags().Lookup(utils.FormatFlag).Changed)
+		shouldFormat, err := utils.CheckFormatFlag(cmd)
+		if err != nil {
+			return err
+		}
+
+		jsonResponse, err := utils.MarshalJSON(response, shouldFormat)
 		if err != nil {
 			return fmt.Errorf("cannot marshal response to JSON: %w", err)
 		}
@@ -64,7 +69,7 @@ func init() {
 	rootCmd.AddCommand(getAllocationCmd)
 
 	getAllocationCmd.Flags().StringP(utils.AllocationIdFlag, "i", "", "ID for allocation lookup (Required)")
-	getAllocationCmd.Flags().BoolP(utils.FormatFlag, "", false, "Format the JSON output")
+	getAllocationCmd.Flags().StringP(utils.FormatFlag, "z", "false", "Pass true for formatted JSON. Default is false")
 	getAllocationCmd.Flags().StringP(utils.PortfolioIdFlag, "", "", "Portfolio ID. Uses environment variable if blank")
 
 	getAllocationCmd.MarkFlagRequired(utils.AllocationIdFlag)

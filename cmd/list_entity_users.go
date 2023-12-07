@@ -51,7 +51,12 @@ var listEntityUsersCmd = &cobra.Command{
 			return fmt.Errorf("cannot list users: %w", err)
 		}
 
-		jsonResponse, err := utils.MarshalJSON(response, cmd.Flags().Lookup(utils.FormatFlag).Changed)
+		shouldFormat, err := utils.CheckFormatFlag(cmd)
+		if err != nil {
+			return err
+		}
+
+		jsonResponse, err := utils.MarshalJSON(response, shouldFormat)
 		if err != nil {
 			return fmt.Errorf("cannot marshal response to JSON: %w", err)
 		}
@@ -66,5 +71,5 @@ func init() {
 	listEntityUsersCmd.Flags().StringP(utils.CursorFlag, "c", "", "Pagination cursor")
 	listEntityUsersCmd.Flags().StringP(utils.LimitFlag, "l", utils.LimitDefault, "Pagination limit")
 	listEntityUsersCmd.Flags().StringP(utils.SortDirectionFlag, "d", utils.SortDirectionDefault, "Sort direction")
-	listEntityUsersCmd.Flags().BoolP(utils.FormatFlag, "", false, "Format the JSON output")
+	listEntityUsersCmd.Flags().StringP(utils.FormatFlag, "z", "false", "Pass true for formatted JSON. Default is false")
 }

@@ -104,3 +104,11 @@ func MarshalJSON(data interface{}, format bool) ([]byte, error) {
 	}
 	return json.Marshal(data)
 }
+
+func CheckFormatFlag(cmd *cobra.Command) (bool, error) {
+	formatFlagValue, err := cmd.Flags().GetString(FormatFlag)
+	if err != nil {
+		return false, fmt.Errorf("error reading format flag: %w", err)
+	}
+	return formatFlagValue == "true", nil
+}

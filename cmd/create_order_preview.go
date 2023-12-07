@@ -63,7 +63,12 @@ var createOrderPreviewCmd = &cobra.Command{
 
 		}
 
-		jsonResponse, err := utils.MarshalJSON(response, cmd.Flags().Lookup(utils.FormatFlag).Changed)
+		shouldFormat, err := utils.CheckFormatFlag(cmd)
+		if err != nil {
+			return err
+		}
+
+		jsonResponse, err := utils.MarshalJSON(response, shouldFormat)
 		if err != nil {
 			return fmt.Errorf("cannot marshal response to JSON: %w", err)
 		}
@@ -84,7 +89,7 @@ func init() {
 	createOrderPreviewCmd.Flags().StringP(utils.LimitPriceFlag, "l", "", "Limit price for the order")
 	createOrderPreviewCmd.Flags().StringP(utils.StartTimeFlag, "", "", "Start time of the order in UTC (TWAP only)")
 	createOrderPreviewCmd.Flags().StringP(utils.ExpiryTimeFlag, "", "", "Expiry time of the order in UTC (TWAP and limit GTDT only)")
-	createOrderPreviewCmd.Flags().BoolP(utils.FormatFlag, "", false, "Format the JSON output")
+	createOrderPreviewCmd.Flags().StringP(utils.FormatFlag, "z", "false", "Pass true for formatted JSON. Default is false")
 	createOrderPreviewCmd.Flags().StringP(utils.PortfolioIdFlag, "", "", "Portfolio ID. Uses environment variable if blank")
 
 	createOrderPreviewCmd.MarkFlagRequired(utils.SideFlag)

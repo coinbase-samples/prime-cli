@@ -65,7 +65,12 @@ var createAllocationCmd = &cobra.Command{
 			return fmt.Errorf("cannot create portfolio allocations: %w", err)
 		}
 
-		jsonResponse, err := utils.MarshalJSON(response, cmd.Flags().Lookup(utils.FormatFlag).Changed)
+		shouldFormat, err := utils.CheckFormatFlag(cmd)
+		if err != nil {
+			return err
+		}
+
+		jsonResponse, err := utils.MarshalJSON(response, shouldFormat)
 		if err != nil {
 			return fmt.Errorf("cannot marshal response to JSON: %w", err)
 		}
@@ -84,7 +89,7 @@ func init() {
 	createAllocationCmd.Flags().StringP(utils.RemainderDestPortfolioIdFlag, "r", "", "ID of the remainder destination portfolio (Required)")
 	createAllocationCmd.Flags().StringP(utils.AllocationLegsFlag, "l", "", "JSON string of allocation legs (Required)")
 	createAllocationCmd.Flags().StringArrayP(utils.OrderIdsFlag, "o", []string{}, "List of order IDs")
-	createAllocationCmd.Flags().BoolP(utils.FormatFlag, "", false, "Format the JSON output")
+	createAllocationCmd.Flags().StringP(utils.FormatFlag, "z", "false", "Pass true for formatted JSON. Default is false")
 
 	createAllocationCmd.MarkFlagRequired(utils.AllocationIdFlag)
 	createAllocationCmd.MarkFlagRequired(utils.SourcePortfolioIdFlag)

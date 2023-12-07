@@ -79,7 +79,12 @@ var listPortfolioTransactionsCmd = &cobra.Command{
 			return fmt.Errorf("cannot list transactions: %w", err)
 		}
 
-		jsonResponse, err := utils.MarshalJSON(response, cmd.Flags().Lookup(utils.FormatFlag).Changed)
+		shouldFormat, err := utils.CheckFormatFlag(cmd)
+		if err != nil {
+			return err
+		}
+
+		jsonResponse, err := utils.MarshalJSON(response, shouldFormat)
 		if err != nil {
 			return fmt.Errorf("cannot marshal response to JSON: %w", err)
 		}
@@ -99,6 +104,6 @@ func init() {
 	listPortfolioTransactionsCmd.Flags().StringP(utils.StartFlag, "s", "", "Start time in RFC3339 format (Required)")
 	listPortfolioTransactionsCmd.Flags().StringP(utils.EndFlag, "e", "", "End time in RFC3339 format")
 	listPortfolioTransactionsCmd.Flags().StringP(utils.SymbolsFlag, "y", "", "Asset symbols")
-	listPortfolioTransactionsCmd.Flags().BoolP(utils.FormatFlag, "", false, "Format the JSON output")
+	listPortfolioTransactionsCmd.Flags().StringP(utils.FormatFlag, "z", "false", "Pass true for formatted JSON. Default is false")
 	listPortfolioTransactionsCmd.Flags().StringP(utils.PortfolioIdFlag, "", "", "Portfolio ID. Uses environment variable if blank")
 }

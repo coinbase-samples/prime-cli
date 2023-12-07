@@ -57,7 +57,12 @@ var getAddressBookCmd = &cobra.Command{
 			return fmt.Errorf("cannot create portfolio allocations: %w", err)
 		}
 
-		jsonResponse, err := utils.MarshalJSON(response, cmd.Flags().Lookup(utils.FormatFlag).Changed)
+		shouldFormat, err := utils.CheckFormatFlag(cmd)
+		if err != nil {
+			return err
+		}
+
+		jsonResponse, err := utils.MarshalJSON(response, shouldFormat)
 		if err != nil {
 			return fmt.Errorf("cannot marshal response to JSON: %w", err)
 		}
@@ -74,7 +79,7 @@ func init() {
 	getAddressBookCmd.Flags().StringP(utils.CursorFlag, "c", "", "Cursor for pagination")
 	getAddressBookCmd.Flags().StringP(utils.LimitFlag, "l", "", "Limit for pagination")
 	getAddressBookCmd.Flags().StringP(utils.SortDirectionFlag, "d", "", "Sort direction for pagination")
-	getAddressBookCmd.Flags().BoolP(utils.FormatFlag, "", false, "Format the JSON output")
+	getAddressBookCmd.Flags().StringP(utils.FormatFlag, "z", "false", "Pass true for formatted JSON. Default is false")
 	getAddressBookCmd.Flags().StringP(utils.PortfolioIdFlag, "", "", "Portfolio ID. Uses environment variable if blank")
 
 }
