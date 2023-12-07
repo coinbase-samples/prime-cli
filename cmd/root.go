@@ -17,6 +17,7 @@
 package cmd
 
 import (
+	"github.com/coinbase-samples/prime-cli/utils"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -35,5 +36,5 @@ func Execute() {
 }
 
 func init() {
-	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	rootCmd.Flags().BoolP(utils.ToggleFlag, "t", false, "Help message for toggle")
 }

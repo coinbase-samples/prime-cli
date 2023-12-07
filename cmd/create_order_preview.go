@@ -17,7 +17,6 @@
 package cmd
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/coinbase-samples/prime-cli/utils"
 	"github.com/coinbase-samples/prime-sdk-go"
@@ -30,14 +29,19 @@ var createOrderPreviewCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		client, err := utils.GetClientFromEnv()
 		if err != nil {
-			return fmt.Errorf("error: %w", err)
+			return fmt.Errorf("failed to initialize client: %w", err)
 		}
 
 		ctx, cancel := utils.GetContextWithTimeout()
 		defer cancel()
 
+		portfolioId := utils.GetFlagStringValue(cmd, utils.PortfolioIdFlag)
+		if portfolioId == "" {
+			portfolioId = client.Credentials.PortfolioId
+		}
+
 		order := &prime.Order{
-			PortfolioId:  client.Credentials.PortfolioId,
+			PortfolioId:  portfolioId,
 			Side:         utils.GetFlagStringValue(cmd, utils.SideFlag),
 			Type:         utils.GetFlagStringValue(cmd, utils.TypeFlag),
 			ProductId:    utils.GetFlagStringValue(cmd, utils.ProductIdFlag),
@@ -55,13 +59,13 @@ var createOrderPreviewCmd = &cobra.Command{
 
 		response, err := client.CreateOrderPreview(ctx, request)
 		if err != nil {
-			return fmt.Errorf("error creating order preview: %w", err)
+			return fmt.Errorf("cannot create order preview: %w", err)
 
 		}
 
-		jsonResponse, err := json.MarshalIndent(response, "", utils.JsonIndent)
+		jsonResponse, err := utils.MarshalJSON(response, cmd.Flags().Lookup(utils.FormatFlag).Changed)
 		if err != nil {
-			return fmt.Errorf("error marshaling response to JSON: %w", err)
+			return fmt.Errorf("cannot marshal response to JSON: %w", err)
 		}
 		fmt.Println(string(jsonResponse))
 		return nil
@@ -72,17 +76,16 @@ func init() {
 	rootCmd.AddCommand(createOrderPreviewCmd)
 
 	createOrderPreviewCmd.Flags().StringP(utils.SideFlag, "s", "", "Order side (Required)")
-	createOrderPreviewCmd.Flags().StringP(utils.ProductIdFlag, "p", "", "ID of the product (Required)")
+	createOrderPreviewCmd.Flags().StringP(utils.ProductIdFlag, "i", "", "ID of the product (Required)")
 	createOrderPreviewCmd.Flags().StringP(utils.TypeFlag, "t", "", "Type of the order (Required)")
-
 	createOrderPreviewCmd.Flags().StringP(utils.BaseQuantityFlag, "b", "", "Order size in base asset units")
 	createOrderPreviewCmd.Flags().StringP(utils.QuoteValueFlag, "q", "", "Order size in quote asset units")
-
 	createOrderPreviewCmd.Flags().StringP(utils.TimeInForceFlag, "f", "", "Determine order fill strategy")
-
 	createOrderPreviewCmd.Flags().StringP(utils.LimitPriceFlag, "l", "", "Limit price for the order")
-	createOrderPreviewCmd.Flags().StringP(utils.StartTimeFlag, "", "", "The start time of the order in UTC (TWAP only)")
-	createOrderPreviewCmd.Flags().StringP(utils.ExpiryTimeFlag, "", "", "The expiry time of the order in UTC (TWAP and limit GTDT only)")
+	createOrderPreviewCmd.Flags().StringP(utils.StartTimeFlag, "", "", "Start time of the order in UTC (TWAP only)")
+	createOrderPreviewCmd.Flags().StringP(utils.ExpiryTimeFlag, "", "", "Expiry time of the order in UTC (TWAP and limit GTDT only)")
+	createOrderPreviewCmd.Flags().BoolP(utils.FormatFlag, "", false, "Format the JSON output")
+	createOrderPreviewCmd.Flags().StringP(utils.PortfolioIdFlag, "", "", "Portfolio ID. Uses environment variable if blank")
 
 	createOrderPreviewCmd.MarkFlagRequired(utils.SideFlag)
 	createOrderPreviewCmd.MarkFlagRequired(utils.ProductIdFlag)

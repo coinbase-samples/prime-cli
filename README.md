@@ -35,6 +35,7 @@ export PRIME_CREDENTIALS='{
 }'
 ```
 
+You may also pass an environment variable called `primeCliTimeout` which will override the default request timeout of 7 seconds. This value should be an integer in seconds. 
 
 Build the application binary and specify an output name, e.g. `primectl`:
 
@@ -47,10 +48,11 @@ To ensure your project's dependencies are up-to-date, run:
 go mod tidy
 ```
 
-To make your application easily accessible from any location, move the binary you created to a directory that's already in your system's PATH. For example, this is the command to move `primectl` to `/usr/local/bin`:
+To make your application easily accessible from any location, move the binary you created to a directory that's already in your system's PATH. For example, these are the commands to move `primectl` to `/usr/local/bin`, as well as set permissions to reduce risk:
 
 ```
 sudo mv primectl /usr/local/bin/
+chmod 755 /usr/local/bin/primectl
 ```
 
 To verify that your application is installed correctly and accessible from any location, run the following command. It will include all available requests:
@@ -59,7 +61,7 @@ To verify that your application is installed correctly and accessible from any l
 primectl
 ```
 
-Finally, to run commands for each endpoint, use the following format to run each endpoint. Please note that many endpoints require flags, which are specified with the `--help` flag. 
+Finally, to run commands for each endpoint, use the following format to test each endpoint. Please note that many endpoints require flags, which are detailed with the `--help` flag. 
 
 ```
 primectl list-portfolios
@@ -70,5 +72,5 @@ primectl create-order --help
 ```
 
 ```
-primectl create-order -b 0.001 -i ETH-USD -s BUY -t MARKET
+primectl create-order-preview -b 0.001 -i ETH-USD -s BUY -t MARKET
 ```

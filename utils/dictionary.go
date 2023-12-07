@@ -88,4 +88,14 @@ const (
 	TifGoodUntilDateTime  = "GOOD_UNTIL_DATE_TIME"
 	TifGoodUntilCancelled = "GOOD_UNTIL_CANCELLED"
 	TifImmediateOrCancel  = "IMMEDIATE_OR_CANCEL"
+
+	FormatFlag = "format"
+	ToggleFlag = "toggle"
+
+	PortfolioIdFlag    = "portfolio-id"
+	IdempotencyKeyFlag = "idempotency-key"
+	ClientOrderIdFlag  = "client-order-id"
+
+	LimitDefault         = "100"
+	SortDirectionDefault = "DESC"
 )

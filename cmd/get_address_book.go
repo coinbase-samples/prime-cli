@@ -17,7 +17,6 @@
 package cmd
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/coinbase-samples/prime-cli/utils"
 	"github.com/coinbase-samples/prime-sdk-go"
@@ -31,11 +30,16 @@ var getAddressBookCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		client, err := utils.GetClientFromEnv()
 		if err != nil {
-			return fmt.Errorf("error: %w", err)
+			return fmt.Errorf("failed to initialize client: %w", err)
 		}
 
 		ctx, cancel := utils.GetContextWithTimeout()
 		defer cancel()
+
+		portfolioId := utils.GetFlagStringValue(cmd, utils.PortfolioIdFlag)
+		if portfolioId == "" {
+			portfolioId = client.Credentials.PortfolioId
+		}
 
 		pagination, err := utils.GetPaginationParams(cmd)
 		if err != nil {
@@ -43,19 +47,19 @@ var getAddressBookCmd = &cobra.Command{
 		}
 
 		request := &prime.GetAddressBookRequest{
-			PortfolioId: client.Credentials.PortfolioId,
+			PortfolioId: portfolioId,
 			Symbol:      utils.GetFlagStringValue(cmd, utils.SymbolFlag),
 			Search:      utils.GetFlagStringValue(cmd, utils.SearchFlag),
 			Pagination:  pagination,
 		}
 		response, err := client.GetAddressBook(ctx, request)
 		if err != nil {
-			return fmt.Errorf("error creating portfolio allocations: %v", err)
+			return fmt.Errorf("cannot create portfolio allocations: %w", err)
 		}
 
-		jsonResponse, err := json.MarshalIndent(response, "", utils.JsonIndent)
+		jsonResponse, err := utils.MarshalJSON(response, cmd.Flags().Lookup(utils.FormatFlag).Changed)
 		if err != nil {
-			return fmt.Errorf("error marshaling response to JSON: %v", err)
+			return fmt.Errorf("cannot marshal response to JSON: %w", err)
 		}
 		fmt.Println(string(jsonResponse))
 		return nil
@@ -70,4 +74,7 @@ func init() {
 	getAddressBookCmd.Flags().StringP(utils.CursorFlag, "c", "", "Cursor for pagination")
 	getAddressBookCmd.Flags().StringP(utils.LimitFlag, "l", "", "Limit for pagination")
 	getAddressBookCmd.Flags().StringP(utils.SortDirectionFlag, "d", "", "Sort direction for pagination")
+	getAddressBookCmd.Flags().BoolP(utils.FormatFlag, "", false, "Format the JSON output")
+	getAddressBookCmd.Flags().StringP(utils.PortfolioIdFlag, "", "", "Portfolio ID. Uses environment variable if blank")
+
 }

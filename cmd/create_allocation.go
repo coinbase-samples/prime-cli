@@ -29,7 +29,7 @@ var createAllocationCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		client, err := utils.GetClientFromEnv()
 		if err != nil {
-			return fmt.Errorf("error: %w", err)
+			return fmt.Errorf("failed to initialize client: %w", err)
 		}
 
 		ctx, cancel := utils.GetContextWithTimeout()
@@ -37,17 +37,17 @@ var createAllocationCmd = &cobra.Command{
 
 		orderIds, err := cmd.Flags().GetStringArray(utils.OrderIdsFlag)
 		if err != nil {
-			return fmt.Errorf("error: %w", err)
+			return fmt.Errorf("cannot get order ids: %w", err)
 		}
 
 		allocationLegsJson, err := cmd.Flags().GetString(utils.AllocationLegsFlag)
 		if err != nil {
-			return fmt.Errorf("error: %w", err)
+			return fmt.Errorf("cannot get allocatio legs: %w", err)
 		}
 
 		var allocationLegs []*prime.AllocationLeg
 		if err := json.Unmarshal([]byte(allocationLegsJson), &allocationLegs); err != nil {
-			return fmt.Errorf("invalid allocation legs format: %v", err)
+			return fmt.Errorf("invalid allocation legs format: %w", err)
 		}
 
 		request := &prime.CreatePortfolioAllocationsRequest{
@@ -62,12 +62,12 @@ var createAllocationCmd = &cobra.Command{
 
 		response, err := client.CreatePortfolioAllocations(ctx, request)
 		if err != nil {
-			return fmt.Errorf("error creating portfolio allocations: %v", err)
+			return fmt.Errorf("cannot create portfolio allocations: %w", err)
 		}
 
-		jsonResponse, err := json.MarshalIndent(response, "", utils.JsonIndent)
+		jsonResponse, err := utils.MarshalJSON(response, cmd.Flags().Lookup(utils.FormatFlag).Changed)
 		if err != nil {
-			return fmt.Errorf("error marshaling response to JSON: %v", err)
+			return fmt.Errorf("cannot marshal response to JSON: %w", err)
 		}
 		fmt.Println(string(jsonResponse))
 		return nil
@@ -80,10 +80,11 @@ func init() {
 	createAllocationCmd.Flags().StringP(utils.AllocationIdFlag, "i", "", "ID of the allocation (Required)")
 	createAllocationCmd.Flags().StringP(utils.SourcePortfolioIdFlag, "s", "", "ID of the source portfolio (Required)")
 	createAllocationCmd.Flags().StringP(utils.ProductIdFlag, "p", "", "ID of the product (Required)")
-	createAllocationCmd.Flags().StringArrayP(utils.OrderIdsFlag, "o", []string{}, "List of order IDs")
 	createAllocationCmd.Flags().StringP(utils.SizeTypeFlag, "t", "", "Size type of the allocation (Required)")
 	createAllocationCmd.Flags().StringP(utils.RemainderDestPortfolioIdFlag, "r", "", "ID of the remainder destination portfolio (Required)")
 	createAllocationCmd.Flags().StringP(utils.AllocationLegsFlag, "l", "", "JSON string of allocation legs (Required)")
+	createAllocationCmd.Flags().StringArrayP(utils.OrderIdsFlag, "o", []string{}, "List of order IDs")
+	createAllocationCmd.Flags().BoolP(utils.FormatFlag, "", false, "Format the JSON output")
 
 	createAllocationCmd.MarkFlagRequired(utils.AllocationIdFlag)
 	createAllocationCmd.MarkFlagRequired(utils.SourcePortfolioIdFlag)
@@ -91,5 +92,4 @@ func init() {
 	createAllocationCmd.MarkFlagRequired(utils.SizeTypeFlag)
 	createAllocationCmd.MarkFlagRequired(utils.RemainderDestPortfolioIdFlag)
 	createAllocationCmd.MarkFlagRequired(utils.AllocationLegsFlag)
-
 }

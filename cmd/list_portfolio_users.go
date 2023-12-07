@@ -17,7 +17,6 @@
 package cmd
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/coinbase-samples/prime-cli/utils"
 	"github.com/coinbase-samples/prime-sdk-go"
@@ -31,11 +30,16 @@ var listPortfolioUsersCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		client, err := utils.GetClientFromEnv()
 		if err != nil {
-			return fmt.Errorf("error: %w", err)
+			return fmt.Errorf("failed to initialize client: %w", err)
 		}
 
 		ctx, cancel := utils.GetContextWithTimeout()
 		defer cancel()
+
+		portfolioId := utils.GetFlagStringValue(cmd, utils.PortfolioIdFlag)
+		if portfolioId == "" {
+			portfolioId = client.Credentials.PortfolioId
+		}
 
 		pagination, err := utils.GetPaginationParams(cmd)
 		if err != nil {
@@ -43,18 +47,18 @@ var listPortfolioUsersCmd = &cobra.Command{
 		}
 
 		request := &prime.ListPortfolioUsersRequest{
-			PortfolioId: client.Credentials.PortfolioId,
+			PortfolioId: portfolioId,
 			Pagination:  pagination,
 		}
 
 		response, err := client.ListPortfolioUsers(ctx, request)
 		if err != nil {
-			return fmt.Errorf("error listing users: %v", err)
+			return fmt.Errorf("cannot list users: %w", err)
 		}
 
-		jsonResponse, err := json.MarshalIndent(response, "", utils.JsonIndent)
+		jsonResponse, err := utils.MarshalJSON(response, cmd.Flags().Lookup(utils.FormatFlag).Changed)
 		if err != nil {
-			return fmt.Errorf("error marshaling response to JSON: %v", err)
+			return fmt.Errorf("cannot marshal response to JSON: %w", err)
 		}
 		fmt.Println(string(jsonResponse))
 		return nil
@@ -65,7 +69,9 @@ func init() {
 	rootCmd.AddCommand(listPortfolioUsersCmd)
 
 	listPortfolioUsersCmd.Flags().StringP(utils.CursorFlag, "c", "", "Pagination cursor")
-	listPortfolioUsersCmd.Flags().StringP(utils.LimitFlag, "l", "", "Pagination limit")
-	listPortfolioUsersCmd.Flags().StringP(utils.SortDirectionFlag, "d", "", "Sort direction")
+	listPortfolioUsersCmd.Flags().StringP(utils.LimitFlag, "l", utils.LimitDefault, "Pagination limit")
+	listPortfolioUsersCmd.Flags().StringP(utils.SortDirectionFlag, "d", utils.SortDirectionDefault, "Sort direction")
+	listPortfolioUsersCmd.Flags().BoolP(utils.FormatFlag, "", false, "Format the JSON output")
+	listPortfolioUsersCmd.Flags().StringP(utils.PortfolioIdFlag, "", "", "Portfolio ID. Uses environment variable if blank")
 
 }

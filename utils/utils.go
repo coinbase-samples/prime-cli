@@ -29,7 +29,7 @@ import (
 )
 
 func getDefaultTimeoutDuration() time.Duration {
-	envTimeout := os.Getenv("appTimeout")
+	envTimeout := os.Getenv("primeCliTimeout")
 	if envTimeout != "" {
 		if value, err := strconv.Atoi(envTimeout); err == nil && value > 0 {
 			return time.Duration(value) * time.Second
@@ -46,7 +46,7 @@ func GetContextWithTimeout() (context.Context, context.CancelFunc) {
 func GetClientFromEnv() (*prime.Client, error) {
 	credentials := &prime.Credentials{}
 	if err := json.Unmarshal([]byte(os.Getenv("PRIME_CREDENTIALS")), credentials); err != nil {
-		return nil, fmt.Errorf("Error unmarshaling credentials: %w", err)
+		return nil, fmt.Errorf("cannot unmarshal credentials: %w", err)
 	}
 
 	client := prime.NewClient(credentials, http.Client{})
@@ -61,15 +61,16 @@ func GetFlagStringValue(cmd *cobra.Command, flagName string) string {
 func GetPaginationParams(cmd *cobra.Command) (*prime.PaginationParams, error) {
 	cursor, err := cmd.Flags().GetString("cursor")
 	if err != nil {
-		return nil, fmt.Errorf("error parsing cursor: %w", err)
+		return nil, fmt.Errorf("cannot parse cursor: %w", err)
 	}
 	limit, err := cmd.Flags().GetString("limit")
 	if err != nil {
-		return nil, fmt.Errorf("error parsing limit: %w", err)
+		return nil, fmt.Errorf("cannot parse limit: %w", err)
 	}
+
 	sortDirection, err := cmd.Flags().GetString("sort-direction")
 	if err != nil {
-		return nil, fmt.Errorf("error parsing sort direction: %w", err)
+		return nil, fmt.Errorf("cannot parse sort direction: %w", err)
 	}
 
 	return &prime.PaginationParams{
@@ -95,4 +96,11 @@ func ParseDateRange(startStr, endStr string) (time.Time, time.Time, error) {
 		}
 	}
 	return start, end, nil
+}
+
+func MarshalJSON(data interface{}, format bool) ([]byte, error) {
+	if format {
+		return json.MarshalIndent(data, "", JsonIndent)
+	}
+	return json.Marshal(data)
 }

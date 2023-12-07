@@ -17,7 +17,6 @@
 package cmd
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/coinbase-samples/prime-cli/utils"
 	"github.com/coinbase-samples/prime-sdk-go"
@@ -31,11 +30,16 @@ var listWalletTransactionsCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		client, err := utils.GetClientFromEnv()
 		if err != nil {
-			return fmt.Errorf("error: %w", err)
+			return fmt.Errorf("failed to initialize client: %w", err)
 		}
 
 		ctx, cancel := utils.GetContextWithTimeout()
 		defer cancel()
+
+		portfolioId := utils.GetFlagStringValue(cmd, utils.PortfolioIdFlag)
+		if portfolioId == "" {
+			portfolioId = client.Credentials.PortfolioId
+		}
 
 		types, err := cmd.Flags().GetStringSlice(utils.TypesFlag)
 		if err != nil {
@@ -63,7 +67,7 @@ var listWalletTransactionsCmd = &cobra.Command{
 		}
 
 		request := &prime.ListWalletTransactionsRequest{
-			PortfolioId: client.Credentials.PortfolioId,
+			PortfolioId: portfolioId,
 			WalletId:    utils.GetFlagStringValue(cmd, utils.WalletIdFlag),
 			Types:       types,
 			Start:       start,
@@ -73,12 +77,12 @@ var listWalletTransactionsCmd = &cobra.Command{
 
 		response, err := client.ListWalletTransactions(ctx, request)
 		if err != nil {
-			return fmt.Errorf("error listing transactions: %w", err)
+			return fmt.Errorf("cannot list transactions: %w", err)
 		}
 
-		jsonResponse, err := json.MarshalIndent(response, "", utils.JsonIndent)
+		jsonResponse, err := utils.MarshalJSON(response, cmd.Flags().Lookup(utils.FormatFlag).Changed)
 		if err != nil {
-			return fmt.Errorf("error marshaling response to JSON: %w", err)
+			return fmt.Errorf("cannot marshal response to JSON: %w", err)
 		}
 		fmt.Println(string(jsonResponse))
 
@@ -92,12 +96,13 @@ func init() {
 	listWalletTransactionsCmd.Flags().StringP(utils.WalletIdFlag, "i", "", "ID for given wallet")
 	listWalletTransactionsCmd.Flags().StringSliceP(utils.TypesFlag, "t", []string{}, "Types of transactions")
 	listWalletTransactionsCmd.Flags().StringP(utils.CursorFlag, "c", "", "Pagination cursor")
-	listWalletTransactionsCmd.Flags().StringP(utils.LimitFlag, "l", "", "Pagination limit")
-	listWalletTransactionsCmd.Flags().StringP(utils.SortDirectionFlag, "d", "", "Sort direction")
+	listWalletTransactionsCmd.Flags().StringP(utils.LimitFlag, "l", utils.LimitDefault, "Pagination limit")
+	listWalletTransactionsCmd.Flags().StringP(utils.SortDirectionFlag, "d", utils.SortDirectionDefault, "Sort direction")
 	listWalletTransactionsCmd.Flags().StringP(utils.StartFlag, "s", "", "Start time in RFC3339 format (Required)")
 	listWalletTransactionsCmd.Flags().StringP(utils.EndFlag, "e", "", "End time in RFC3339 format")
 	listWalletTransactionsCmd.Flags().StringP(utils.SymbolsFlag, "y", "", "Asset symbols")
+	listWalletTransactionsCmd.Flags().BoolP(utils.FormatFlag, "", false, "Format the JSON output")
+	listWalletTransactionsCmd.Flags().StringP(utils.PortfolioIdFlag, "", "", "Portfolio ID. Uses environment variable if blank")
 
 	listWalletTransactionsCmd.MarkFlagRequired(utils.WalletIdFlag)
-
 }

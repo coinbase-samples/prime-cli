@@ -17,7 +17,6 @@
 package cmd
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/coinbase-samples/prime-cli/utils"
 	"github.com/coinbase-samples/prime-sdk-go"
@@ -31,25 +30,30 @@ var getTransactionCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		client, err := utils.GetClientFromEnv()
 		if err != nil {
-			return fmt.Errorf("error: %w", err)
+			return fmt.Errorf("failed to initialize client: %w", err)
 		}
 
 		ctx, cancel := utils.GetContextWithTimeout()
 		defer cancel()
 
+		portfolioId := utils.GetFlagStringValue(cmd, utils.PortfolioIdFlag)
+		if portfolioId == "" {
+			portfolioId = client.Credentials.PortfolioId
+		}
+
 		request := &prime.GetTransactionRequest{
-			PortfolioId:   client.Credentials.PortfolioId,
+			PortfolioId:   portfolioId,
 			TransactionId: utils.GetFlagStringValue(cmd, utils.TransactionIdFlag),
 		}
 
 		response, err := client.GetTransaction(ctx, request)
 		if err != nil {
-			return fmt.Errorf("error getting transaction: %w", err)
+			return fmt.Errorf("cannot get transaction: %w", err)
 		}
 
-		jsonResponse, err := json.MarshalIndent(response, "", utils.JsonIndent)
+		jsonResponse, err := utils.MarshalJSON(response, cmd.Flags().Lookup(utils.FormatFlag).Changed)
 		if err != nil {
-			return fmt.Errorf("error marshaling response to JSON: %w", err)
+			return fmt.Errorf("cannot marshal response to JSON: %w", err)
 		}
 		fmt.Println(string(jsonResponse))
 
@@ -61,6 +65,8 @@ func init() {
 	rootCmd.AddCommand(getTransactionCmd)
 
 	getTransactionCmd.Flags().StringP(utils.TransactionIdFlag, "i", "", "Transaction ID (Required)")
+	getTransactionCmd.Flags().BoolP(utils.FormatFlag, "", false, "Format the JSON output")
+	getTransactionCmd.Flags().StringP(utils.PortfolioIdFlag, "", "", "Portfolio ID. Uses environment variable if blank")
 
 	getTransactionCmd.MarkFlagRequired(utils.TransactionIdFlag)
 }

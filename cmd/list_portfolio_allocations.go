@@ -17,7 +17,6 @@
 package cmd
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/coinbase-samples/prime-cli/utils"
 	"github.com/coinbase-samples/prime-sdk-go"
@@ -30,11 +29,16 @@ var listPortfolioAllocationsCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		client, err := utils.GetClientFromEnv()
 		if err != nil {
-			return fmt.Errorf("error: %w", err)
+			return fmt.Errorf("failed to initialize client: %w", err)
 		}
 
 		ctx, cancel := utils.GetContextWithTimeout()
 		defer cancel()
+
+		portfolioId := utils.GetFlagStringValue(cmd, utils.PortfolioIdFlag)
+		if portfolioId == "" {
+			portfolioId = client.Credentials.PortfolioId
+		}
 
 		productIds, err := cmd.Flags().GetStringSlice(utils.ProductIdsFlag)
 		if err != nil {
@@ -62,7 +66,7 @@ var listPortfolioAllocationsCmd = &cobra.Command{
 		}
 
 		request := &prime.ListPortfolioAllocationsRequest{
-			PortfolioId: client.Credentials.PortfolioId,
+			PortfolioId: portfolioId,
 			ProductIds:  productIds,
 			Side:        utils.GetFlagStringValue(cmd, utils.OrderSideFlag),
 			Start:       start,
@@ -72,12 +76,12 @@ var listPortfolioAllocationsCmd = &cobra.Command{
 
 		response, err := client.ListPortfolioAllocations(ctx, request)
 		if err != nil {
-			return fmt.Errorf("error listing allocations: %w", err)
+			return fmt.Errorf("cannot list allocations: %w", err)
 		}
 
-		jsonResponse, err := json.MarshalIndent(response, "", utils.JsonIndent)
+		jsonResponse, err := utils.MarshalJSON(response, cmd.Flags().Lookup(utils.FormatFlag).Changed)
 		if err != nil {
-			return fmt.Errorf("error marshaling response to JSON: %w", err)
+			return fmt.Errorf("cannot marshal response to JSON: %w", err)
 		}
 		fmt.Println(string(jsonResponse))
 
@@ -90,11 +94,13 @@ func init() {
 
 	listPortfolioAllocationsCmd.Flags().StringSliceP(utils.ProductIdsFlag, "p", []string{}, "List of product IDs")
 	listPortfolioAllocationsCmd.Flags().StringP(utils.CursorFlag, "c", "", "Pagination cursor")
-	listPortfolioAllocationsCmd.Flags().StringP(utils.LimitFlag, "l", "", "Pagination limit")
-	listPortfolioAllocationsCmd.Flags().StringP(utils.SortDirectionFlag, "d", "", "Sort direction")
+	listPortfolioAllocationsCmd.Flags().StringP(utils.LimitFlag, "l", utils.LimitDefault, "Pagination limit")
+	listPortfolioAllocationsCmd.Flags().StringP(utils.SortDirectionFlag, "d", utils.SortDirectionDefault, "Sort direction")
 	listPortfolioAllocationsCmd.Flags().StringP(utils.StartFlag, "s", "", "Start time in RFC3339 format (Required)")
 	listPortfolioAllocationsCmd.Flags().StringP(utils.EndFlag, "e", "", "End time in RFC3339 format")
 	listPortfolioAllocationsCmd.Flags().StringP(utils.OrderSideFlag, "o", "", "Side of orders")
+	listPortfolioAllocationsCmd.Flags().BoolP(utils.FormatFlag, "", false, "Format the JSON output")
+	listPortfolioAllocationsCmd.Flags().StringP(utils.PortfolioIdFlag, "", "", "Portfolio ID. Uses environment variable if blank")
 
 	listPortfolioAllocationsCmd.MarkFlagRequired(utils.StartFlag)
 }

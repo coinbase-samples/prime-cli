@@ -17,7 +17,6 @@
 package cmd
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/coinbase-samples/prime-cli/utils"
 	"github.com/coinbase-samples/prime-sdk-go"
@@ -31,11 +30,16 @@ var listOrdersCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		client, err := utils.GetClientFromEnv()
 		if err != nil {
-			return fmt.Errorf("error: %w", err)
+			return fmt.Errorf("failed to initialize client: %w", err)
 		}
 
 		ctx, cancel := utils.GetContextWithTimeout()
 		defer cancel()
+
+		portfolioId := utils.GetFlagStringValue(cmd, utils.PortfolioIdFlag)
+		if portfolioId == "" {
+			portfolioId = client.Credentials.PortfolioId
+		}
 
 		productIds, err := cmd.Flags().GetStringSlice(utils.ProductIdsFlag)
 		if err != nil {
@@ -82,7 +86,7 @@ var listOrdersCmd = &cobra.Command{
 		}
 
 		request := &prime.ListOrdersRequest{
-			PortfolioId: client.Credentials.PortfolioId,
+			PortfolioId: portfolioId,
 			Statuses:    statuses,
 			ProductIds:  productIds,
 			Type:        orderType,
@@ -94,12 +98,12 @@ var listOrdersCmd = &cobra.Command{
 
 		response, err := client.ListOrders(ctx, request)
 		if err != nil {
-			return fmt.Errorf("error listing orders: %v", err)
+			return fmt.Errorf("cannot list orders: %w", err)
 		}
 
-		jsonResponse, err := json.MarshalIndent(response, "", utils.JsonIndent)
+		jsonResponse, err := utils.MarshalJSON(response, cmd.Flags().Lookup(utils.FormatFlag).Changed)
 		if err != nil {
-			return fmt.Errorf("error marshaling response to JSON: %v", err)
+			return fmt.Errorf("cannot marshal response to JSON: %w", err)
 		}
 		fmt.Println(string(jsonResponse))
 		return nil
@@ -110,14 +114,16 @@ func init() {
 	rootCmd.AddCommand(listOrdersCmd)
 
 	listOrdersCmd.Flags().StringP(utils.CursorFlag, "c", "", "Pagination cursor")
-	listOrdersCmd.Flags().StringP(utils.LimitFlag, "l", "", "Pagination limit")
-	listOrdersCmd.Flags().StringP(utils.SortDirectionFlag, "d", "", "Sort direction")
+	listOrdersCmd.Flags().StringP(utils.LimitFlag, "l", utils.LimitDefault, "Pagination limit")
+	listOrdersCmd.Flags().StringP(utils.SortDirectionFlag, "d", utils.SortDirectionDefault, "Sort direction")
 	listOrdersCmd.Flags().StringSliceP(utils.OrderStatusesFlag, "r", []string{}, "List of statuses")
 	listOrdersCmd.Flags().StringSliceP(utils.ProductIdsFlag, "p", []string{}, "List of product IDs")
 	listOrdersCmd.Flags().StringP(utils.OrderTypeFlag, "t", "", "Type of orders")
 	listOrdersCmd.Flags().StringP(utils.OrderSideFlag, "o", "", "Side of orders")
 	listOrdersCmd.Flags().StringP(utils.StartFlag, "s", "", "Start time in RFC3339 format")
 	listOrdersCmd.Flags().StringP(utils.EndFlag, "e", "", "End time in RFC3339 format")
+	listOrdersCmd.Flags().BoolP(utils.FormatFlag, "", false, "Format the JSON output")
+	listOrdersCmd.Flags().StringP(utils.PortfolioIdFlag, "", "", "Portfolio ID. Uses environment variable if blank")
 
 	listOrdersCmd.MarkFlagRequired(utils.StartFlag)
 }

@@ -17,7 +17,6 @@
 package cmd
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/coinbase-samples/prime-cli/utils"
 	"github.com/coinbase-samples/prime-sdk-go"
@@ -32,31 +31,36 @@ var listPortfolioBalancesCmd = &cobra.Command{
 
 		client, err := utils.GetClientFromEnv()
 		if err != nil {
-			return fmt.Errorf("error: %w", err)
+			return fmt.Errorf("failed to initialize client: %w", err)
 		}
 
 		ctx, cancel := utils.GetContextWithTimeout()
 		defer cancel()
 
+		portfolioId := utils.GetFlagStringValue(cmd, utils.PortfolioIdFlag)
+		if portfolioId == "" {
+			portfolioId = client.Credentials.PortfolioId
+		}
+
 		symbols, err := cmd.Flags().GetStringSlice(utils.SymbolsFlag)
 		if err != nil {
-			return fmt.Errorf("error: %w", err)
+			return fmt.Errorf("cannot get symbols: %w", err)
 		}
 
 		request := &prime.ListPortfolioBalancesRequest{
-			PortfolioId: client.Credentials.PortfolioId,
+			PortfolioId: portfolioId,
 			Type:        utils.GetFlagStringValue(cmd, utils.TypeFlag),
 			Symbols:     symbols,
 		}
 
 		response, err := client.ListPortfolioBalances(ctx, request)
 		if err != nil {
-			return fmt.Errorf("error listing portfolio balances: %v", err)
+			return fmt.Errorf("cannot list portfolio balances: %w", err)
 		}
 
-		jsonResponse, err := json.MarshalIndent(response, "", utils.JsonIndent)
+		jsonResponse, err := utils.MarshalJSON(response, cmd.Flags().Lookup(utils.FormatFlag).Changed)
 		if err != nil {
-			return fmt.Errorf("error marshaling response to JSON: %v", err)
+			return fmt.Errorf("cannot marshal response to JSON: %w", err)
 		}
 		fmt.Println(string(jsonResponse))
 		return nil
@@ -68,4 +72,6 @@ func init() {
 
 	listPortfolioBalancesCmd.Flags().StringArrayP(utils.TypeFlag, "t", []string{}, "Type of balance")
 	listPortfolioBalancesCmd.Flags().StringSliceP(utils.SymbolsFlag, "s", []string{}, "List of symbols")
+	listPortfolioBalancesCmd.Flags().BoolP(utils.FormatFlag, "", false, "Format the JSON output")
+	listPortfolioBalancesCmd.Flags().StringP(utils.PortfolioIdFlag, "", "", "Portfolio ID. Uses environment variable if blank")
 }

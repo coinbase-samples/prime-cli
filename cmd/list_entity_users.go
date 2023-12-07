@@ -17,7 +17,6 @@
 package cmd
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/coinbase-samples/prime-cli/utils"
 	"github.com/coinbase-samples/prime-sdk-go"
@@ -31,7 +30,7 @@ var listEntityUsersCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		client, err := utils.GetClientFromEnv()
 		if err != nil {
-			return fmt.Errorf("error: %w", err)
+			return fmt.Errorf("failed to initialize client: %w", err)
 		}
 
 		ctx, cancel := utils.GetContextWithTimeout()
@@ -49,12 +48,12 @@ var listEntityUsersCmd = &cobra.Command{
 
 		response, err := client.ListEntityUsers(ctx, request)
 		if err != nil {
-			return fmt.Errorf("error listing users: %v", err)
+			return fmt.Errorf("cannot list users: %w", err)
 		}
 
-		jsonResponse, err := json.MarshalIndent(response, "", utils.JsonIndent)
+		jsonResponse, err := utils.MarshalJSON(response, cmd.Flags().Lookup(utils.FormatFlag).Changed)
 		if err != nil {
-			return fmt.Errorf("error marshaling response to JSON: %v", err)
+			return fmt.Errorf("cannot marshal response to JSON: %w", err)
 		}
 		fmt.Println(string(jsonResponse))
 		return nil
@@ -65,7 +64,7 @@ func init() {
 	rootCmd.AddCommand(listEntityUsersCmd)
 
 	listEntityUsersCmd.Flags().StringP(utils.CursorFlag, "c", "", "Pagination cursor")
-	listEntityUsersCmd.Flags().StringP(utils.LimitFlag, "l", "", "Pagination limit")
-	listEntityUsersCmd.Flags().StringP(utils.SortDirectionFlag, "d", "", "Sort direction")
-
+	listEntityUsersCmd.Flags().StringP(utils.LimitFlag, "l", utils.LimitDefault, "Pagination limit")
+	listEntityUsersCmd.Flags().StringP(utils.SortDirectionFlag, "d", utils.SortDirectionDefault, "Sort direction")
+	listEntityUsersCmd.Flags().BoolP(utils.FormatFlag, "", false, "Format the JSON output")
 }

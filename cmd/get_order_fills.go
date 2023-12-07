@@ -17,7 +17,6 @@
 package cmd
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/coinbase-samples/prime-cli/utils"
 	"github.com/coinbase-samples/prime-sdk-go"
@@ -30,11 +29,16 @@ var getOrderFillsCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		client, err := utils.GetClientFromEnv()
 		if err != nil {
-			return fmt.Errorf("error: %w", err)
+			return fmt.Errorf("failed to initialize client: %w", err)
 		}
 
 		ctx, cancel := utils.GetContextWithTimeout()
 		defer cancel()
+
+		portfolioId := utils.GetFlagStringValue(cmd, utils.PortfolioIdFlag)
+		if portfolioId == "" {
+			portfolioId = client.Credentials.PortfolioId
+		}
 
 		pagination, err := utils.GetPaginationParams(cmd)
 		if err != nil {
@@ -42,19 +46,19 @@ var getOrderFillsCmd = &cobra.Command{
 		}
 
 		request := &prime.ListOrderFillsRequest{
-			PortfolioId: client.Credentials.PortfolioId,
+			PortfolioId: portfolioId,
 			OrderId:     utils.GetFlagStringValue(cmd, utils.OrderIdFlag),
 			Pagination:  pagination,
 		}
 
 		response, err := client.ListOrderFills(ctx, request)
 		if err != nil {
-			return fmt.Errorf("error getting order fills: %w", err)
+			return fmt.Errorf("cannot get order fills: %w", err)
 		}
 
-		jsonResponse, err := json.MarshalIndent(response, "", utils.JsonIndent)
+		jsonResponse, err := utils.MarshalJSON(response, cmd.Flags().Lookup(utils.FormatFlag).Changed)
 		if err != nil {
-			return fmt.Errorf("error marshaling response to JSON: %w", err)
+			return fmt.Errorf("cannot marshal response to JSON: %w", err)
 		}
 		fmt.Println(string(jsonResponse))
 
@@ -65,10 +69,12 @@ var getOrderFillsCmd = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(getOrderFillsCmd)
 
-	getOrderFillsCmd.Flags().StringP(utils.CursorFlag, "c", "", "Pagination cursor")
-	getOrderFillsCmd.Flags().StringP(utils.LimitFlag, "l", "", "Pagination limit")
-	getOrderFillsCmd.Flags().StringP(utils.SortDirectionFlag, "d", "", "Sort direction")
 	getOrderFillsCmd.Flags().StringP(utils.OrderIdFlag, "i", "", "Order ID (Required)")
+	getOrderFillsCmd.Flags().StringP(utils.CursorFlag, "c", "", "Pagination cursor")
+	getOrderFillsCmd.Flags().StringP(utils.LimitFlag, "l", utils.LimitDefault, "Pagination limit")
+	getOrderFillsCmd.Flags().StringP(utils.SortDirectionFlag, "d", utils.SortDirectionDefault, "Sort direction")
+	getOrderFillsCmd.Flags().BoolP(utils.FormatFlag, "", false, "Format the JSON output")
+	getOrderFillsCmd.Flags().StringP(utils.PortfolioIdFlag, "", "", "Portfolio ID. Uses environment variable if blank")
 
 	getOrderFillsCmd.MarkFlagRequired(utils.OrderIdFlag)
 }

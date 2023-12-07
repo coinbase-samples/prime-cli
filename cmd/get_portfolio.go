@@ -17,7 +17,6 @@
 package cmd
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/coinbase-samples/prime-cli/utils"
 	"github.com/coinbase-samples/prime-sdk-go"
@@ -30,22 +29,28 @@ var getPortfolioCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		client, err := utils.GetClientFromEnv()
 		if err != nil {
-			return fmt.Errorf("error getting client from environment: %w", err)
+			return fmt.Errorf("cannot get client from environment: %w", err)
 		}
 
 		ctx, cancel := utils.GetContextWithTimeout()
 		defer cancel()
+
+		portfolioId := utils.GetFlagStringValue(cmd, utils.PortfolioIdFlag)
+		if portfolioId == "" {
+			portfolioId = client.Credentials.PortfolioId
+		}
+
 		request := &prime.GetPortfolioRequest{
-			PortfolioId: client.Credentials.PortfolioId,
+			PortfolioId: portfolioId,
 		}
 		response, err := client.GetPortfolio(ctx, request)
 		if err != nil {
-			return fmt.Errorf("error fetching portfolio: %w", err)
+			return fmt.Errorf("cannot get portfolio: %w", err)
 		}
 
-		jsonResponse, err := json.MarshalIndent(response, "", utils.JsonIndent)
+		jsonResponse, err := utils.MarshalJSON(response, cmd.Flags().Lookup(utils.FormatFlag).Changed)
 		if err != nil {
-			return fmt.Errorf("error marshaling response to JSON: %w", err)
+			return fmt.Errorf("cannot marshal response to JSON: %w", err)
 		}
 		fmt.Println(string(jsonResponse))
 		return nil
@@ -54,4 +59,8 @@ var getPortfolioCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(getPortfolioCmd)
+
+	getPortfolioCmd.Flags().BoolP(utils.FormatFlag, "", false, "Format the JSON output")
+	getPortfolioCmd.Flags().StringP(utils.PortfolioIdFlag, "", "", "Portfolio ID. Uses environment variable if blank")
+
 }

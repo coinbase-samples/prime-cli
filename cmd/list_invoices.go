@@ -17,7 +17,6 @@
 package cmd
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/coinbase-samples/prime-cli/utils"
 	"github.com/coinbase-samples/prime-sdk-go"
@@ -32,7 +31,7 @@ var listInvoicesCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		client, err := utils.GetClientFromEnv()
 		if err != nil {
-			return fmt.Errorf("error: %w", err)
+			return fmt.Errorf("failed to initialize client: %w", err)
 		}
 
 		ctx, cancel := utils.GetContextWithTimeout()
@@ -40,17 +39,17 @@ var listInvoicesCmd = &cobra.Command{
 
 		states, err := cmd.Flags().GetStringSlice(utils.InvoiceStatesFlag)
 		if err != nil {
-			return fmt.Errorf("error: %w", err)
+			return fmt.Errorf("cannot get states slice: %w", err)
 		}
 
 		billingYearSlice, err := cmd.Flags().GetIntSlice(utils.InvoiceBillingYear)
 		if err != nil {
-			return fmt.Errorf("error: %w", err)
+			return fmt.Errorf("cannot get year slice: %w", err)
 		}
 
 		billingMonthSlice, err := cmd.Flags().GetIntSlice(utils.InvoiceBillingMonth)
 		if err != nil {
-			return fmt.Errorf("error: %w", err)
+			return fmt.Errorf("cannot get month slice: %w", err)
 		}
 
 		var billingYear, billingMonth int32
@@ -64,7 +63,7 @@ var listInvoicesCmd = &cobra.Command{
 
 		pagination, err := utils.GetPaginationParams(cmd)
 		if err != nil {
-			return fmt.Errorf("error: %w", err)
+			return fmt.Errorf("cannot get pagination params: %w", err)
 		}
 
 		request := &prime.ListInvoicesRequest{
@@ -79,14 +78,14 @@ var listInvoicesCmd = &cobra.Command{
 
 		response, err := client.ListInvoices(ctx, request)
 		if err != nil {
-			return fmt.Errorf("error listing invoices: %v", err)
+			return fmt.Errorf("cannot list invoices: %w", err)
 		}
 
 		log.Printf("Received response: %+v\n", response)
 
-		jsonResponse, err := json.MarshalIndent(response, "", utils.JsonIndent)
+		jsonResponse, err := utils.MarshalJSON(response, cmd.Flags().Lookup(utils.FormatFlag).Changed)
 		if err != nil {
-			return fmt.Errorf("error marshaling response to JSON: %v", err)
+			return fmt.Errorf("cannot marshal response to JSON: %w", err)
 		}
 		fmt.Println(string(jsonResponse))
 
@@ -98,9 +97,10 @@ func init() {
 	rootCmd.AddCommand(listInvoicesCmd)
 
 	listInvoicesCmd.Flags().StringP(utils.CursorFlag, "c", "", "Pagination cursor")
-	listInvoicesCmd.Flags().StringP(utils.LimitFlag, "l", "", "Pagination limit")
-	listInvoicesCmd.Flags().StringP(utils.SortDirectionFlag, "d", "", "Sort direction")
+	listInvoicesCmd.Flags().StringP(utils.LimitFlag, "l", utils.LimitDefault, "Pagination limit")
+	listInvoicesCmd.Flags().StringP(utils.SortDirectionFlag, "d", utils.SortDirectionDefault, "Sort direction")
 	listInvoicesCmd.Flags().StringSliceP(utils.InvoiceStatesFlag, "s", []string{}, "List of states")
 	listInvoicesCmd.Flags().IntSliceP(utils.InvoiceBillingYear, "y", []int{}, "Billing year")
 	listInvoicesCmd.Flags().IntSliceP(utils.InvoiceBillingMonth, "m", []int{}, "Billing month")
+	listInvoicesCmd.Flags().BoolP(utils.FormatFlag, "", false, "Format the JSON output")
 }

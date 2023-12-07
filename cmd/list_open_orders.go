@@ -17,7 +17,6 @@
 package cmd
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/coinbase-samples/prime-cli/utils"
 	"github.com/coinbase-samples/prime-sdk-go"
@@ -31,25 +30,30 @@ var listOpenOrdersCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		client, err := utils.GetClientFromEnv()
 		if err != nil {
-			return fmt.Errorf("error: %w", err)
+			return fmt.Errorf("failed to initialize client: %w", err)
 		}
 
 		ctx, cancel := utils.GetContextWithTimeout()
 		defer cancel()
 
+		portfolioId := utils.GetFlagStringValue(cmd, utils.PortfolioIdFlag)
+		if portfolioId == "" {
+			portfolioId = client.Credentials.PortfolioId
+		}
+
 		request := &prime.ListOpenOrdersRequest{
-			PortfolioId: client.Credentials.PortfolioId,
+			PortfolioId: portfolioId,
 			ProductId:   utils.GetFlagStringValue(cmd, utils.ProductIdFlag),
 		}
 
 		response, err := client.ListOpenOrders(ctx, request)
 		if err != nil {
-			return fmt.Errorf("error listing open orders: %v", err)
+			return fmt.Errorf("cannot list open orders: %w", err)
 		}
 
-		jsonResponse, err := json.MarshalIndent(response, "", utils.JsonIndent)
+		jsonResponse, err := utils.MarshalJSON(response, cmd.Flags().Lookup(utils.FormatFlag).Changed)
 		if err != nil {
-			return fmt.Errorf("error marshaling response to JSON: %v", err)
+			return fmt.Errorf("cannot marshal response to JSON: %w", err)
 		}
 		fmt.Println(string(jsonResponse))
 		return nil
@@ -60,6 +64,8 @@ func init() {
 	rootCmd.AddCommand(listOpenOrdersCmd)
 
 	listOpenOrdersCmd.Flags().StringP(utils.ProductIdFlag, "i", "", "ID of the product")
+	listOpenOrdersCmd.Flags().BoolP(utils.FormatFlag, "", false, "Format the JSON output")
+	listOpenOrdersCmd.Flags().StringP(utils.PortfolioIdFlag, "", "", "Portfolio ID. Uses environment variable if blank")
 
 	listOpenOrdersCmd.MarkFlagRequired(utils.ProductIdFlag)
 }
