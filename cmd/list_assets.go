@@ -44,16 +44,12 @@ var listAssetsCmd = &cobra.Command{
 			return fmt.Errorf("cannot list assets: %w", err)
 		}
 
-		shouldFormat, err := utils.CheckFormatFlag(cmd)
+		jsonResponse, err := utils.FormatResponseAsJSON(cmd, response)
 		if err != nil {
 			return err
 		}
 
-		jsonResponse, err := utils.MarshalJSON(response, shouldFormat)
-		if err != nil {
-			return fmt.Errorf("cannot marshal response to JSON: %w", err)
-		}
-		fmt.Println(string(jsonResponse))
+		fmt.Println(jsonResponse)
 		return nil
 	},
 }

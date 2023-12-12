@@ -36,7 +36,11 @@ func ValidateUUID(uuid string) error {
 }
 
 func ValidateUUIDFlag(cmd *cobra.Command, flagName string) error {
-	uuid, _ := cmd.Flags().GetString(flagName)
+	uuid, err := cmd.Flags().GetString(flagName)
+	if err != nil {
+		return fmt.Errorf("could not retrieve %s: %w", flagName, err)
+	}
+
 	if err := ValidateUUID(uuid); err != nil {
 		return fmt.Errorf("%s must be a valid UUID: %w", flagName, err)
 	}
@@ -53,7 +57,11 @@ func contains(slice []string, item string) bool {
 }
 
 func ValidateSide(cmd *cobra.Command) error {
-	side, _ := cmd.Flags().GetString(SideFlag)
+	side, err := cmd.Flags().GetString(SideFlag)
+	if err != nil {
+		return fmt.Errorf("could not retrieve %s: %w", SideFlag, err)
+	}
+
 	if side != OrderSideBuy && side != OrderSideSell {
 		return errors.New("side must be either 'BUY' or 'SELL'")
 	}
@@ -61,8 +69,16 @@ func ValidateSide(cmd *cobra.Command) error {
 }
 
 func ValidateOrderTypeAndLimitPrice(cmd *cobra.Command) error {
-	orderType, _ := cmd.Flags().GetString(TypeFlag)
-	limitPrice, _ := cmd.Flags().GetString(LimitPriceFlag)
+	orderType, err := cmd.Flags().GetString(TypeFlag)
+	if err != nil {
+		return fmt.Errorf("could not retrieve %s: %w", TypeFlag, err)
+	}
+
+	limitPrice, err := cmd.Flags().GetString(LimitPriceFlag)
+	if err != nil {
+		return fmt.Errorf("could not retrieve %s: %w", LimitPriceFlag, err)
+	}
+
 	switch strings.ToUpper(orderType) {
 	case OrderTypeMarket:
 		// No further validation needed for MARKET
@@ -77,7 +93,11 @@ func ValidateOrderTypeAndLimitPrice(cmd *cobra.Command) error {
 }
 
 func ValidateTimeInForce(cmd *cobra.Command) error {
-	timeInForce, _ := cmd.Flags().GetString(TimeInForceFlag)
+	timeInForce, err := cmd.Flags().GetString(TimeInForceFlag)
+	if err != nil {
+		return fmt.Errorf("could not retrieve %s: %w", TimeInForceFlag, err)
+	}
+
 	if timeInForce != "" {
 		validOptions := []string{
 			TifFillOrKill,
@@ -92,8 +112,16 @@ func ValidateTimeInForce(cmd *cobra.Command) error {
 }
 
 func ValidateQuantities(cmd *cobra.Command) error {
-	baseQuantity, _ := cmd.Flags().GetString(BaseQuantityFlag)
-	quoteValue, _ := cmd.Flags().GetString(QuoteValueFlag)
+	baseQuantity, err := cmd.Flags().GetString(BaseQuantityFlag)
+	if err != nil {
+		return fmt.Errorf("could not retrieve %s: %w", BaseQuantityFlag, err)
+	}
+
+	quoteValue, err := cmd.Flags().GetString(QuoteValueFlag)
+	if err != nil {
+		return fmt.Errorf("could not retrieve %s: %w", QuoteValueFlag, err)
+	}
+
 	if baseQuantity != "" && quoteValue != "" {
 		return errors.New("either base-quantity or quote-value must be provided, not both")
 	}

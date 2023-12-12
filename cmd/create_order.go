@@ -38,13 +38,7 @@ var createOrderCmd = &cobra.Command{
 			clientOrderId = uuid.New().String()
 		}
 
-		ctx, cancel := utils.GetContextWithTimeout()
-		defer cancel()
-
-		portfolioId := utils.GetFlagStringValue(cmd, utils.PortfolioIdFlag)
-		if portfolioId == "" {
-			portfolioId = client.Credentials.PortfolioId
-		}
+		portfolioId := utils.GetPortfolioId(cmd, client)
 
 		order := &prime.Order{
 			PortfolioId:   portfolioId,
@@ -60,6 +54,9 @@ var createOrderCmd = &cobra.Command{
 			TimeInForce:   utils.GetFlagStringValue(cmd, utils.TimeInForceFlag),
 		}
 
+		ctx, cancel := utils.GetContextWithTimeout()
+		defer cancel()
+
 		request := &prime.CreateOrderRequest{
 			Order: order,
 		}
@@ -69,16 +66,12 @@ var createOrderCmd = &cobra.Command{
 			return fmt.Errorf("cannot create order: %w", err)
 		}
 
-		shouldFormat, err := utils.CheckFormatFlag(cmd)
+		jsonResponse, err := utils.FormatResponseAsJSON(cmd, response)
 		if err != nil {
 			return err
 		}
 
-		jsonResponse, err := utils.MarshalJSON(response, shouldFormat)
-		if err != nil {
-			return fmt.Errorf("cannot marshal response to JSON: %w", err)
-		}
-		fmt.Println(string(jsonResponse))
+		fmt.Println(jsonResponse)
 
 		return nil
 	},

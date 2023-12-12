@@ -33,13 +33,10 @@ var getCreditCmd = &cobra.Command{
 			return fmt.Errorf("failed to initialize client: %w", err)
 		}
 
+		portfolioId := utils.GetPortfolioId(cmd, client)
+
 		ctx, cancel := utils.GetContextWithTimeout()
 		defer cancel()
-
-		portfolioId := utils.GetFlagStringValue(cmd, utils.PortfolioIdFlag)
-		if portfolioId == "" {
-			portfolioId = client.Credentials.PortfolioId
-		}
 
 		request := &prime.GetPortfolioCreditRequest{
 			Id: portfolioId,
@@ -50,16 +47,12 @@ var getCreditCmd = &cobra.Command{
 			return fmt.Errorf("cannot get portfolio credit: %w", err)
 		}
 
-		shouldFormat, err := utils.CheckFormatFlag(cmd)
+		jsonResponse, err := utils.FormatResponseAsJSON(cmd, response)
 		if err != nil {
 			return err
 		}
 
-		jsonResponse, err := utils.MarshalJSON(response, shouldFormat)
-		if err != nil {
-			return fmt.Errorf("cannot marshal response to JSON: %w", err)
-		}
-		fmt.Println(string(jsonResponse))
+		fmt.Println(jsonResponse)
 		return nil
 	},
 }

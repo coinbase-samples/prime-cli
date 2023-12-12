@@ -42,17 +42,13 @@ var listPortfoliosCmd = &cobra.Command{
 			return fmt.Errorf("listing portfolios: %w", err)
 		}
 
-		shouldFormat, err := utils.CheckFormatFlag(cmd)
+		jsonResponse, err := utils.FormatResponseAsJSON(cmd, response)
 		if err != nil {
 			return err
 		}
 
-		jsonResponse, err := utils.MarshalJSON(response, shouldFormat)
-		if err != nil {
-			return fmt.Errorf("cannot marshal response to JSON: %w", err)
-		}
+		fmt.Println(jsonResponse)
 
-		fmt.Println(string(jsonResponse))
 		return nil
 	},
 }

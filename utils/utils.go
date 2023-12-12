@@ -112,3 +112,25 @@ func CheckFormatFlag(cmd *cobra.Command) (bool, error) {
 	}
 	return formatFlagValue == "true", nil
 }
+
+func GetPortfolioId(cmd *cobra.Command, client *prime.Client) string {
+	portfolioId := GetFlagStringValue(cmd, PortfolioIdFlag)
+	if portfolioId == "" {
+		portfolioId = client.Credentials.PortfolioId
+	}
+	return portfolioId
+}
+
+func FormatResponseAsJSON(cmd *cobra.Command, response interface{}) (string, error) {
+	shouldFormat, err := CheckFormatFlag(cmd)
+	if err != nil {
+		return "", err
+	}
+
+	jsonResponse, err := MarshalJSON(response, shouldFormat)
+	if err != nil {
+		return "", fmt.Errorf("cannot marshal response to JSON: %w", err)
+	}
+
+	return string(jsonResponse), nil
+}

@@ -38,13 +38,10 @@ var createTransferCmd = &cobra.Command{
 			idempotencyKey = uuid.New().String()
 		}
 
+		portfolioId := utils.GetPortfolioId(cmd, client)
+
 		ctx, cancel := utils.GetContextWithTimeout()
 		defer cancel()
-
-		portfolioId := utils.GetFlagStringValue(cmd, utils.PortfolioIdFlag)
-		if portfolioId == "" {
-			portfolioId = client.Credentials.PortfolioId
-		}
 
 		request := &prime.CreateWalletTransferRequest{
 			PortfolioId:         portfolioId,
@@ -60,17 +57,12 @@ var createTransferCmd = &cobra.Command{
 			return fmt.Errorf("cannot create transfer: %w", err)
 		}
 
-		shouldFormat, err := utils.CheckFormatFlag(cmd)
+		jsonResponse, err := utils.FormatResponseAsJSON(cmd, response)
 		if err != nil {
 			return err
 		}
 
-		jsonResponse, err := utils.MarshalJSON(response, shouldFormat)
-		if err != nil {
-			return fmt.Errorf("cannot marshal response to JSON: %w", err)
-		}
-
-		fmt.Println(string(jsonResponse))
+		fmt.Println(jsonResponse)
 		return nil
 	},
 }

@@ -32,9 +32,6 @@ var createAllocationCmd = &cobra.Command{
 			return fmt.Errorf("failed to initialize client: %w", err)
 		}
 
-		ctx, cancel := utils.GetContextWithTimeout()
-		defer cancel()
-
 		orderIds, err := cmd.Flags().GetStringArray(utils.OrderIdsFlag)
 		if err != nil {
 			return fmt.Errorf("cannot get order ids: %w", err)
@@ -49,6 +46,9 @@ var createAllocationCmd = &cobra.Command{
 		if err := json.Unmarshal([]byte(allocationLegsJson), &allocationLegs); err != nil {
 			return fmt.Errorf("invalid allocation legs format: %w", err)
 		}
+
+		ctx, cancel := utils.GetContextWithTimeout()
+		defer cancel()
 
 		request := &prime.CreatePortfolioAllocationsRequest{
 			AllocationId:                    utils.GetFlagStringValue(cmd, utils.AllocationIdFlag),
@@ -65,16 +65,12 @@ var createAllocationCmd = &cobra.Command{
 			return fmt.Errorf("cannot create portfolio allocations: %w", err)
 		}
 
-		shouldFormat, err := utils.CheckFormatFlag(cmd)
+		jsonResponse, err := utils.FormatResponseAsJSON(cmd, response)
 		if err != nil {
 			return err
 		}
 
-		jsonResponse, err := utils.MarshalJSON(response, shouldFormat)
-		if err != nil {
-			return fmt.Errorf("cannot marshal response to JSON: %w", err)
-		}
-		fmt.Println(string(jsonResponse))
+		fmt.Println(jsonResponse)
 		return nil
 	},
 }

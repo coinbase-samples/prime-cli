@@ -34,9 +34,6 @@ var listInvoicesCmd = &cobra.Command{
 			return fmt.Errorf("failed to initialize client: %w", err)
 		}
 
-		ctx, cancel := utils.GetContextWithTimeout()
-		defer cancel()
-
 		states, err := cmd.Flags().GetStringSlice(utils.InvoiceStatesFlag)
 		if err != nil {
 			return fmt.Errorf("cannot get states slice: %w", err)
@@ -66,6 +63,9 @@ var listInvoicesCmd = &cobra.Command{
 			return fmt.Errorf("cannot get pagination params: %w", err)
 		}
 
+		ctx, cancel := utils.GetContextWithTimeout()
+		defer cancel()
+
 		request := &prime.ListInvoicesRequest{
 			EntityId:     client.Credentials.EntityId,
 			States:       states,
@@ -83,16 +83,12 @@ var listInvoicesCmd = &cobra.Command{
 
 		log.Printf("Received response: %+v\n", response)
 
-		shouldFormat, err := utils.CheckFormatFlag(cmd)
+		jsonResponse, err := utils.FormatResponseAsJSON(cmd, response)
 		if err != nil {
 			return err
 		}
 
-		jsonResponse, err := utils.MarshalJSON(response, shouldFormat)
-		if err != nil {
-			return fmt.Errorf("cannot marshal response to JSON: %w", err)
-		}
-		fmt.Println(string(jsonResponse))
+		fmt.Println(jsonResponse)
 
 		return nil
 	},

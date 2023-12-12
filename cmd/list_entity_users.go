@@ -33,13 +33,13 @@ var listEntityUsersCmd = &cobra.Command{
 			return fmt.Errorf("failed to initialize client: %w", err)
 		}
 
-		ctx, cancel := utils.GetContextWithTimeout()
-		defer cancel()
-
 		pagination, err := utils.GetPaginationParams(cmd)
 		if err != nil {
 			return err
 		}
+
+		ctx, cancel := utils.GetContextWithTimeout()
+		defer cancel()
 
 		request := &prime.ListEntityUsersRequest{
 			EntityId:   client.Credentials.EntityId,
@@ -51,16 +51,12 @@ var listEntityUsersCmd = &cobra.Command{
 			return fmt.Errorf("cannot list users: %w", err)
 		}
 
-		shouldFormat, err := utils.CheckFormatFlag(cmd)
+		jsonResponse, err := utils.FormatResponseAsJSON(cmd, response)
 		if err != nil {
 			return err
 		}
 
-		jsonResponse, err := utils.MarshalJSON(response, shouldFormat)
-		if err != nil {
-			return fmt.Errorf("cannot marshal response to JSON: %w", err)
-		}
-		fmt.Println(string(jsonResponse))
+		fmt.Println(jsonResponse)
 		return nil
 	},
 }

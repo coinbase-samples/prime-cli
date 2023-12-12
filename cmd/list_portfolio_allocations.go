@@ -32,13 +32,7 @@ var listPortfolioAllocationsCmd = &cobra.Command{
 			return fmt.Errorf("failed to initialize client: %w", err)
 		}
 
-		ctx, cancel := utils.GetContextWithTimeout()
-		defer cancel()
-
-		portfolioId := utils.GetFlagStringValue(cmd, utils.PortfolioIdFlag)
-		if portfolioId == "" {
-			portfolioId = client.Credentials.PortfolioId
-		}
+		portfolioId := utils.GetPortfolioId(cmd, client)
 
 		productIds, err := cmd.Flags().GetStringSlice(utils.ProductIdsFlag)
 		if err != nil {
@@ -65,6 +59,9 @@ var listPortfolioAllocationsCmd = &cobra.Command{
 			return err
 		}
 
+		ctx, cancel := utils.GetContextWithTimeout()
+		defer cancel()
+
 		request := &prime.ListPortfolioAllocationsRequest{
 			PortfolioId: portfolioId,
 			ProductIds:  productIds,
@@ -79,16 +76,12 @@ var listPortfolioAllocationsCmd = &cobra.Command{
 			return fmt.Errorf("cannot list allocations: %w", err)
 		}
 
-		shouldFormat, err := utils.CheckFormatFlag(cmd)
+		jsonResponse, err := utils.FormatResponseAsJSON(cmd, response)
 		if err != nil {
 			return err
 		}
 
-		jsonResponse, err := utils.MarshalJSON(response, shouldFormat)
-		if err != nil {
-			return fmt.Errorf("cannot marshal response to JSON: %w", err)
-		}
-		fmt.Println(string(jsonResponse))
+		fmt.Println(jsonResponse)
 
 		return nil
 	},
