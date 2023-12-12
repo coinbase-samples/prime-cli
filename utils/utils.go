@@ -19,6 +19,7 @@ package utils
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/coinbase-samples/prime-sdk-go"
 	"github.com/spf13/cobra"
@@ -113,15 +114,26 @@ func CheckFormatFlag(cmd *cobra.Command) (bool, error) {
 	return formatFlagValue == "true", nil
 }
 
-func GetPortfolioId(cmd *cobra.Command, client *prime.Client) string {
-	portfolioId := GetFlagStringValue(cmd, PortfolioIdFlag)
-	if portfolioId == "" {
-		portfolioId = client.Credentials.PortfolioId
+func GetPortfolioId(cmd *cobra.Command, client *prime.Client) (string, error) {
+	portfolioId, err := cmd.Flags().GetString(PortfolioIdFlag)
+	if err != nil {
+		return "", fmt.Errorf("error retrieving portfolio ID: %w", err)
 	}
-	return portfolioId
+
+	if portfolioId == "" {
+		if client == nil || client.Credentials == nil {
+			return "", errors.New("client or client credentials are nil")
+		}
+		portfolioId = client.Credentials.PortfolioId
+		if portfolioId == "" {
+			return "", errors.New("portfolio ID is not provided in both flag and client credentials")
+		}
+	}
+
+	return portfolioId, nil
 }
 
-func FormatResponseAsJSON(cmd *cobra.Command, response interface{}) (string, error) {
+func FormatResponseAsJson(cmd *cobra.Command, response interface{}) (string, error) {
 	shouldFormat, err := CheckFormatFlag(cmd)
 	if err != nil {
 		return "", err

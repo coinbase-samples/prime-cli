@@ -38,7 +38,10 @@ var cancelOrderCmd = &cobra.Command{
 			return fmt.Errorf("cannot cancel order: %w", err)
 		}
 
-		portfolioId := utils.GetPortfolioId(cmd, client)
+		portfolioId, err := utils.GetPortfolioId(cmd, client)
+		if err != nil {
+			return err
+		}
 
 		ctx, cancel := utils.GetContextWithTimeout()
 		defer cancel()
@@ -53,7 +56,7 @@ var cancelOrderCmd = &cobra.Command{
 			return fmt.Errorf("cannot cancel order: %w", err)
 		}
 
-		jsonResponse, err := utils.FormatResponseAsJSON(cmd, response)
+		jsonResponse, err := utils.FormatResponseAsJson(cmd, response)
 		if err != nil {
 			return err
 		}

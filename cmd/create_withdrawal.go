@@ -52,7 +52,10 @@ var createWithdrawalCmd = &cobra.Command{
 			idempotencyKey = uuid.New().String()
 		}
 
-		portfolioId := utils.GetPortfolioId(cmd, client)
+		portfolioId, err := utils.GetPortfolioId(cmd, client)
+		if err != nil {
+			return err
+		}
 
 		ctx, cancel := utils.GetContextWithTimeout()
 		defer cancel()
@@ -72,7 +75,7 @@ var createWithdrawalCmd = &cobra.Command{
 			return fmt.Errorf("cannot create withdrawal: %w", err)
 		}
 
-		jsonResponse, err := utils.FormatResponseAsJSON(cmd, response)
+		jsonResponse, err := utils.FormatResponseAsJson(cmd, response)
 		if err != nil {
 			return err
 		}

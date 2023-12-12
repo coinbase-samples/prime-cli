@@ -33,7 +33,10 @@ var listOrdersCmd = &cobra.Command{
 			return fmt.Errorf("failed to initialize client: %w", err)
 		}
 
-		portfolioId := utils.GetPortfolioId(cmd, client)
+		portfolioId, err := utils.GetPortfolioId(cmd, client)
+		if err != nil {
+			return err
+		}
 
 		productIds, err := cmd.Flags().GetStringSlice(utils.ProductIdsFlag)
 		if err != nil {
@@ -98,7 +101,7 @@ var listOrdersCmd = &cobra.Command{
 			return fmt.Errorf("cannot list orders: %w", err)
 		}
 
-		jsonResponse, err := utils.FormatResponseAsJSON(cmd, response)
+		jsonResponse, err := utils.FormatResponseAsJson(cmd, response)
 		if err != nil {
 			return err
 		}

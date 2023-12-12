@@ -32,7 +32,10 @@ var listActivitiesCmd = &cobra.Command{
 			return fmt.Errorf("failed to initialize client: %w", err)
 		}
 
-		portfolioId := utils.GetPortfolioId(cmd, client)
+		portfolioId, err := utils.GetPortfolioId(cmd, client)
+		if err != nil {
+			return err
+		}
 
 		symbols, err := cmd.Flags().GetStringSlice(utils.SymbolsFlag)
 		if err != nil {
@@ -87,7 +90,7 @@ var listActivitiesCmd = &cobra.Command{
 			return fmt.Errorf("cannot list activities: %w", err)
 		}
 
-		jsonResponse, err := utils.FormatResponseAsJSON(cmd, response)
+		jsonResponse, err := utils.FormatResponseAsJson(cmd, response)
 		if err != nil {
 			return err
 		}

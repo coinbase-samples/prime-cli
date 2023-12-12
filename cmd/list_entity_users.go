@@ -51,7 +51,7 @@ var listEntityUsersCmd = &cobra.Command{
 			return fmt.Errorf("cannot list users: %w", err)
 		}
 
-		jsonResponse, err := utils.FormatResponseAsJSON(cmd, response)
+		jsonResponse, err := utils.FormatResponseAsJson(cmd, response)
 		if err != nil {
 			return err
 		}

@@ -83,7 +83,7 @@ var listInvoicesCmd = &cobra.Command{
 
 		log.Printf("Received response: %+v\n", response)
 
-		jsonResponse, err := utils.FormatResponseAsJSON(cmd, response)
+		jsonResponse, err := utils.FormatResponseAsJson(cmd, response)
 		if err != nil {
 			return err
 		}
