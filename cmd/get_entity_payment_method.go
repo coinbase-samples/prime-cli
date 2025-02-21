@@ -19,7 +19,7 @@ package cmd
 import (
 	"fmt"
 	"github.com/coinbase-samples/prime-cli/utils"
-	"github.com/coinbase-samples/prime-sdk-go"
+	"github.com/coinbase-samples/prime-sdk-go/paymentmethods"
 
 	"github.com/spf13/cobra"
 )
@@ -33,15 +33,17 @@ var getEntityPaymentMethodCmd = &cobra.Command{
 			return fmt.Errorf("failed to initialize client: %w", err)
 		}
 
+		paymentMethodsService := paymentmethods.NewPaymentMethodsService(client)
+
 		ctx, cancel := utils.GetContextWithTimeout()
 		defer cancel()
 
-		request := &prime.GetEntityPaymentMethodRequest{
-			Id:              client.Credentials.EntityId,
+		request := &paymentmethods.GetEntityPaymentMethodRequest{
+			Id:              client.Credentials().EntityId,
 			PaymentMethodId: utils.GetFlagStringValue(cmd, utils.PaymentMethodIdFlag),
 		}
 
-		response, err := client.GetEntityPaymentMethod(ctx, request)
+		response, err := paymentMethodsService.GetEntityPaymentMethod(ctx, request)
 		if err != nil {
 			return fmt.Errorf("cannot get entity payment method: %w", err)
 		}

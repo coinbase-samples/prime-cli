@@ -19,7 +19,8 @@ package cmd
 import (
 	"fmt"
 	"github.com/coinbase-samples/prime-cli/utils"
-	"github.com/coinbase-samples/prime-sdk-go"
+	"github.com/coinbase-samples/prime-sdk-go/model"
+	"github.com/coinbase-samples/prime-sdk-go/orders"
 	"github.com/spf13/cobra"
 )
 
@@ -32,12 +33,14 @@ var createOrderPreviewCmd = &cobra.Command{
 			return fmt.Errorf("failed to initialize client: %w", err)
 		}
 
+		ordersService := orders.NewOrdersService(client)
+
 		portfolioId, err := utils.GetPortfolioId(cmd, client)
 		if err != nil {
 			return err
 		}
 
-		order := &prime.Order{
+		order := &model.Order{
 			PortfolioId:  portfolioId,
 			Side:         utils.GetFlagStringValue(cmd, utils.SideFlag),
 			Type:         utils.GetFlagStringValue(cmd, utils.TypeFlag),
@@ -53,11 +56,11 @@ var createOrderPreviewCmd = &cobra.Command{
 		ctx, cancel := utils.GetContextWithTimeout()
 		defer cancel()
 
-		request := &prime.CreateOrderRequest{
+		request := &orders.CreateOrderRequest{
 			Order: order,
 		}
 
-		response, err := client.CreateOrderPreview(ctx, request)
+		response, err := ordersService.CreateOrder(ctx, request)
 		if err != nil {
 			return fmt.Errorf("cannot create order preview: %w", err)
 

@@ -19,7 +19,7 @@ package cmd
 import (
 	"fmt"
 	"github.com/coinbase-samples/prime-cli/utils"
-	"github.com/coinbase-samples/prime-sdk-go"
+	"github.com/coinbase-samples/prime-sdk-go/assets"
 	"github.com/spf13/cobra"
 )
 
@@ -32,14 +32,16 @@ var listAssetsCmd = &cobra.Command{
 			return fmt.Errorf("failed to initialize client: %w", err)
 		}
 
+		assetsService := assets.NewAssetsService(client)
+
 		ctx, cancel := utils.GetContextWithTimeout()
 		defer cancel()
 
-		request := &prime.ListAssetsRequest{
-			EntityId: client.Credentials.EntityId,
+		request := &assets.ListAssetsRequest{
+			EntityId: client.Credentials().EntityId,
 		}
 
-		response, err := client.ListAssets(ctx, request)
+		response, err := assetsService.ListAssets(ctx, request)
 		if err != nil {
 			return fmt.Errorf("cannot list assets: %w", err)
 		}

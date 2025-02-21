@@ -19,7 +19,7 @@ package cmd
 import (
 	"fmt"
 	"github.com/coinbase-samples/prime-cli/utils"
-	"github.com/coinbase-samples/prime-sdk-go"
+	"github.com/coinbase-samples/prime-sdk-go/addressbook"
 
 	"github.com/spf13/cobra"
 )
@@ -32,6 +32,8 @@ var getAddressBookCmd = &cobra.Command{
 		if err != nil {
 			return fmt.Errorf("failed to initialize client: %w", err)
 		}
+
+		addressBookService := addressbook.NewAddressBookService(client)
 
 		portfolioId, err := utils.GetPortfolioId(cmd, client)
 		if err != nil {
@@ -46,15 +48,15 @@ var getAddressBookCmd = &cobra.Command{
 		ctx, cancel := utils.GetContextWithTimeout()
 		defer cancel()
 
-		request := &prime.GetAddressBookRequest{
+		request := &addressbook.GetAddressBookRequest{
 			PortfolioId: portfolioId,
 			Symbol:      utils.GetFlagStringValue(cmd, utils.SymbolFlag),
 			Search:      utils.GetFlagStringValue(cmd, utils.SearchFlag),
 			Pagination:  pagination,
 		}
-		response, err := client.GetAddressBook(ctx, request)
+		response, err := addressBookService.GetAddressBook(ctx, request)
 		if err != nil {
-			return fmt.Errorf("cannot create portfolio allocations: %w", err)
+			return fmt.Errorf("cannot get address book: %w", err)
 		}
 
 		jsonResponse, err := utils.FormatResponseAsJson(cmd, response)

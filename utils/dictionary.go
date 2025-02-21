@@ -26,6 +26,7 @@ const (
 	AddressFlag      = "address"
 	SymbolFlag       = "symbol"
 	NameFlag         = "name"
+	NetworkTypeFlag  = "network-type"
 	AccountIdFlag    = "account-identifier"
 	TypeFlag         = "type"
 	SideFlag         = "side"
@@ -62,6 +63,7 @@ const (
 	SortDirectionFlag = "sort-direction"
 
 	SymbolsFlag       = "symbols"
+	ActivityLevelFlag = "activity-level"
 	CategoriesFlag    = "categories"
 	StatusesFlag      = "statuses"
 	StartFlag         = "start"
@@ -98,4 +100,9 @@ const (
 
 	LimitDefault         = "100"
 	SortDirectionDefault = "DESC"
+
+	RawUnsignedTransactionFlag = "raw-unsigned-transaction"
+	SkipBroadcastFlag          = "skip-broadcast"
+	ChainIdFlag                = "chain-id"
+	UrlFlag                    = "url"
 )

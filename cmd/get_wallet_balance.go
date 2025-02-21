@@ -19,7 +19,7 @@ package cmd
 import (
 	"fmt"
 	"github.com/coinbase-samples/prime-cli/utils"
-	"github.com/coinbase-samples/prime-sdk-go"
+	"github.com/coinbase-samples/prime-sdk-go/balances"
 
 	"github.com/spf13/cobra"
 )
@@ -33,6 +33,8 @@ var getWalletBalanceCmd = &cobra.Command{
 			return fmt.Errorf("failed to initialize client: %w", err)
 		}
 
+		balancesService := balances.NewBalancesService(client)
+
 		portfolioId, err := utils.GetPortfolioId(cmd, client)
 		if err != nil {
 			return err
@@ -41,12 +43,12 @@ var getWalletBalanceCmd = &cobra.Command{
 		ctx, cancel := utils.GetContextWithTimeout()
 		defer cancel()
 
-		request := &prime.GetWalletBalanceRequest{
+		request := &balances.GetWalletBalanceRequest{
 			PortfolioId: portfolioId,
 			Id:          utils.GetFlagStringValue(cmd, utils.WalletIdFlag),
 		}
 
-		response, err := client.GetWalletBalance(ctx, request)
+		response, err := balancesService.GetWalletBalance(ctx, request)
 		if err != nil {
 			return fmt.Errorf("cannot get wallet balance: %w", err)
 		}

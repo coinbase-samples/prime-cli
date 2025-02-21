@@ -19,7 +19,7 @@ package cmd
 import (
 	"fmt"
 	"github.com/coinbase-samples/prime-cli/utils"
-	"github.com/coinbase-samples/prime-sdk-go"
+	"github.com/coinbase-samples/prime-sdk-go/portfolios"
 	"github.com/spf13/cobra"
 )
 
@@ -32,6 +32,8 @@ var getPortfolioCmd = &cobra.Command{
 			return fmt.Errorf("cannot get client from environment: %w", err)
 		}
 
+		portfoliosService := portfolios.NewPortfoliosService(client)
+
 		portfolioId, err := utils.GetPortfolioId(cmd, client)
 		if err != nil {
 			return err
@@ -40,10 +42,10 @@ var getPortfolioCmd = &cobra.Command{
 		ctx, cancel := utils.GetContextWithTimeout()
 		defer cancel()
 
-		request := &prime.GetPortfolioRequest{
+		request := &portfolios.GetPortfolioRequest{
 			PortfolioId: portfolioId,
 		}
-		response, err := client.GetPortfolio(ctx, request)
+		response, err := portfoliosService.GetPortfolio(ctx, request)
 		if err != nil {
 			return fmt.Errorf("cannot get portfolio: %w", err)
 		}

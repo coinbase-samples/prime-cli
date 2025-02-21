@@ -21,12 +21,15 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/coinbase-samples/prime-sdk-go"
-	"github.com/spf13/cobra"
 	"net/http"
 	"os"
 	"strconv"
 	"time"
+
+	"github.com/coinbase-samples/prime-sdk-go/client"
+	"github.com/coinbase-samples/prime-sdk-go/credentials"
+	"github.com/coinbase-samples/prime-sdk-go/model"
+	"github.com/spf13/cobra"
 )
 
 func getDefaultTimeoutDuration() time.Duration {
@@ -44,14 +47,14 @@ func GetContextWithTimeout() (context.Context, context.CancelFunc) {
 	return context.WithTimeout(context.Background(), timeoutDuration)
 }
 
-func GetClientFromEnv() (*prime.Client, error) {
-	credentials := &prime.Credentials{}
-	if err := json.Unmarshal([]byte(os.Getenv("PRIME_CREDENTIALS")), credentials); err != nil {
+func GetClientFromEnv() (client.RestClient, error) {
+	creds := &credentials.Credentials{}
+	if err := json.Unmarshal([]byte(os.Getenv("PRIME_CREDENTIALS")), creds); err != nil {
 		return nil, fmt.Errorf("cannot unmarshal credentials: %w", err)
 	}
 
-	client := prime.NewClient(credentials, http.Client{})
-	return client, nil
+	restClient := client.NewRestClient(creds, http.Client{})
+	return restClient, nil
 }
 
 func GetFlagStringValue(cmd *cobra.Command, flagName string) string {
@@ -59,14 +62,20 @@ func GetFlagStringValue(cmd *cobra.Command, flagName string) string {
 	return value
 }
 
-func GetPaginationParams(cmd *cobra.Command) (*prime.PaginationParams, error) {
+func GetPaginationParams(cmd *cobra.Command) (*model.PaginationParams, error) {
 	cursor, err := cmd.Flags().GetString("cursor")
 	if err != nil {
 		return nil, fmt.Errorf("cannot parse cursor: %w", err)
 	}
-	limit, err := cmd.Flags().GetString("limit")
+
+	limitStr, err := cmd.Flags().GetString("limit")
 	if err != nil {
 		return nil, fmt.Errorf("cannot parse limit: %w", err)
+	}
+
+	limit, err := strconv.Atoi(limitStr)
+	if err != nil {
+		return nil, fmt.Errorf("invalid limit value: %w", err)
 	}
 
 	sortDirection, err := cmd.Flags().GetString("sort-direction")
@@ -74,9 +83,9 @@ func GetPaginationParams(cmd *cobra.Command) (*prime.PaginationParams, error) {
 		return nil, fmt.Errorf("cannot parse sort direction: %w", err)
 	}
 
-	return &prime.PaginationParams{
+	return &model.PaginationParams{
 		Cursor:        cursor,
-		Limit:         limit,
+		Limit:         int32(limit),
 		SortDirection: sortDirection,
 	}, nil
 }
@@ -114,17 +123,18 @@ func CheckFormatFlag(cmd *cobra.Command) (bool, error) {
 	return formatFlagValue == "true", nil
 }
 
-func GetPortfolioId(cmd *cobra.Command, client *prime.Client) (string, error) {
+func GetPortfolioId(cmd *cobra.Command, client client.RestClient) (string, error) {
 	portfolioId, err := cmd.Flags().GetString(PortfolioIdFlag)
 	if err != nil {
 		return "", fmt.Errorf("error retrieving portfolio ID: %w", err)
 	}
 
 	if portfolioId == "" {
-		if client == nil || client.Credentials == nil {
-			return "", errors.New("client or client credentials are nil")
+		creds := client.Credentials()
+		if creds == nil {
+			return "", errors.New("client credentials are nil")
 		}
-		portfolioId = client.Credentials.PortfolioId
+		portfolioId = creds.PortfolioId
 		if portfolioId == "" {
 			return "", errors.New("portfolio ID is not provided in both flag and client credentials")
 		}
@@ -145,4 +155,9 @@ func FormatResponseAsJson(cmd *cobra.Command, response interface{}) (string, err
 	}
 
 	return string(jsonResponse), nil
+}
+
+func GetFlagBoolValue(cmd *cobra.Command, flagName string) bool {
+	value, _ := cmd.Flags().GetBool(flagName)
+	return value
 }

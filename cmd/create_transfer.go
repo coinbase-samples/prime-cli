@@ -19,7 +19,7 @@ package cmd
 import (
 	"fmt"
 	"github.com/coinbase-samples/prime-cli/utils"
-	"github.com/coinbase-samples/prime-sdk-go"
+	"github.com/coinbase-samples/prime-sdk-go/transactions"
 	"github.com/google/uuid"
 	"github.com/spf13/cobra"
 )
@@ -32,6 +32,8 @@ var createTransferCmd = &cobra.Command{
 		if err != nil {
 			return fmt.Errorf("failed to initialize client: %w", err)
 		}
+
+		transactionsService := transactions.NewTransactionsService(client)
 
 		idempotencyKey := utils.GetFlagStringValue(cmd, utils.IdempotencyKeyFlag)
 		if idempotencyKey == "" {
@@ -46,7 +48,7 @@ var createTransferCmd = &cobra.Command{
 		ctx, cancel := utils.GetContextWithTimeout()
 		defer cancel()
 
-		request := &prime.CreateWalletTransferRequest{
+		request := &transactions.CreateWalletTransferRequest{
 			PortfolioId:         portfolioId,
 			SourceWalletId:      utils.GetFlagStringValue(cmd, utils.SourceWalletIdFlag),
 			Symbol:              utils.GetFlagStringValue(cmd, utils.SymbolFlag),
@@ -55,7 +57,7 @@ var createTransferCmd = &cobra.Command{
 			Amount:              utils.GetFlagStringValue(cmd, utils.AmountFlag),
 		}
 
-		response, err := client.CreateWalletTransfer(ctx, request)
+		response, err := transactionsService.CreateWalletTransfer(ctx, request)
 		if err != nil {
 			return fmt.Errorf("cannot create transfer: %w", err)
 		}

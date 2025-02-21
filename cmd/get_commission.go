@@ -19,7 +19,7 @@ package cmd
 import (
 	"fmt"
 	"github.com/coinbase-samples/prime-cli/utils"
-	"github.com/coinbase-samples/prime-sdk-go"
+	"github.com/coinbase-samples/prime-sdk-go/commission"
 
 	"github.com/spf13/cobra"
 )
@@ -33,6 +33,8 @@ var getCommissionCmd = &cobra.Command{
 			return fmt.Errorf("failed to initialize client: %w", err)
 		}
 
+		commissionService := commission.NewCommissionService(client)
+
 		portfolioId, err := utils.GetPortfolioId(cmd, client)
 		if err != nil {
 			return err
@@ -41,11 +43,11 @@ var getCommissionCmd = &cobra.Command{
 		ctx, cancel := utils.GetContextWithTimeout()
 		defer cancel()
 
-		request := &prime.GetPortfolioCommissionRequest{
+		request := &commission.GetPortfolioCommissionRequest{
 			PortfolioId: portfolioId,
 		}
 
-		response, err := client.GetPortfolioCommission(ctx, request)
+		response, err := commissionService.GetPortfolioCommission(ctx, request)
 		if err != nil {
 			return fmt.Errorf("cannot get portfolio commission: %w", err)
 		}
