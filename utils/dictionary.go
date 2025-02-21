@@ -94,12 +94,13 @@ const (
 	FormatFlag = "format"
 	ToggleFlag = "toggle"
 
-	PortfolioIdFlag    = "portfolio-id"
-	IdempotencyKeyFlag = "idempotency-key"
-	ClientOrderIdFlag  = "client-order-id"
-
-	LimitDefault         = "100"
-	SortDirectionDefault = "DESC"
+	PortfolioIdFlag           = "portfolio-id"
+	IdempotencyKeyFlag        = "idempotency-key"
+	ClientOrderIdFlag         = "client-order-id"
+	DisableDynamicGasFlag     = "disable-dynamic-gas"
+	ReplacedTransactionIdFlag = "replaced-transaction-id"
+	LimitDefault              = "100"
+	SortDirectionDefault      = "DESC"
 
 	RawUnsignedTransactionFlag = "raw-unsigned-transaction"
 	SkipBroadcastFlag          = "skip-broadcast"
