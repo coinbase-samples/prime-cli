@@ -19,7 +19,7 @@ package cmd
 import (
 	"fmt"
 	"github.com/coinbase-samples/prime-cli/utils"
-	"github.com/coinbase-samples/prime-sdk-go"
+	"github.com/coinbase-samples/prime-sdk-go/addressbook"
 	"github.com/spf13/cobra"
 )
 
@@ -32,6 +32,8 @@ var createAddressBookEntryCmd = &cobra.Command{
 			return fmt.Errorf("failed to initialize client: %w", err)
 		}
 
+		addressBookService := addressbook.NewAddressBookService(client)
+
 		portfolioId, err := utils.GetPortfolioId(cmd, client)
 		if err != nil {
 			return err
@@ -40,7 +42,7 @@ var createAddressBookEntryCmd = &cobra.Command{
 		ctx, cancel := utils.GetContextWithTimeout()
 		defer cancel()
 
-		request := &prime.CreateAddressBookEntryRequest{
+		request := &addressbook.CreateAddressBookEntryRequest{
 			PortfolioId:       portfolioId,
 			Address:           utils.GetFlagStringValue(cmd, utils.AddressFlag),
 			Symbol:            utils.GetFlagStringValue(cmd, utils.SymbolFlag),
@@ -48,7 +50,7 @@ var createAddressBookEntryCmd = &cobra.Command{
 			AccountIdentifier: utils.GetFlagStringValue(cmd, utils.AccountIdFlag),
 		}
 
-		response, err := client.CreateAddressBookEntry(ctx, request)
+		response, err := addressBookService.CreateAddressBookEntry(ctx, request)
 		if err != nil {
 			return fmt.Errorf("cannot create address book entry: %w", err)
 		}

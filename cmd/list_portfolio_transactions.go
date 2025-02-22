@@ -19,7 +19,7 @@ package cmd
 import (
 	"fmt"
 	"github.com/coinbase-samples/prime-cli/utils"
-	"github.com/coinbase-samples/prime-sdk-go"
+	"github.com/coinbase-samples/prime-sdk-go/transactions"
 
 	"github.com/spf13/cobra"
 )
@@ -32,6 +32,8 @@ var listPortfolioTransactionsCmd = &cobra.Command{
 		if err != nil {
 			return fmt.Errorf("failed to initialize client: %w", err)
 		}
+
+		transactionsService := transactions.NewTransactionsService(client)
 
 		portfolioId, err := utils.GetPortfolioId(cmd, client)
 		if err != nil {
@@ -66,7 +68,7 @@ var listPortfolioTransactionsCmd = &cobra.Command{
 		ctx, cancel := utils.GetContextWithTimeout()
 		defer cancel()
 
-		request := &prime.ListPortfolioTransactionsRequest{
+		request := &transactions.ListPortfolioTransactionsRequest{
 			PortfolioId: portfolioId,
 			Symbols:     utils.GetFlagStringValue(cmd, utils.SymbolsFlag),
 			Types:       types,
@@ -74,7 +76,7 @@ var listPortfolioTransactionsCmd = &cobra.Command{
 			End:         end,
 			Pagination:  pagination,
 		}
-		response, err := client.ListPortfolioTransactions(ctx, request)
+		response, err := transactionsService.ListPortfolioTransactions(ctx, request)
 		if err != nil {
 			return fmt.Errorf("cannot list transactions: %w", err)
 		}

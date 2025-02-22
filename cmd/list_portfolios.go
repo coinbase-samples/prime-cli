@@ -18,8 +18,9 @@ package cmd
 
 import (
 	"fmt"
+
 	"github.com/coinbase-samples/prime-cli/utils"
-	"github.com/coinbase-samples/prime-sdk-go"
+	"github.com/coinbase-samples/prime-sdk-go/portfolios"
 	"github.com/spf13/cobra"
 )
 
@@ -32,12 +33,14 @@ var listPortfoliosCmd = &cobra.Command{
 			return fmt.Errorf("cannot get client from environment: %w", err)
 		}
 
+		portfoliosService := portfolios.NewPortfoliosService(client)
+
 		ctx, cancel := utils.GetContextWithTimeout()
 		defer cancel()
 
-		request := &prime.ListPortfoliosRequest{}
+		request := &portfolios.ListPortfoliosRequest{}
 
-		response, err := client.ListPortfolios(ctx, request)
+		response, err := portfoliosService.ListPortfolios(ctx, request)
 		if err != nil {
 			return fmt.Errorf("listing portfolios: %w", err)
 		}

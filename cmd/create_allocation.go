@@ -18,8 +18,10 @@ package cmd
 import (
 	"encoding/json"
 	"fmt"
+
 	"github.com/coinbase-samples/prime-cli/utils"
-	"github.com/coinbase-samples/prime-sdk-go"
+	"github.com/coinbase-samples/prime-sdk-go/allocations"
+	"github.com/coinbase-samples/prime-sdk-go/model"
 	"github.com/spf13/cobra"
 )
 
@@ -32,6 +34,8 @@ var createAllocationCmd = &cobra.Command{
 			return fmt.Errorf("failed to initialize client: %w", err)
 		}
 
+		allocationsService := allocations.NewAllocationsService(client)
+
 		orderIds, err := cmd.Flags().GetStringArray(utils.OrderIdsFlag)
 		if err != nil {
 			return fmt.Errorf("cannot get order ids: %w", err)
@@ -42,7 +46,7 @@ var createAllocationCmd = &cobra.Command{
 			return fmt.Errorf("cannot get allocatio legs: %w", err)
 		}
 
-		var allocationLegs []*prime.AllocationLeg
+		var allocationLegs []*model.AllocationLeg
 		if err := json.Unmarshal([]byte(allocationLegsJson), &allocationLegs); err != nil {
 			return fmt.Errorf("invalid allocation legs format: %w", err)
 		}
@@ -50,7 +54,7 @@ var createAllocationCmd = &cobra.Command{
 		ctx, cancel := utils.GetContextWithTimeout()
 		defer cancel()
 
-		request := &prime.CreatePortfolioAllocationsRequest{
+		request := &allocations.CreatePortfolioAllocationsRequest{
 			AllocationId:                    utils.GetFlagStringValue(cmd, utils.AllocationIdFlag),
 			SourcePortfolioId:               utils.GetFlagStringValue(cmd, utils.SourcePortfolioIdFlag),
 			ProductId:                       utils.GetFlagStringValue(cmd, utils.ProductIdFlag),
@@ -60,7 +64,7 @@ var createAllocationCmd = &cobra.Command{
 			RemainderDestinationPortfolioId: utils.GetFlagStringValue(cmd, utils.RemainderDestPortfolioIdFlag),
 		}
 
-		response, err := client.CreatePortfolioAllocations(ctx, request)
+		response, err := allocationsService.CreatePortfolioAllocations(ctx, request)
 		if err != nil {
 			return fmt.Errorf("cannot create portfolio allocations: %w", err)
 		}

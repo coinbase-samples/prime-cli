@@ -19,7 +19,7 @@ package cmd
 import (
 	"fmt"
 	"github.com/coinbase-samples/prime-cli/utils"
-	"github.com/coinbase-samples/prime-sdk-go"
+	"github.com/coinbase-samples/prime-sdk-go/orders"
 
 	"github.com/spf13/cobra"
 )
@@ -32,6 +32,8 @@ var cancelOrderCmd = &cobra.Command{
 		if err != nil {
 			return fmt.Errorf("cannot get client from environment: %w", err)
 		}
+
+		ordersService := orders.NewOrdersService(client)
 
 		orderId, err := cmd.Flags().GetString(utils.OrderIdFlag)
 		if err != nil {
@@ -46,12 +48,12 @@ var cancelOrderCmd = &cobra.Command{
 		ctx, cancel := utils.GetContextWithTimeout()
 		defer cancel()
 
-		request := &prime.CancelOrderRequest{
+		request := &orders.CancelOrderRequest{
 			PortfolioId: portfolioId,
 			OrderId:     orderId,
 		}
 
-		response, err := client.CancelOrder(ctx, request)
+		response, err := ordersService.CancelOrder(ctx, request)
 		if err != nil {
 			return fmt.Errorf("cannot cancel order: %w", err)
 		}

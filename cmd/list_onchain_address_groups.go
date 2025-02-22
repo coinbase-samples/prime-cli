@@ -1,5 +1,5 @@
 /**
- * Copyright 2023-present Coinbase Global, Inc.
+ * Copyright 2025-present Coinbase Global, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,39 +13,42 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package cmd
 
 import (
 	"fmt"
-	"github.com/coinbase-samples/prime-cli/utils"
-	"github.com/coinbase-samples/prime-sdk-go/paymentmethods"
 
+	"github.com/coinbase-samples/prime-cli/utils"
+	"github.com/coinbase-samples/prime-sdk-go/onchainaddressbook"
 	"github.com/spf13/cobra"
 )
 
-var getEntityPaymentMethodCmd = &cobra.Command{
-	Use:   "get-entity-payment-method",
-	Short: "Returns entity information from payment method ID",
+var listOnchainAddressGroupsCmd = &cobra.Command{
+	Use:   "list-onchain-address-groups",
+	Short: "List onchain address groups",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		client, err := utils.GetClientFromEnv()
 		if err != nil {
 			return fmt.Errorf("failed to initialize client: %w", err)
 		}
 
-		paymentMethodsService := paymentmethods.NewPaymentMethodsService(client)
+		onchainService := onchainaddressbook.NewOnchainAddressBookService(client)
+
+		portfolioId, err := utils.GetPortfolioId(cmd, client)
+		if err != nil {
+			return err
+		}
 
 		ctx, cancel := utils.GetContextWithTimeout()
 		defer cancel()
 
-		request := &paymentmethods.GetEntityPaymentMethodRequest{
-			Id:              client.Credentials().EntityId,
-			PaymentMethodId: utils.GetFlagStringValue(cmd, utils.PaymentMethodIdFlag),
+		request := &onchainaddressbook.ListOnchainAddressBookGroupsRequest{
+			PortfolioId: portfolioId,
 		}
 
-		response, err := paymentMethodsService.GetEntityPaymentMethod(ctx, request)
+		response, err := onchainService.ListOnchainAddressBookGroups(ctx, request)
 		if err != nil {
-			return fmt.Errorf("cannot get entity payment method: %w", err)
+			return fmt.Errorf("cannot list onchain address groups: %w", err)
 		}
 
 		jsonResponse, err := utils.FormatResponseAsJson(cmd, response)
@@ -59,10 +62,8 @@ var getEntityPaymentMethodCmd = &cobra.Command{
 }
 
 func init() {
-	rootCmd.AddCommand(getEntityPaymentMethodCmd)
+	rootCmd.AddCommand(listOnchainAddressGroupsCmd)
 
-	getEntityPaymentMethodCmd.Flags().StringP(utils.PaymentMethodIdFlag, "i", "", "Payment Method ID (Required)")
-	getEntityPaymentMethodCmd.Flags().StringP(utils.FormatFlag, "z", "false", "Pass true for formatted JSON. Default is false")
-
-	getEntityPaymentMethodCmd.MarkFlagRequired(utils.PaymentMethodIdFlag)
+	listOnchainAddressGroupsCmd.Flags().StringP(utils.FormatFlag, "z", "false", "Pass true for formatted JSON. Default is false")
+	listOnchainAddressGroupsCmd.Flags().StringP(utils.PortfolioIdFlag, "p", "", "Portfolio ID. Uses environment variable if blank")
 }

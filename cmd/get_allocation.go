@@ -19,7 +19,7 @@ package cmd
 import (
 	"fmt"
 	"github.com/coinbase-samples/prime-cli/utils"
-	"github.com/coinbase-samples/prime-sdk-go"
+	"github.com/coinbase-samples/prime-sdk-go/allocations"
 
 	"github.com/spf13/cobra"
 )
@@ -33,6 +33,8 @@ var getAllocationCmd = &cobra.Command{
 			return fmt.Errorf("failed to initialize client: %w", err)
 		}
 
+		allocationsService := allocations.NewAllocationsService(client)
+
 		portfolioId, err := utils.GetPortfolioId(cmd, client)
 		if err != nil {
 			return err
@@ -41,12 +43,12 @@ var getAllocationCmd = &cobra.Command{
 		ctx, cancel := utils.GetContextWithTimeout()
 		defer cancel()
 
-		request := &prime.GetPortfolioAllocationRequest{
+		request := &allocations.GetPortfolioAllocationRequest{
 			PortfolioId:  portfolioId,
 			AllocationId: utils.GetFlagStringValue(cmd, utils.AllocationIdFlag),
 		}
 
-		response, err := client.GetPortfolioAllocation(ctx, request)
+		response, err := allocationsService.GetPortfolioAllocation(ctx, request)
 		if err != nil {
 			return fmt.Errorf("cannot get allocation: %w", err)
 		}

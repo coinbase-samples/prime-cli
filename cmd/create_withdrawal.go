@@ -19,7 +19,8 @@ package cmd
 import (
 	"fmt"
 	"github.com/coinbase-samples/prime-cli/utils"
-	"github.com/coinbase-samples/prime-sdk-go"
+	"github.com/coinbase-samples/prime-sdk-go/model"
+	"github.com/coinbase-samples/prime-sdk-go/transactions"
 	"github.com/google/uuid"
 	"github.com/spf13/cobra"
 )
@@ -32,6 +33,8 @@ var createWithdrawalCmd = &cobra.Command{
 		if err != nil {
 			return fmt.Errorf("failed to initialize client: %w", err)
 		}
+
+		transactionsService := transactions.NewTransactionsService(client)
 
 		paymentMethodId, err := cmd.Flags().GetString(utils.PaymentMethodIdFlag)
 		if err != nil {
@@ -60,17 +63,17 @@ var createWithdrawalCmd = &cobra.Command{
 		ctx, cancel := utils.GetContextWithTimeout()
 		defer cancel()
 
-		request := &prime.CreateWalletWithdrawalRequest{
+		request := &transactions.CreateWalletWithdrawalRequest{
 			PortfolioId:       portfolioId,
 			SourceWalletId:    utils.GetFlagStringValue(cmd, utils.SourceWalletIdFlag),
 			Symbol:            utils.GetFlagStringValue(cmd, utils.SymbolFlag),
 			DestinationType:   utils.GetFlagStringValue(cmd, utils.DestinationTypeFlag),
 			IdempotencyKey:    idempotencyKey,
 			Amount:            utils.GetFlagStringValue(cmd, utils.AmountFlag),
-			PaymentMethod:     &prime.CreateWalletWithdrawalPaymentMethod{Id: paymentMethodId},
-			BlockchainAddress: &prime.BlockchainAddress{Address: address, AccountIdentifier: accountIdentifier},
+			PaymentMethod:     &transactions.CreateWalletWithdrawalPaymentMethod{Id: paymentMethodId},
+			BlockchainAddress: &model.BlockchainAddress{Address: address, AccountIdentifier: accountIdentifier},
 		}
-		response, err := client.CreateWalletWithdrawal(ctx, request)
+		response, err := transactionsService.CreateWalletWithdrawal(ctx, request)
 		if err != nil {
 			return fmt.Errorf("cannot create withdrawal: %w", err)
 		}

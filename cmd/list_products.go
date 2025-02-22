@@ -19,7 +19,7 @@ package cmd
 import (
 	"fmt"
 	"github.com/coinbase-samples/prime-cli/utils"
-	"github.com/coinbase-samples/prime-sdk-go"
+	"github.com/coinbase-samples/prime-sdk-go/products"
 
 	"github.com/spf13/cobra"
 )
@@ -32,6 +32,8 @@ var listProductsCmd = &cobra.Command{
 		if err != nil {
 			return fmt.Errorf("failed to initialize client: %w", err)
 		}
+
+		productsService := products.NewProductsService(client)
 
 		portfolioId, err := utils.GetPortfolioId(cmd, client)
 		if err != nil {
@@ -46,12 +48,12 @@ var listProductsCmd = &cobra.Command{
 		ctx, cancel := utils.GetContextWithTimeout()
 		defer cancel()
 
-		request := &prime.ListProductsRequest{
+		request := &products.ListProductsRequest{
 			PortfolioId: portfolioId,
 			Pagination:  pagination,
 		}
 
-		response, err := client.ListProducts(ctx, request)
+		response, err := productsService.ListProducts(ctx, request)
 		if err != nil {
 			return fmt.Errorf("cannot list products: %w", err)
 		}

@@ -19,7 +19,7 @@ package cmd
 import (
 	"fmt"
 	"github.com/coinbase-samples/prime-cli/utils"
-	"github.com/coinbase-samples/prime-sdk-go"
+	"github.com/coinbase-samples/prime-sdk-go/users"
 
 	"github.com/spf13/cobra"
 )
@@ -33,6 +33,8 @@ var listEntityUsersCmd = &cobra.Command{
 			return fmt.Errorf("failed to initialize client: %w", err)
 		}
 
+		usersService := users.NewUsersService(client)
+
 		pagination, err := utils.GetPaginationParams(cmd)
 		if err != nil {
 			return err
@@ -41,12 +43,12 @@ var listEntityUsersCmd = &cobra.Command{
 		ctx, cancel := utils.GetContextWithTimeout()
 		defer cancel()
 
-		request := &prime.ListEntityUsersRequest{
-			EntityId:   client.Credentials.EntityId,
+		request := &users.ListEntityUsersRequest{
+			EntityId:   client.Credentials().EntityId,
 			Pagination: pagination,
 		}
 
-		response, err := client.ListEntityUsers(ctx, request)
+		response, err := usersService.ListEntityUsers(ctx, request)
 		if err != nil {
 			return fmt.Errorf("cannot list users: %w", err)
 		}

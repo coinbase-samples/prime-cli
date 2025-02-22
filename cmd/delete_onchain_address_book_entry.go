@@ -1,5 +1,5 @@
 /**
- * Copyright 2023-present Coinbase Global, Inc.
+ * Copyright 2025-present Coinbase Global, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,38 +18,44 @@ package cmd
 
 import (
 	"fmt"
+
 	"github.com/coinbase-samples/prime-cli/utils"
-	"github.com/coinbase-samples/prime-sdk-go/activities"
+	"github.com/coinbase-samples/prime-sdk-go/onchainaddressbook"
 	"github.com/spf13/cobra"
 )
 
-var getActivityCmd = &cobra.Command{
-	Use:   "get-activity",
-	Short: "Get activity information using Activity ID",
+var deleteOnchainAddressBookEntryCmd = &cobra.Command{
+	Use:   "delete-onchain-address-book-entry",
+	Short: "Delete an onchain address book entry",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		client, err := utils.GetClientFromEnv()
 		if err != nil {
 			return fmt.Errorf("failed to initialize client: %w", err)
 		}
 
-		activitiesService := activities.NewActivitiesService(client)
+		onchainService := onchainaddressbook.NewOnchainAddressBookService(client)
 
 		portfolioId, err := utils.GetPortfolioId(cmd, client)
 		if err != nil {
 			return err
 		}
 
+		addressGroupId := utils.GetFlagStringValue(cmd, utils.GenericIdFlag)
+		if addressGroupId == "" {
+			return fmt.Errorf("address group ID is required")
+		}
+
 		ctx, cancel := utils.GetContextWithTimeout()
 		defer cancel()
 
-		request := &activities.GetActivityRequest{
-			PortfolioId: portfolioId,
-			Id:          utils.GetFlagStringValue(cmd, utils.GenericIdFlag),
+		request := &onchainaddressbook.DeleteOnchainAddressBookEntryRequest{
+			PortfolioId:    portfolioId,
+			AddressGroupId: addressGroupId,
 		}
 
-		response, err := activitiesService.GetActivity(ctx, request)
+		response, err := onchainService.DeleteOnchainAddressBookEntry(ctx, request)
 		if err != nil {
-			return fmt.Errorf("cannot get activity: %w", err)
+			return fmt.Errorf("cannot delete onchain address book entry: %w", err)
 		}
 
 		jsonResponse, err := utils.FormatResponseAsJson(cmd, response)
@@ -58,17 +64,15 @@ var getActivityCmd = &cobra.Command{
 		}
 
 		fmt.Println(jsonResponse)
-
 		return nil
 	},
 }
 
 func init() {
-	rootCmd.AddCommand(getActivityCmd)
+	rootCmd.AddCommand(deleteOnchainAddressBookEntryCmd)
 
-	getActivityCmd.Flags().StringP(utils.GenericIdFlag, "i", "", "Activity ID (Required)")
-	getActivityCmd.Flags().StringP(utils.FormatFlag, "z", "false", "Pass true for formatted JSON. Default is false")
-	getActivityCmd.Flags().StringP(utils.PortfolioIdFlag, "", "", "Portfolio ID. Uses environment variable if blank")
+	deleteOnchainAddressBookEntryCmd.Flags().StringP(utils.PortfolioIdFlag, "p", "", "Portfolio ID. Uses environment variable if blank")
+	deleteOnchainAddressBookEntryCmd.Flags().StringP(utils.GenericIdFlag, "i", "", "Address group ID (Required)")
 
-	createOrderCmd.MarkFlagRequired(utils.GenericIdFlag)
+	deleteOnchainAddressBookEntryCmd.MarkFlagRequired(utils.GenericIdFlag)
 }

@@ -19,7 +19,7 @@ package cmd
 import (
 	"fmt"
 	"github.com/coinbase-samples/prime-cli/utils"
-	"github.com/coinbase-samples/prime-sdk-go"
+	"github.com/coinbase-samples/prime-sdk-go/wallets"
 
 	"github.com/spf13/cobra"
 )
@@ -32,6 +32,8 @@ var listWalletsCmd = &cobra.Command{
 		if err != nil {
 			return fmt.Errorf("failed to initialize client: %w", err)
 		}
+
+		walletsService := wallets.NewWalletsService(client)
 
 		portfolioId, err := utils.GetPortfolioId(cmd, client)
 		if err != nil {
@@ -51,14 +53,14 @@ var listWalletsCmd = &cobra.Command{
 		ctx, cancel := utils.GetContextWithTimeout()
 		defer cancel()
 
-		request := &prime.ListWalletsRequest{
+		request := &wallets.ListWalletsRequest{
 			PortfolioId: portfolioId,
 			Type:        utils.GetFlagStringValue(cmd, utils.TypeFlag),
 			Symbols:     symbols,
 			Pagination:  pagination,
 		}
 
-		response, err := client.ListWallets(ctx, request)
+		response, err := walletsService.ListWallets(ctx, request)
 		if err != nil {
 			return fmt.Errorf("cannot list users: %w", err)
 		}

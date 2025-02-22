@@ -19,7 +19,7 @@ package cmd
 import (
 	"fmt"
 	"github.com/coinbase-samples/prime-cli/utils"
-	"github.com/coinbase-samples/prime-sdk-go"
+	"github.com/coinbase-samples/prime-sdk-go/invoice"
 	"log"
 
 	"github.com/spf13/cobra"
@@ -33,6 +33,8 @@ var listInvoicesCmd = &cobra.Command{
 		if err != nil {
 			return fmt.Errorf("failed to initialize client: %w", err)
 		}
+
+		invoiceService := invoice.NewInvoiceService(client)
 
 		states, err := cmd.Flags().GetStringSlice(utils.InvoiceStatesFlag)
 		if err != nil {
@@ -66,8 +68,8 @@ var listInvoicesCmd = &cobra.Command{
 		ctx, cancel := utils.GetContextWithTimeout()
 		defer cancel()
 
-		request := &prime.ListInvoicesRequest{
-			EntityId:     client.Credentials.EntityId,
+		request := &invoice.ListInvoicesRequest{
+			EntityId:     client.Credentials().EntityId,
 			States:       states,
 			BillingYear:  billingYear,
 			BillingMonth: billingMonth,
@@ -76,7 +78,7 @@ var listInvoicesCmd = &cobra.Command{
 
 		log.Printf("Sending request: %+v\n", request)
 
-		response, err := client.ListInvoices(ctx, request)
+		response, err := invoiceService.ListInvoices(ctx, request)
 		if err != nil {
 			return fmt.Errorf("cannot list invoices: %w", err)
 		}

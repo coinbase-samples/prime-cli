@@ -26,6 +26,7 @@ const (
 	AddressFlag      = "address"
 	SymbolFlag       = "symbol"
 	NameFlag         = "name"
+	NetworkTypeFlag  = "network-type"
 	AccountIdFlag    = "account-identifier"
 	TypeFlag         = "type"
 	SideFlag         = "side"
@@ -62,6 +63,7 @@ const (
 	SortDirectionFlag = "sort-direction"
 
 	SymbolsFlag       = "symbols"
+	ActivityLevelFlag = "activity-level"
 	CategoriesFlag    = "categories"
 	StatusesFlag      = "statuses"
 	StartFlag         = "start"
@@ -92,10 +94,16 @@ const (
 	FormatFlag = "format"
 	ToggleFlag = "toggle"
 
-	PortfolioIdFlag    = "portfolio-id"
-	IdempotencyKeyFlag = "idempotency-key"
-	ClientOrderIdFlag  = "client-order-id"
+	PortfolioIdFlag           = "portfolio-id"
+	IdempotencyKeyFlag        = "idempotency-key"
+	ClientOrderIdFlag         = "client-order-id"
+	DisableDynamicGasFlag     = "disable-dynamic-gas"
+	ReplacedTransactionIdFlag = "replaced-transaction-id"
+	LimitDefault              = "100"
+	SortDirectionDefault      = "DESC"
 
-	LimitDefault         = "100"
-	SortDirectionDefault = "DESC"
+	RawUnsignedTransactionFlag = "raw-unsigned-transaction"
+	SkipBroadcastFlag          = "skip-broadcast"
+	ChainIdFlag                = "chain-id"
+	UrlFlag                    = "url"
 )

@@ -19,7 +19,7 @@ package cmd
 import (
 	"fmt"
 	"github.com/coinbase-samples/prime-cli/utils"
-	"github.com/coinbase-samples/prime-sdk-go"
+	"github.com/coinbase-samples/prime-sdk-go/balances"
 
 	"github.com/spf13/cobra"
 )
@@ -34,6 +34,8 @@ var listPortfolioBalancesCmd = &cobra.Command{
 			return fmt.Errorf("failed to initialize client: %w", err)
 		}
 
+		balancesService := balances.NewBalancesService(client)
+
 		portfolioId, err := utils.GetPortfolioId(cmd, client)
 		if err != nil {
 			return err
@@ -47,13 +49,13 @@ var listPortfolioBalancesCmd = &cobra.Command{
 		ctx, cancel := utils.GetContextWithTimeout()
 		defer cancel()
 
-		request := &prime.ListPortfolioBalancesRequest{
+		request := &balances.ListPortfolioBalancesRequest{
 			PortfolioId: portfolioId,
 			Type:        utils.GetFlagStringValue(cmd, utils.TypeFlag),
 			Symbols:     symbols,
 		}
 
-		response, err := client.ListPortfolioBalances(ctx, request)
+		response, err := balancesService.ListPortfolioBalances(ctx, request)
 		if err != nil {
 			return fmt.Errorf("cannot list portfolio balances: %w", err)
 		}

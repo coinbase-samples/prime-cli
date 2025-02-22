@@ -19,7 +19,8 @@ package cmd
 import (
 	"fmt"
 	"github.com/coinbase-samples/prime-cli/utils"
-	"github.com/coinbase-samples/prime-sdk-go"
+	"github.com/coinbase-samples/prime-sdk-go/model"
+	"github.com/coinbase-samples/prime-sdk-go/orders"
 	"github.com/google/uuid"
 	"github.com/spf13/cobra"
 )
@@ -33,6 +34,8 @@ var createOrderCmd = &cobra.Command{
 			return fmt.Errorf("failed to initialize client: %w", err)
 		}
 
+		ordersService := orders.NewOrdersService(client)
+
 		clientOrderId := utils.GetFlagStringValue(cmd, utils.ClientOrderIdFlag)
 		if clientOrderId == "" {
 			clientOrderId = uuid.New().String()
@@ -43,7 +46,7 @@ var createOrderCmd = &cobra.Command{
 			return err
 		}
 
-		order := &prime.Order{
+		order := &model.Order{
 			PortfolioId:   portfolioId,
 			Side:          utils.GetFlagStringValue(cmd, utils.SideFlag),
 			Type:          utils.GetFlagStringValue(cmd, utils.TypeFlag),
@@ -60,11 +63,11 @@ var createOrderCmd = &cobra.Command{
 		ctx, cancel := utils.GetContextWithTimeout()
 		defer cancel()
 
-		request := &prime.CreateOrderRequest{
+		request := &orders.CreateOrderRequest{
 			Order: order,
 		}
 
-		response, err := client.CreateOrder(ctx, request)
+		response, err := ordersService.CreateOrder(ctx, request)
 		if err != nil {
 			return fmt.Errorf("cannot create order: %w", err)
 		}
