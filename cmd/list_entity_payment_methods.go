@@ -1,5 +1,5 @@
 /**
- * Copyright 2023-present Coinbase Global, Inc.
+ * Copyright 2025-present Coinbase Global, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,37 +19,36 @@ package cmd
 import (
 	"fmt"
 	"github.com/coinbase-samples/prime-cli/utils"
-	"github.com/coinbase-samples/prime-sdk-go/activities"
+	"github.com/coinbase-samples/prime-sdk-go/paymentmethods"
 	"github.com/spf13/cobra"
 )
 
-var getActivityCmd = &cobra.Command{
-	Use:   "get-activity",
-	Short: "Get activity information using Activity ID",
+var listEntityPaymentMethodsCmd = &cobra.Command{
+	Use:   "list-entity-payment-methods",
+	Short: "Lists payment methods meeting filter criteria.",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		client, err := utils.GetClientFromEnv()
 		if err != nil {
 			return fmt.Errorf("failed to initialize client: %w", err)
 		}
 
-		activitiesService := activities.NewActivitiesService(client)
+		paymentMethodsService := paymentmethods.NewPaymentMethodsService(client)
 
-		portfolioId, err := utils.GetPortfolioId(cmd, client)
+		entityId, err := utils.GetEntityId(cmd, client)
 		if err != nil {
-			return err
+			return fmt.Errorf("cannot get entity ID: %w", err)
 		}
 
 		ctx, cancel := utils.GetContextWithTimeout()
 		defer cancel()
 
-		request := &activities.GetActivityRequest{
-			PortfolioId: portfolioId,
-			Id:          utils.GetFlagStringValue(cmd, utils.GenericIdFlag),
+		request := &paymentmethods.ListEntityPaymentMethodsRequest{
+			EntityId: entityId,
 		}
 
-		response, err := activitiesService.GetActivity(ctx, request)
+		response, err := paymentMethodsService.ListEntityPaymentMethods(ctx, request)
 		if err != nil {
-			return fmt.Errorf("cannot get activity: %w", err)
+			return fmt.Errorf("cannot list entity payment methods: %w", err)
 		}
 
 		jsonResponse, err := utils.FormatResponseAsJson(cmd, response)
@@ -58,17 +57,12 @@ var getActivityCmd = &cobra.Command{
 		}
 
 		fmt.Println(jsonResponse)
-
 		return nil
 	},
 }
 
 func init() {
-	rootCmd.AddCommand(getActivityCmd)
-
-	getActivityCmd.Flags().StringP(utils.GenericIdFlag, "i", "", "Activity ID (Required)")
-	getActivityCmd.Flags().StringP(utils.FormatFlag, "z", "false", "Pass true for formatted JSON. Default is false")
-	getActivityCmd.Flags().StringP(utils.PortfolioIdFlag, "", "", "Portfolio ID. Uses environment variable if blank")
-
-	getActivityCmd.MarkFlagRequired(utils.GenericIdFlag)
+	rootCmd.AddCommand(listEntityPaymentMethodsCmd)
+	listEntityPaymentMethodsCmd.Flags().StringP(utils.FormatFlag, "z", "false", "Pass true for formatted JSON. Default is false")
+	listEntityPaymentMethodsCmd.Flags().StringP(utils.EntityIdFlag, "", "", "Entity ID. Uses environment variable if blank")
 }

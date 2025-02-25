@@ -1,5 +1,5 @@
 /**
- * Copyright 2023-present Coinbase Global, Inc.
+ * Copyright 2025-present Coinbase Global, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,9 +23,9 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var getActivityCmd = &cobra.Command{
-	Use:   "get-activity",
-	Short: "Get activity information using Activity ID",
+var getEntityActivityCmd = &cobra.Command{
+	Use:   "get-entity-activity",
+	Short: "Get activity information using Activity ID only",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		client, err := utils.GetClientFromEnv()
 		if err != nil {
@@ -34,22 +34,16 @@ var getActivityCmd = &cobra.Command{
 
 		activitiesService := activities.NewActivitiesService(client)
 
-		portfolioId, err := utils.GetPortfolioId(cmd, client)
-		if err != nil {
-			return err
-		}
-
 		ctx, cancel := utils.GetContextWithTimeout()
 		defer cancel()
 
-		request := &activities.GetActivityRequest{
-			PortfolioId: portfolioId,
-			Id:          utils.GetFlagStringValue(cmd, utils.GenericIdFlag),
+		request := &activities.GetEntityActivityRequest{
+			ActivityId: utils.GetFlagStringValue(cmd, utils.ActivityIdFlag),
 		}
 
-		response, err := activitiesService.GetActivity(ctx, request)
+		response, err := activitiesService.GetEntityActivity(ctx, request)
 		if err != nil {
-			return fmt.Errorf("cannot get activity: %w", err)
+			return fmt.Errorf("cannot get entity activity: %w", err)
 		}
 
 		jsonResponse, err := utils.FormatResponseAsJson(cmd, response)
@@ -64,11 +58,11 @@ var getActivityCmd = &cobra.Command{
 }
 
 func init() {
-	rootCmd.AddCommand(getActivityCmd)
+	rootCmd.AddCommand(getEntityActivityCmd)
 
-	getActivityCmd.Flags().StringP(utils.GenericIdFlag, "i", "", "Activity ID (Required)")
-	getActivityCmd.Flags().StringP(utils.FormatFlag, "z", "false", "Pass true for formatted JSON. Default is false")
-	getActivityCmd.Flags().StringP(utils.PortfolioIdFlag, "", "", "Portfolio ID. Uses environment variable if blank")
+	getEntityActivityCmd.Flags().StringP(utils.ActivityIdFlag, "i", "", "Activity ID (Required)")
+	getEntityActivityCmd.Flags().StringP(utils.FormatFlag, "z", "false", "Pass true for formatted JSON. Default is false")
+	getEntityActivityCmd.Flags().StringP(utils.PortfolioIdFlag, "", "", "Portfolio ID. Uses environment variable if blank")
 
-	getActivityCmd.MarkFlagRequired(utils.GenericIdFlag)
+	getEntityActivityCmd.MarkFlagRequired(utils.GenericIdFlag)
 }

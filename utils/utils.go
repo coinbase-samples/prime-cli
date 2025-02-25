@@ -143,6 +143,26 @@ func GetPortfolioId(cmd *cobra.Command, client client.RestClient) (string, error
 	return portfolioId, nil
 }
 
+func GetEntityId(cmd *cobra.Command, client client.RestClient) (string, error) {
+	entityId, err := cmd.Flags().GetString(EntityIdFlag)
+	if err != nil {
+		return "", fmt.Errorf("error retrieving entity ID: %w", err)
+	}
+
+	if entityId == "" {
+		creds := client.Credentials()
+		if creds == nil {
+			return "", errors.New("client credentials are nil")
+		}
+		entityId = creds.EntityId
+		if entityId == "" {
+			return "", errors.New("entity ID is not provided in both flag and client credentials")
+		}
+	}
+
+	return entityId, nil
+}
+
 func FormatResponseAsJson(cmd *cobra.Command, response interface{}) (string, error) {
 	shouldFormat, err := CheckFormatFlag(cmd)
 	if err != nil {

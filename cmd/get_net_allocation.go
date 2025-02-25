@@ -1,5 +1,5 @@
 /**
- * Copyright 2023-present Coinbase Global, Inc.
+ * Copyright 2025-present Coinbase Global, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,20 +19,21 @@ package cmd
 import (
 	"fmt"
 	"github.com/coinbase-samples/prime-cli/utils"
-	"github.com/coinbase-samples/prime-sdk-go/activities"
+	"github.com/coinbase-samples/prime-sdk-go/allocations"
+
 	"github.com/spf13/cobra"
 )
 
-var getActivityCmd = &cobra.Command{
-	Use:   "get-activity",
-	Short: "Get activity information using Activity ID",
+var getNetAllocationCmd = &cobra.Command{
+	Use:   "get-net-allocation",
+	Short: "Get a net allocation using a net allocation ID",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		client, err := utils.GetClientFromEnv()
 		if err != nil {
 			return fmt.Errorf("failed to initialize client: %w", err)
 		}
 
-		activitiesService := activities.NewActivitiesService(client)
+		allocationsService := allocations.NewAllocationsService(client)
 
 		portfolioId, err := utils.GetPortfolioId(cmd, client)
 		if err != nil {
@@ -42,14 +43,14 @@ var getActivityCmd = &cobra.Command{
 		ctx, cancel := utils.GetContextWithTimeout()
 		defer cancel()
 
-		request := &activities.GetActivityRequest{
+		request := &allocations.GetPortfolioNetAllocationRequest{
 			PortfolioId: portfolioId,
-			Id:          utils.GetFlagStringValue(cmd, utils.GenericIdFlag),
+			NettingId:   utils.GetFlagStringValue(cmd, utils.NettingIdFlag),
 		}
 
-		response, err := activitiesService.GetActivity(ctx, request)
+		response, err := allocationsService.GetPortfolioNetAllocation(ctx, request)
 		if err != nil {
-			return fmt.Errorf("cannot get activity: %w", err)
+			return fmt.Errorf("cannot get net allocation: %w", err)
 		}
 
 		jsonResponse, err := utils.FormatResponseAsJson(cmd, response)
@@ -58,17 +59,16 @@ var getActivityCmd = &cobra.Command{
 		}
 
 		fmt.Println(jsonResponse)
-
 		return nil
 	},
 }
 
 func init() {
-	rootCmd.AddCommand(getActivityCmd)
+	rootCmd.AddCommand(getNetAllocationCmd)
 
-	getActivityCmd.Flags().StringP(utils.GenericIdFlag, "i", "", "Activity ID (Required)")
-	getActivityCmd.Flags().StringP(utils.FormatFlag, "z", "false", "Pass true for formatted JSON. Default is false")
-	getActivityCmd.Flags().StringP(utils.PortfolioIdFlag, "", "", "Portfolio ID. Uses environment variable if blank")
+	getNetAllocationCmd.Flags().StringP(utils.AllocationIdFlag, "i", "", "ID for allocation lookup (Required)")
+	getNetAllocationCmd.Flags().StringP(utils.FormatFlag, "z", "false", "Pass true for formatted JSON. Default is false")
+	getNetAllocationCmd.Flags().StringP(utils.PortfolioIdFlag, "", "", "Portfolio ID. Uses environment variable if blank")
 
-	getActivityCmd.MarkFlagRequired(utils.GenericIdFlag)
+	getNetAllocationCmd.MarkFlagRequired(utils.AllocationIdFlag)
 }
