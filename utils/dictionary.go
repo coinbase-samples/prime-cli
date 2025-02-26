@@ -20,6 +20,7 @@ const (
 	OrderIdFlag       = "order-id"
 	ProductIdFlag     = "product-id"
 	GenericIdFlag     = "id"
+	ActivityIdFlag    = "activity-id"
 	TransactionIdFlag = "transaction-id"
 	WalletIdFlag      = "wallet-id"
 
@@ -46,6 +47,7 @@ const (
 	DepositTypeFlag         = "deposit-type"
 
 	AllocationIdFlag             = "allocation-id"
+	NettingIdFlag                = "netting-id"
 	SizeTypeFlag                 = "size-type"
 	SourcePortfolioIdFlag        = "source-portfolio-id"
 	RemainderDestPortfolioIdFlag = "remainder-destination-portfolio-id"
@@ -95,6 +97,7 @@ const (
 	ToggleFlag = "toggle"
 
 	PortfolioIdFlag           = "portfolio-id"
+	EntityIdFlag              = "entity-id"
 	IdempotencyKeyFlag        = "idempotency-key"
 	ClientOrderIdFlag         = "client-order-id"
 	DisableDynamicGasFlag     = "disable-dynamic-gas"

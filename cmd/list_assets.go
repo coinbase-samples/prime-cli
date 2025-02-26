@@ -34,11 +34,16 @@ var listAssetsCmd = &cobra.Command{
 
 		assetsService := assets.NewAssetsService(client)
 
+		entityId, err := utils.GetEntityId(cmd, client)
+		if err != nil {
+			return fmt.Errorf("cannot get entity ID: %w", err)
+		}
+
 		ctx, cancel := utils.GetContextWithTimeout()
 		defer cancel()
 
 		request := &assets.ListAssetsRequest{
-			EntityId: client.Credentials().EntityId,
+			EntityId: entityId,
 		}
 
 		response, err := assetsService.ListAssets(ctx, request)
@@ -60,5 +65,6 @@ func init() {
 	rootCmd.AddCommand(listAssetsCmd)
 
 	listAssetsCmd.Flags().StringP(utils.FormatFlag, "z", "false", "Pass true for formatted JSON. Default is false")
+	listAssetsCmd.Flags().StringP(utils.EntityIdFlag, "", "", "Entity ID. Uses environment variable if blank")
 
 }
