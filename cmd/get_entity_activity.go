@@ -25,7 +25,7 @@ import (
 
 var getEntityActivityCmd = &cobra.Command{
 	Use:   "get-entity-activity",
-	Short: "Get activity information using Activity ID only",
+	Short: "Get entity-level activity information using an Activity ID",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		client, err := utils.GetClientFromEnv()
 		if err != nil {
