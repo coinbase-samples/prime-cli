@@ -55,11 +55,11 @@ var createOnchainTransactionCmd = &cobra.Command{
 			Rpc: &model.OnchainRpc{
 				Url:           utils.GetFlagStringValue(cmd, utils.UrlFlag),
 				SkipBroadcast: utils.GetFlagBoolValue(cmd, utils.SkipBroadcastFlag),
-				EvmParams: &model.OnchainEvmParams{
-					DisableDynamicGas:     utils.GetFlagBoolValue(cmd, utils.DisableDynamicGasFlag),
-					ReplacedTransactionId: utils.GetFlagStringValue(cmd, utils.ReplacedTransactionIdFlag),
-					ChainId:               utils.GetFlagStringValue(cmd, utils.ChainIdFlag),
-				},
+			},
+			EvmParams: &model.OnchainEvmParams{
+				DisableDynamicGas:     utils.GetFlagBoolValue(cmd, utils.DisableDynamicGasFlag),
+				ReplacedTransactionId: utils.GetFlagStringValue(cmd, utils.ReplacedTransactionIdFlag),
+				ChainId:               utils.GetFlagStringValue(cmd, utils.ChainIdFlag),
 			},
 		}
 
