@@ -21,7 +21,6 @@ import (
 
 	"github.com/coinbase-samples/prime-cli/utils"
 	"github.com/coinbase-samples/prime-sdk-go/transactions"
-	"github.com/google/uuid"
 	"github.com/spf13/cobra"
 )
 
@@ -38,7 +37,7 @@ var createConversionCmd = &cobra.Command{
 
 		idempotencyKey := utils.GetFlagStringValue(cmd, utils.IdempotencyKeyFlag)
 		if idempotencyKey == "" {
-			idempotencyKey = uuid.New().String()
+			idempotencyKey = utils.NewUuidStr()
 		}
 
 		portfolioId, err := utils.GetPortfolioId(cmd, client)

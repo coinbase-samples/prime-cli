@@ -22,7 +22,6 @@ import (
 	"github.com/coinbase-samples/prime-cli/utils"
 	"github.com/coinbase-samples/prime-sdk-go/model"
 	"github.com/coinbase-samples/prime-sdk-go/orders"
-	"github.com/google/uuid"
 	"github.com/spf13/cobra"
 )
 
@@ -39,7 +38,7 @@ var createOrderCmd = &cobra.Command{
 
 		clientOrderId := utils.GetFlagStringValue(cmd, utils.ClientOrderIdFlag)
 		if clientOrderId == "" {
-			clientOrderId = uuid.New().String()
+			clientOrderId = utils.NewUuidStr()
 		}
 
 		portfolioId, err := utils.GetPortfolioId(cmd, client)
