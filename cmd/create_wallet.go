@@ -76,7 +76,6 @@ var createWalletCmd = &cobra.Command{
 		networkId := utils.GetFlagStringValue(cmd, utils.NetworkIdFlag)
 		if len(networkId) > 0 {
 			network.Id = networkId
-
 		}
 
 		networkType := utils.GetFlagStringValue(cmd, utils.NetworkTypeFlag)
