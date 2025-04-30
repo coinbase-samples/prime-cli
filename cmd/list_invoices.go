@@ -18,7 +18,6 @@ package cmd
 
 import (
 	"fmt"
-	"log"
 
 	"github.com/coinbase-samples/prime-cli/utils"
 	"github.com/coinbase-samples/prime-sdk-go/invoice"
@@ -77,14 +76,14 @@ var listInvoicesCmd = &cobra.Command{
 			Pagination:   pagination,
 		}
 
-		log.Printf("Sending request: %+v\n", request)
+		fmt.Println("Sending request: %+v", request)
 
 		response, err := invoiceService.ListInvoices(ctx, request)
 		if err != nil {
 			return fmt.Errorf("cannot list invoices: %w", err)
 		}
 
-		log.Printf("Received response: %+v\n", response)
+		fmt.Println("Received response: %+v", response)
 
 		jsonResponse, err := utils.FormatResponseAsJson(cmd, response)
 		if err != nil {
