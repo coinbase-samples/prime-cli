@@ -29,6 +29,7 @@ import (
 	"github.com/coinbase-samples/prime-sdk-go/client"
 	"github.com/coinbase-samples/prime-sdk-go/credentials"
 	"github.com/coinbase-samples/prime-sdk-go/model"
+	"github.com/google/uuid"
 	"github.com/spf13/cobra"
 )
 
@@ -180,4 +181,12 @@ func FormatResponseAsJson(cmd *cobra.Command, response interface{}) (string, err
 func GetFlagBoolValue(cmd *cobra.Command, flagName string) bool {
 	value, _ := cmd.Flags().GetBool(flagName)
 	return value
+}
+
+func NewUuid() uuid.UUID {
+	return uuid.New()
+}
+
+func NewUuidStr() string {
+	return NewUuid().String()
 }
