@@ -116,11 +116,11 @@ func MarshalJSON(data interface{}, format bool) ([]byte, error) {
 }
 
 func CheckFormatFlag(cmd *cobra.Command) (bool, error) {
-	formatFlagValue, err := cmd.Flags().GetString(FormatFlag)
+	formatFlagValue, err := cmd.Flags().GetBool(FormatFlag)
 	if err != nil {
 		return false, fmt.Errorf("cannot read format flag: %w", err)
 	}
-	return formatFlagValue == "true", nil
+	return formatFlagValue, nil
 }
 
 func GetPortfolioId(cmd *cobra.Command, client client.RestClient) (string, error) {
