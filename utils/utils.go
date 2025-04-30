@@ -29,6 +29,7 @@ import (
 	"github.com/coinbase-samples/prime-sdk-go/client"
 	"github.com/coinbase-samples/prime-sdk-go/credentials"
 	"github.com/coinbase-samples/prime-sdk-go/model"
+	"github.com/google/uuid"
 	"github.com/spf13/cobra"
 )
 
@@ -116,11 +117,11 @@ func MarshalJSON(data interface{}, format bool) ([]byte, error) {
 }
 
 func CheckFormatFlag(cmd *cobra.Command) (bool, error) {
-	formatFlagValue, err := cmd.Flags().GetString(FormatFlag)
+	formatFlagValue, err := cmd.Flags().GetBool(FormatFlag)
 	if err != nil {
 		return false, fmt.Errorf("cannot read format flag: %w", err)
 	}
-	return formatFlagValue == "true", nil
+	return formatFlagValue, nil
 }
 
 func GetPortfolioId(cmd *cobra.Command, client client.RestClient) (string, error) {
@@ -180,4 +181,12 @@ func FormatResponseAsJson(cmd *cobra.Command, response interface{}) (string, err
 func GetFlagBoolValue(cmd *cobra.Command, flagName string) bool {
 	value, _ := cmd.Flags().GetBool(flagName)
 	return value
+}
+
+func NewUuid() uuid.UUID {
+	return uuid.New()
+}
+
+func NewUuidStr() string {
+	return NewUuid().String()
 }

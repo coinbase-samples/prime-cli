@@ -18,6 +18,7 @@ package cmd
 
 import (
 	"fmt"
+
 	"github.com/coinbase-samples/prime-cli/utils"
 	"github.com/coinbase-samples/prime-sdk-go/allocations"
 	"github.com/spf13/cobra"
@@ -102,7 +103,6 @@ func init() {
 	listPortfolioAllocationsCmd.Flags().StringP(utils.StartFlag, "s", "", "Start time in RFC3339 format (Required)")
 	listPortfolioAllocationsCmd.Flags().StringP(utils.EndFlag, "e", "", "End time in RFC3339 format")
 	listPortfolioAllocationsCmd.Flags().StringP(utils.OrderSideFlag, "o", "", "Side of orders")
-	listPortfolioAllocationsCmd.Flags().StringP(utils.FormatFlag, "z", "false", "Pass true for formatted JSON. Default is false")
 	listPortfolioAllocationsCmd.Flags().StringP(utils.PortfolioIdFlag, "", "", "Portfolio ID. Uses environment variable if blank")
 
 	listPortfolioAllocationsCmd.MarkFlagRequired(utils.StartFlag)

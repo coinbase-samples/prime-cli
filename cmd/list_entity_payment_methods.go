@@ -18,6 +18,7 @@ package cmd
 
 import (
 	"fmt"
+
 	"github.com/coinbase-samples/prime-cli/utils"
 	"github.com/coinbase-samples/prime-sdk-go/paymentmethods"
 	"github.com/spf13/cobra"
@@ -63,6 +64,5 @@ var listEntityPaymentMethodsCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(listEntityPaymentMethodsCmd)
-	listEntityPaymentMethodsCmd.Flags().StringP(utils.FormatFlag, "z", "false", "Pass true for formatted JSON. Default is false")
 	listEntityPaymentMethodsCmd.Flags().StringP(utils.EntityIdFlag, "", "", "Entity ID. Uses environment variable if blank")
 }

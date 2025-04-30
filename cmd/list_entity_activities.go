@@ -18,6 +18,7 @@ package cmd
 
 import (
 	"fmt"
+
 	"github.com/coinbase-samples/prime-cli/utils"
 	"github.com/coinbase-samples/prime-sdk-go/activities"
 	"github.com/spf13/cobra"
@@ -120,7 +121,6 @@ func init() {
 	listEntityActivitiesCmd.Flags().StringSliceP(utils.StatusesFlag, "u", []string{}, "List of statuses")
 	listEntityActivitiesCmd.Flags().StringP(utils.StartFlag, "r", "", "Start time in RFC3339 format")
 	listEntityActivitiesCmd.Flags().StringP(utils.EndFlag, "e", "", "End time in RFC3339 format")
-	listEntityActivitiesCmd.Flags().StringP(utils.FormatFlag, "z", "false", "Pass true for formatted JSON. Default is false")
 	listEntityActivitiesCmd.Flags().StringP(utils.PortfolioIdFlag, "", "", "Portfolio ID. Uses environment variable if blank")
 	listEntityActivitiesCmd.Flags().StringP(utils.EntityIdFlag, "", "", "Entity ID. Uses environment variable if blank")
 }

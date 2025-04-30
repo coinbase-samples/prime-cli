@@ -18,6 +18,7 @@ package cmd
 
 import (
 	"fmt"
+
 	"github.com/coinbase-samples/prime-cli/utils"
 	"github.com/coinbase-samples/prime-sdk-go/assets"
 	"github.com/spf13/cobra"
@@ -64,7 +65,6 @@ var listAssetsCmd = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(listAssetsCmd)
 
-	listAssetsCmd.Flags().StringP(utils.FormatFlag, "z", "false", "Pass true for formatted JSON. Default is false")
 	listAssetsCmd.Flags().StringP(utils.EntityIdFlag, "", "", "Entity ID. Uses environment variable if blank")
 
 }

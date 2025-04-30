@@ -18,6 +18,7 @@ package cmd
 
 import (
 	"fmt"
+
 	"github.com/coinbase-samples/prime-cli/utils"
 	"github.com/coinbase-samples/prime-sdk-go/addressbook"
 	"github.com/spf13/cobra"
@@ -72,7 +73,6 @@ func init() {
 	createAddressBookEntryCmd.Flags().StringP(utils.SymbolFlag, "s", "", "The currency symbol (Required)")
 	createAddressBookEntryCmd.Flags().StringP(utils.NameFlag, "n", "", "Name for the address book entry (Required)")
 	createAddressBookEntryCmd.Flags().StringP(utils.AccountIdFlag, "i", "", "Account identifier for the address")
-	createAddressBookEntryCmd.Flags().StringP(utils.FormatFlag, "z", "false", "Pass true for formatted JSON. Default is false")
 	createAddressBookEntryCmd.Flags().StringP(utils.PortfolioIdFlag, "", "", "Portfolio ID. Uses environment variable if blank")
 
 	createAddressBookEntryCmd.MarkFlagRequired(utils.AddressFlag)

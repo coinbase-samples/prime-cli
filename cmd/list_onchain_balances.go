@@ -18,6 +18,7 @@ package cmd
 
 import (
 	"fmt"
+
 	"github.com/coinbase-samples/prime-cli/utils"
 	"github.com/coinbase-samples/prime-sdk-go/balances"
 
@@ -74,7 +75,6 @@ func init() {
 	rootCmd.AddCommand(listOnchainBalancesCmd)
 
 	listOnchainBalancesCmd.Flags().StringP(utils.WalletIdFlag, "", "", "Wallet ID")
-	listOnchainBalancesCmd.Flags().StringP(utils.FormatFlag, "z", "false", "Pass true for formatted JSON. Default is false")
 	listOnchainBalancesCmd.Flags().StringP(utils.PortfolioIdFlag, "", "", "Portfolio ID. Uses environment variable if blank")
 
 	listOnchainBalancesCmd.MarkFlagRequired(utils.WalletIdFlag)

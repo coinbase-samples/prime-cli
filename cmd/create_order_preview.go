@@ -18,6 +18,7 @@ package cmd
 
 import (
 	"fmt"
+
 	"github.com/coinbase-samples/prime-cli/utils"
 	"github.com/coinbase-samples/prime-sdk-go/model"
 	"github.com/coinbase-samples/prime-sdk-go/orders"
@@ -88,7 +89,6 @@ func init() {
 	createOrderPreviewCmd.Flags().StringP(utils.LimitPriceFlag, "l", "", "Limit price for the order")
 	createOrderPreviewCmd.Flags().StringP(utils.StartTimeFlag, "", "", "Start time of the order in UTC (TWAP only)")
 	createOrderPreviewCmd.Flags().StringP(utils.ExpiryTimeFlag, "", "", "Expiry time of the order in UTC (TWAP and limit GTDT only)")
-	createOrderPreviewCmd.Flags().StringP(utils.FormatFlag, "z", "false", "Pass true for formatted JSON. Default is false")
 	createOrderPreviewCmd.Flags().StringP(utils.PortfolioIdFlag, "", "", "Portfolio ID. Uses environment variable if blank")
 
 	createOrderPreviewCmd.MarkFlagRequired(utils.SideFlag)

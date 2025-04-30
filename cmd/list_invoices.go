@@ -18,9 +18,9 @@ package cmd
 
 import (
 	"fmt"
+
 	"github.com/coinbase-samples/prime-cli/utils"
 	"github.com/coinbase-samples/prime-sdk-go/invoice"
-	"log"
 
 	"github.com/spf13/cobra"
 )
@@ -76,14 +76,14 @@ var listInvoicesCmd = &cobra.Command{
 			Pagination:   pagination,
 		}
 
-		log.Printf("Sending request: %+v\n", request)
+		fmt.Println("Sending request: %+v", request)
 
 		response, err := invoiceService.ListInvoices(ctx, request)
 		if err != nil {
 			return fmt.Errorf("cannot list invoices: %w", err)
 		}
 
-		log.Printf("Received response: %+v\n", response)
+		fmt.Println("Received response: %+v", response)
 
 		jsonResponse, err := utils.FormatResponseAsJson(cmd, response)
 		if err != nil {
@@ -105,5 +105,4 @@ func init() {
 	listInvoicesCmd.Flags().StringSliceP(utils.InvoiceStatesFlag, "s", []string{}, "List of states")
 	listInvoicesCmd.Flags().IntSliceP(utils.InvoiceBillingYear, "y", []int{}, "Billing year")
 	listInvoicesCmd.Flags().IntSliceP(utils.InvoiceBillingMonth, "m", []int{}, "Billing month")
-	listInvoicesCmd.Flags().StringP(utils.FormatFlag, "z", "false", "Pass true for formatted JSON. Default is false")
 }

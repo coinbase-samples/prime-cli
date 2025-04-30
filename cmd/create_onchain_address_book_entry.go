@@ -94,7 +94,6 @@ var createOnchainAddressBookEntryCmd = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(createOnchainAddressBookEntryCmd)
 
-	createOnchainAddressBookEntryCmd.Flags().StringP(utils.FormatFlag, "z", "false", "Pass true for formatted JSON. Default is false")
 	createOnchainAddressBookEntryCmd.Flags().StringP(utils.PortfolioIdFlag, "p", "", "Portfolio ID. Uses environment variable if blank")
 	createOnchainAddressBookEntryCmd.Flags().StringP(utils.GenericIdFlag, "i", "", "Address group ID (Required)")
 	createOnchainAddressBookEntryCmd.Flags().StringP(utils.AddressFlag, "a", "", "Address (Required)")

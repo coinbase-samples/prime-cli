@@ -18,6 +18,7 @@ package cmd
 
 import (
 	"fmt"
+
 	"github.com/coinbase-samples/prime-cli/utils"
 	"github.com/coinbase-samples/prime-sdk-go/orders"
 
@@ -67,7 +68,6 @@ func init() {
 	rootCmd.AddCommand(listOpenOrdersCmd)
 
 	listOpenOrdersCmd.Flags().StringP(utils.ProductIdFlag, "i", "", "ID of the product")
-	listOpenOrdersCmd.Flags().StringP(utils.FormatFlag, "z", "false", "Pass true for formatted JSON. Default is false")
 	listOpenOrdersCmd.Flags().StringP(utils.PortfolioIdFlag, "", "", "Portfolio ID. Uses environment variable if blank")
 
 	listOpenOrdersCmd.MarkFlagRequired(utils.ProductIdFlag)
