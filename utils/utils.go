@@ -124,6 +124,14 @@ func CheckFormatFlag(cmd *cobra.Command) (bool, error) {
 	return formatFlagValue, nil
 }
 
+func IsNoCliPagerFlagSet(cmd *cobra.Command) (bool, error) {
+	flag, err := cmd.Flags().GetBool(NoCliPagerFlag)
+	if err != nil {
+		return false, fmt.Errorf("cannot read no cli pager flag: %w", err)
+	}
+	return flag, nil
+}
+
 func GetPortfolioId(cmd *cobra.Command, client client.RestClient) (string, error) {
 	portfolioId, err := cmd.Flags().GetString(PortfolioIdFlag)
 	if err != nil {
