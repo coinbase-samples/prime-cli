@@ -100,7 +100,6 @@ func init() {
 	listPortfolioFillsCmd.Flags().StringP(utils.CursorFlag, "c", "", "Pagination cursor")
 	listPortfolioFillsCmd.Flags().StringP(utils.LimitFlag, "l", utils.LimitDefault, "Pagination limit")
 	listPortfolioFillsCmd.Flags().StringP(utils.SortDirectionFlag, "d", utils.SortDirectionDefault, "Sort direction")
-	listPortfolioFillsCmd.Flags().StringP(utils.FormatFlag, "z", "false", "Pass true for formatted JSON. Default is false")
 	listPortfolioFillsCmd.Flags().StringP(utils.PortfolioIdFlag, "", "", "Portfolio ID. Uses environment variable if blank")
 
 	listPortfolioFillsCmd.MarkFlagRequired(utils.StartFlag)

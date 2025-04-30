@@ -18,6 +18,7 @@ package cmd
 
 import (
 	"fmt"
+
 	"github.com/coinbase-samples/prime-cli/utils"
 	"github.com/coinbase-samples/prime-sdk-go/activities"
 	"github.com/spf13/cobra"
@@ -61,7 +62,6 @@ func init() {
 	rootCmd.AddCommand(getEntityActivityCmd)
 
 	getEntityActivityCmd.Flags().StringP(utils.ActivityIdFlag, "i", "", "Activity ID (Required)")
-	getEntityActivityCmd.Flags().StringP(utils.FormatFlag, "z", "false", "Pass true for formatted JSON. Default is false")
 	getEntityActivityCmd.Flags().StringP(utils.PortfolioIdFlag, "", "", "Portfolio ID. Uses environment variable if blank")
 
 	getEntityActivityCmd.MarkFlagRequired(utils.GenericIdFlag)

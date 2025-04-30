@@ -18,6 +18,7 @@ package cmd
 
 import (
 	"fmt"
+
 	"github.com/coinbase-samples/prime-cli/utils"
 	"github.com/coinbase-samples/prime-sdk-go/paymentmethods"
 
@@ -62,7 +63,6 @@ func init() {
 	rootCmd.AddCommand(getEntityPaymentMethodCmd)
 
 	getEntityPaymentMethodCmd.Flags().StringP(utils.PaymentMethodIdFlag, "i", "", "Payment Method ID (Required)")
-	getEntityPaymentMethodCmd.Flags().StringP(utils.FormatFlag, "z", "false", "Pass true for formatted JSON. Default is false")
 
 	getEntityPaymentMethodCmd.MarkFlagRequired(utils.PaymentMethodIdFlag)
 }

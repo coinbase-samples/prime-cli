@@ -18,6 +18,7 @@ package cmd
 
 import (
 	"fmt"
+
 	"github.com/coinbase-samples/prime-cli/utils"
 	"github.com/coinbase-samples/prime-sdk-go/wallets"
 
@@ -70,7 +71,6 @@ func init() {
 
 	getWalletDepositInstructionsCmd.Flags().StringP(utils.WalletIdFlag, "i", "", "Wallet ID (Required)")
 	getWalletDepositInstructionsCmd.Flags().StringP(utils.DepositTypeFlag, "d", "", "Wallet deposit type (Required)")
-	getWalletDepositInstructionsCmd.Flags().StringP(utils.FormatFlag, "z", "false", "Pass true for formatted JSON. Default is false")
 	getWalletDepositInstructionsCmd.Flags().StringP(utils.PortfolioIdFlag, "", "", "Portfolio ID. Uses environment variable if blank")
 
 	getWalletDepositInstructionsCmd.MarkFlagRequired(utils.WalletIdFlag)

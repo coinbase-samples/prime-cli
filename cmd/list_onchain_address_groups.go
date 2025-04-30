@@ -64,6 +64,5 @@ var listOnchainAddressGroupsCmd = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(listOnchainAddressGroupsCmd)
 
-	listOnchainAddressGroupsCmd.Flags().StringP(utils.FormatFlag, "z", "false", "Pass true for formatted JSON. Default is false")
 	listOnchainAddressGroupsCmd.Flags().StringP(utils.PortfolioIdFlag, "p", "", "Portfolio ID. Uses environment variable if blank")
 }

@@ -7,8 +7,7 @@
  *
  *  http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
+ * Unless required by applicable law or agreed to in writing, software * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
@@ -17,8 +16,9 @@
 package cmd
 
 import (
-	"github.com/coinbase-samples/prime-cli/utils"
 	"os"
+
+	"github.com/coinbase-samples/prime-cli/utils"
 
 	"github.com/spf13/cobra"
 )
@@ -36,5 +36,5 @@ func Execute() {
 }
 
 func init() {
-	rootCmd.Flags().BoolP(utils.ToggleFlag, "t", false, "Help message for toggle")
+	rootCmd.PersistentFlags().BoolP(utils.FormatFlag, "z", false, "Set to include formatted JSON. Default is false")
 }
