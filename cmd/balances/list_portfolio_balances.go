@@ -73,7 +73,7 @@ var listPortfolioBalancesCmd = &cobra.Command{
 }
 
 func init() {
-	BalancesCmd.AddCommand(listPortfolioBalancesCmd)
+	Cmd.AddCommand(listPortfolioBalancesCmd)
 
 	listPortfolioBalancesCmd.Flags().StringArrayP(utils.TypeFlag, "t", []string{}, "Type of balance")
 	listPortfolioBalancesCmd.Flags().StringSliceP(utils.SymbolsFlag, "s", []string{}, "List of symbols")
