@@ -110,8 +110,8 @@ func GetStartEndFlagsAsTime(cmd *cobra.Command) (time.Time, time.Time, error) {
 func AddPaginationFlags(cmd *cobra.Command, includeSortLimit bool) {
 
 	if includeSortLimit {
-		cmd.Flags().StringP(LimitFlag, "l", LimitDefault, "Pagination limit")
-		cmd.Flags().StringP(SortDirectionFlag, "d", SortDirectionDefault, "Sort direction")
+		cmd.Flags().StringP(LimitFlag, "", LimitDefault, "Pagination limit")
+		cmd.Flags().StringP(SortDirectionFlag, "", SortDirectionDefault, "Sort direction")
 	}
 
 	cmd.Flags().BoolP(AllFlag, "", false, "Set to print all results without manually paging through results")
