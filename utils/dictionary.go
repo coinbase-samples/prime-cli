@@ -17,8 +17,6 @@
 package utils
 
 const (
-	CursorFlag = "cursor" // REMOVE
-
 	OrderIdFlag       = "order-id"
 	ProductIdFlag     = "product-id"
 	GenericIdFlag     = "id"
