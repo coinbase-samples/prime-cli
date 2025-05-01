@@ -20,6 +20,7 @@ import (
 	"fmt"
 
 	"github.com/coinbase-samples/prime-cli/utils"
+	"github.com/coinbase-samples/prime-sdk-go/model"
 	"github.com/coinbase-samples/prime-sdk-go/users"
 
 	"github.com/spf13/cobra"
@@ -34,48 +35,55 @@ var listPortfolioUsersCmd = &cobra.Command{
 			return fmt.Errorf("failed to initialize client: %w", err)
 		}
 
-		usersService := users.NewUsersService(client)
+		svc := users.NewUsersService(client)
 
 		portfolioId, err := utils.GetPortfolioId(cmd, client)
 		if err != nil {
 			return err
 		}
 
-		pagination, err := utils.GetPaginationParams(cmd)
-		if err != nil {
-			return err
-		}
+		return utils.HandleListCmd(
+			cmd,
+			func(paginationParams *model.PaginationParams) (*model.Pagination, error) {
+				response, err := listPortfolioUsers(svc, portfolioId, paginationParams)
+				if err != nil {
+					return nil, err
+				}
 
-		ctx, cancel := utils.GetContextWithTimeout()
-		defer cancel()
+				if err := utils.PrintJsonDocs(cmd, response.Users); err != nil {
+					return nil, err
+				}
 
-		request := &users.ListPortfolioUsersRequest{
-			PortfolioId: portfolioId,
-			Pagination:  pagination,
-		}
-
-		response, err := usersService.ListPortfolioUsers(ctx, request)
-		if err != nil {
-			return fmt.Errorf("cannot list users: %w", err)
-		}
-
-		jsonResponse, err := utils.FormatResponseAsJson(cmd, response)
-		if err != nil {
-			return err
-		}
-
-		fmt.Println(jsonResponse)
-
-		return nil
+				return response.Pagination, nil
+			},
+		)
 	},
+}
+
+func listPortfolioUsers(
+	svc users.UsersService,
+	portfolioId string,
+	pagination *model.PaginationParams,
+) (*users.ListPortfolioUsersResponse, error) {
+	ctx, cancel := utils.GetContextWithTimeout()
+	defer cancel()
+
+	request := &users.ListPortfolioUsersRequest{
+		PortfolioId: portfolioId,
+		Pagination:  pagination,
+	}
+
+	response, err := svc.ListPortfolioUsers(ctx, request)
+	if err != nil {
+		return nil, fmt.Errorf("cannot list users: %w", err)
+	}
+
+	return response, nil
 }
 
 func init() {
 	rootCmd.AddCommand(listPortfolioUsersCmd)
 
-	listPortfolioUsersCmd.Flags().StringP(utils.CursorFlag, "c", "", "Pagination cursor")
-	listPortfolioUsersCmd.Flags().StringP(utils.LimitFlag, "l", utils.LimitDefault, "Pagination limit")
-	listPortfolioUsersCmd.Flags().StringP(utils.SortDirectionFlag, "d", utils.SortDirectionDefault, "Sort direction")
-	listPortfolioUsersCmd.Flags().StringP(utils.PortfolioIdFlag, "", "", "Portfolio ID. Uses environment variable if blank")
-
+	utils.AddPortfolioIdFlag(listPortfolioUsersCmd)
+	utils.AddPaginationFlags(listPortfolioUsersCmd, true)
 }

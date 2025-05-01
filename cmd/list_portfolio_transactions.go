@@ -18,8 +18,10 @@ package cmd
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/coinbase-samples/prime-cli/utils"
+	"github.com/coinbase-samples/prime-sdk-go/model"
 	"github.com/coinbase-samples/prime-sdk-go/transactions"
 
 	"github.com/spf13/cobra"
@@ -34,9 +36,14 @@ var listPortfolioTransactionsCmd = &cobra.Command{
 			return fmt.Errorf("failed to initialize client: %w", err)
 		}
 
-		transactionsService := transactions.NewTransactionsService(client)
+		svc := transactions.NewTransactionsService(client)
 
 		portfolioId, err := utils.GetPortfolioId(cmd, client)
+		if err != nil {
+			return err
+		}
+
+		symbols, err := cmd.Flags().GetString(utils.SymbolsFlag)
 		if err != nil {
 			return err
 		}
@@ -46,62 +53,65 @@ var listPortfolioTransactionsCmd = &cobra.Command{
 			return err
 		}
 
-		startStr, err := cmd.Flags().GetString(utils.StartFlag)
+		start, end, err := utils.GetStartEndFlagsAsTime(cmd)
 		if err != nil {
 			return err
 		}
 
-		endStr, err := cmd.Flags().GetString(utils.EndFlag)
-		if err != nil {
-			return err
-		}
+		return utils.HandleListCmd(
+			cmd,
+			func(paginationParams *model.PaginationParams) (*model.Pagination, error) {
+				response, err := listPortfolioTransactions(svc, portfolioId, types, symbols, start, end, paginationParams)
+				if err != nil {
+					return nil, err
+				}
 
-		start, end, err := utils.ParseDateRange(startStr, endStr)
-		if err != nil {
-			return err
-		}
+				if err := utils.PrintJsonDocs(cmd, response.Transactions); err != nil {
+					return nil, err
+				}
 
-		pagination, err := utils.GetPaginationParams(cmd)
-		if err != nil {
-			return err
-		}
-
-		ctx, cancel := utils.GetContextWithTimeout()
-		defer cancel()
-
-		request := &transactions.ListPortfolioTransactionsRequest{
-			PortfolioId: portfolioId,
-			Symbols:     utils.GetFlagStringValue(cmd, utils.SymbolsFlag),
-			Types:       types,
-			Start:       start,
-			End:         end,
-			Pagination:  pagination,
-		}
-		response, err := transactionsService.ListPortfolioTransactions(ctx, request)
-		if err != nil {
-			return fmt.Errorf("cannot list transactions: %w", err)
-		}
-
-		jsonResponse, err := utils.FormatResponseAsJson(cmd, response)
-		if err != nil {
-			return err
-		}
-
-		fmt.Println(jsonResponse)
-
-		return nil
+				return response.Pagination, nil
+			},
+		)
 	},
+}
+
+func listPortfolioTransactions(
+	svc transactions.TransactionsService,
+	portfolioId string,
+	types []string,
+	symbols string,
+	start,
+	end time.Time,
+	pagination *model.PaginationParams,
+) (*transactions.ListPortfolioTransactionsResponse, error) {
+	ctx, cancel := utils.GetContextWithTimeout()
+	defer cancel()
+
+	request := &transactions.ListPortfolioTransactionsRequest{
+		PortfolioId: portfolioId,
+		Symbols:     symbols,
+		Types:       types,
+		Start:       start,
+		End:         end,
+		Pagination:  pagination,
+	}
+	response, err := svc.ListPortfolioTransactions(ctx, request)
+	if err != nil {
+		return nil, fmt.Errorf("cannot list transactions: %w", err)
+	}
+
+	return response, nil
 }
 
 func init() {
 	rootCmd.AddCommand(listPortfolioTransactionsCmd)
 
 	listPortfolioTransactionsCmd.Flags().StringSliceP(utils.TypesFlag, "t", []string{}, "Types of transactions")
-	listPortfolioTransactionsCmd.Flags().StringP(utils.CursorFlag, "c", "", "Pagination cursor")
-	listPortfolioTransactionsCmd.Flags().StringP(utils.LimitFlag, "l", utils.LimitDefault, "Pagination limit")
-	listPortfolioTransactionsCmd.Flags().StringP(utils.SortDirectionFlag, "d", utils.SortDirectionDefault, "Sort direction")
-	listPortfolioTransactionsCmd.Flags().StringP(utils.StartFlag, "s", "", "Start time in RFC3339 format (Required)")
-	listPortfolioTransactionsCmd.Flags().StringP(utils.EndFlag, "e", "", "End time in RFC3339 format")
 	listPortfolioTransactionsCmd.Flags().StringP(utils.SymbolsFlag, "y", "", "Asset symbols")
-	listPortfolioTransactionsCmd.Flags().StringP(utils.PortfolioIdFlag, "", "", "Portfolio ID. Uses environment variable if blank")
+	listPortfolioTransactionsCmd.MarkFlagRequired(utils.SymbolsFlag)
+
+	utils.AddPortfolioIdFlag(listPortfolioTransactionsCmd)
+	utils.AddPaginationFlags(listPortfolioTransactionsCmd, true)
+	utils.AddStartEndFlags(listPortfolioTransactionsCmd)
 }

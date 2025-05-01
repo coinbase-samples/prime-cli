@@ -20,6 +20,7 @@ import (
 	"fmt"
 
 	"github.com/coinbase-samples/prime-cli/utils"
+	"github.com/coinbase-samples/prime-sdk-go/model"
 	"github.com/coinbase-samples/prime-sdk-go/wallets"
 
 	"github.com/spf13/cobra"
@@ -34,47 +35,61 @@ var listWalletsCmd = &cobra.Command{
 			return fmt.Errorf("failed to initialize client: %w", err)
 		}
 
-		walletsService := wallets.NewWalletsService(client)
+		svc := wallets.NewWalletsService(client)
 
 		portfolioId, err := utils.GetPortfolioId(cmd, client)
 		if err != nil {
 			return err
 		}
 
+		walletType := utils.GetFlagStringValue(cmd, utils.TypeFlag)
+
 		symbols, err := cmd.Flags().GetStringSlice(utils.SymbolsFlag)
 		if err != nil {
 			return fmt.Errorf("cannot get symbols slice: %w", err)
 		}
 
-		pagination, err := utils.GetPaginationParams(cmd)
-		if err != nil {
-			return err
-		}
+		return utils.HandleListCmd(
+			cmd,
+			func(paginationParams *model.PaginationParams) (*model.Pagination, error) {
+				response, err := listWallets(svc, portfolioId, walletType, symbols, paginationParams)
+				if err != nil {
+					return nil, err
+				}
 
-		ctx, cancel := utils.GetContextWithTimeout()
-		defer cancel()
+				if err := utils.PrintJsonDocs(cmd, response.Wallets); err != nil {
+					return nil, err
+				}
 
-		request := &wallets.ListWalletsRequest{
-			PortfolioId: portfolioId,
-			Type:        utils.GetFlagStringValue(cmd, utils.TypeFlag),
-			Symbols:     symbols,
-			Pagination:  pagination,
-		}
-
-		response, err := walletsService.ListWallets(ctx, request)
-		if err != nil {
-			return fmt.Errorf("cannot list users: %w", err)
-		}
-
-		jsonResponse, err := utils.FormatResponseAsJson(cmd, response)
-		if err != nil {
-			return err
-		}
-
-		fmt.Println(jsonResponse)
-
-		return nil
+				return response.Pagination, nil
+			},
+		)
 	},
+}
+
+func listWallets(
+	svc wallets.WalletsService,
+	portfolioId,
+	walletType string,
+	symbols []string,
+	pagination *model.PaginationParams,
+) (*wallets.ListWalletsResponse, error) {
+	ctx, cancel := utils.GetContextWithTimeout()
+	defer cancel()
+
+	request := &wallets.ListWalletsRequest{
+		PortfolioId: portfolioId,
+		Type:        walletType,
+		Symbols:     symbols,
+		Pagination:  pagination,
+	}
+
+	response, err := svc.ListWallets(ctx, request)
+	if err != nil {
+		return nil, fmt.Errorf("cannot list wallets: %w", err)
+	}
+
+	return response, nil
 }
 
 func init() {
@@ -82,10 +97,9 @@ func init() {
 
 	listWalletsCmd.Flags().StringP(utils.TypeFlag, "t", "", "Type of balance (Required)")
 	listWalletsCmd.Flags().StringSliceP(utils.SymbolsFlag, "s", []string{}, "List of symbols")
-	listWalletsCmd.Flags().StringP(utils.CursorFlag, "c", "", "Pagination cursor")
-	listWalletsCmd.Flags().StringP(utils.LimitFlag, "l", utils.LimitDefault, "Pagination limit")
-	listWalletsCmd.Flags().StringP(utils.SortDirectionFlag, "d", utils.SortDirectionDefault, "Sort direction")
-	listWalletsCmd.Flags().StringP(utils.PortfolioIdFlag, "", "", "Portfolio ID. Uses environment variable if blank")
+
+	utils.AddPortfolioIdFlag(listWalletsCmd)
+	utils.AddPaginationFlags(listWalletsCmd, true)
 
 	listWalletsCmd.MarkFlagRequired(utils.TypeFlag)
 }

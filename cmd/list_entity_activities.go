@@ -18,9 +18,11 @@ package cmd
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/coinbase-samples/prime-cli/utils"
 	"github.com/coinbase-samples/prime-sdk-go/activities"
+	"github.com/coinbase-samples/prime-sdk-go/model"
 	"github.com/spf13/cobra"
 )
 
@@ -33,7 +35,7 @@ var listEntityActivitiesCmd = &cobra.Command{
 			return fmt.Errorf("failed to initialize client: %w", err)
 		}
 
-		activitiesService := activities.NewActivitiesService(client)
+		svc := activities.NewActivitiesService(client)
 
 		entityId, err := utils.GetEntityId(cmd, client)
 		if err != nil {
@@ -60,67 +62,71 @@ var listEntityActivitiesCmd = &cobra.Command{
 			return err
 		}
 
-		pagination, err := utils.GetPaginationParams(cmd)
+		start, end, err := utils.GetStartEndFlagsAsTime(cmd)
 		if err != nil {
 			return err
 		}
 
-		startStr, err := cmd.Flags().GetString(utils.StartFlag)
-		if err != nil {
-			return err
-		}
+		return utils.HandleListCmd(
+			cmd,
+			func(paginationParams *model.PaginationParams) (*model.Pagination, error) {
+				response, err := listEntityActivities(svc, entityId, activityLevel, symbols, categories, statuses, start, end, paginationParams)
+				if err != nil {
+					return nil, err
+				}
 
-		endStr, err := cmd.Flags().GetString(utils.EndFlag)
-		if err != nil {
-			return err
-		}
+				if err := utils.PrintJsonDocs(cmd, response.Activities); err != nil {
+					return nil, err
+				}
 
-		start, end, err := utils.ParseDateRange(startStr, endStr)
-		if err != nil {
-			return err
-		}
-
-		ctx, cancel := utils.GetContextWithTimeout()
-		defer cancel()
-
-		request := &activities.ListEntityActivitiesRequest{
-			EntityId:      entityId,
-			ActivityLevel: activityLevel,
-			Symbols:       symbols,
-			Categories:    categories,
-			Statuses:      statuses,
-			StartTime:     start,
-			EndTime:       end,
-			Pagination:    pagination,
-		}
-
-		response, err := activitiesService.ListEntityActivities(ctx, request)
-		if err != nil {
-			return fmt.Errorf("cannot list entity activities: %w", err)
-		}
-
-		jsonResponse, err := utils.FormatResponseAsJson(cmd, response)
-		if err != nil {
-			return err
-		}
-
-		fmt.Println(jsonResponse)
-		return nil
+				return response.Pagination, nil
+			},
+		)
 	},
+}
+
+func listEntityActivities(
+	svc activities.ActivitiesService,
+	entityId,
+	activityLevel string,
+	symbols,
+	categories,
+	statuses []string,
+	start,
+	end time.Time,
+	pagination *model.PaginationParams,
+) (*activities.ListEntityActivitiesResponse, error) {
+	ctx, cancel := utils.GetContextWithTimeout()
+	defer cancel()
+
+	request := &activities.ListEntityActivitiesRequest{
+		EntityId:      entityId,
+		ActivityLevel: activityLevel,
+		Symbols:       symbols,
+		Categories:    categories,
+		Statuses:      statuses,
+		StartTime:     start,
+		EndTime:       end,
+		Pagination:    pagination,
+	}
+
+	response, err := svc.ListEntityActivities(ctx, request)
+	if err != nil {
+		return nil, fmt.Errorf("cannot list entity activities: %w", err)
+	}
+
+	return response, nil
 }
 
 func init() {
 	rootCmd.AddCommand(listEntityActivitiesCmd)
 
-	listEntityActivitiesCmd.Flags().StringP(utils.CursorFlag, "c", "", "Pagination cursor")
-	listEntityActivitiesCmd.Flags().StringP(utils.LimitFlag, "l", utils.LimitDefault, "Pagination limit")
-	listEntityActivitiesCmd.Flags().StringP(utils.SortDirectionFlag, "d", utils.SortDirectionDefault, "Sort direction")
 	listEntityActivitiesCmd.Flags().StringP(utils.ActivityLevelFlag, "a", "", "Activity level")
 	listEntityActivitiesCmd.Flags().StringSliceP(utils.SymbolsFlag, "s", []string{}, "List of symbols")
 	listEntityActivitiesCmd.Flags().StringSliceP(utils.CategoriesFlag, "t", []string{}, "List of categories")
 	listEntityActivitiesCmd.Flags().StringSliceP(utils.StatusesFlag, "u", []string{}, "List of statuses")
-	listEntityActivitiesCmd.Flags().StringP(utils.StartFlag, "r", "", "Start time in RFC3339 format")
-	listEntityActivitiesCmd.Flags().StringP(utils.EndFlag, "e", "", "End time in RFC3339 format")
-	listEntityActivitiesCmd.Flags().StringP(utils.PortfolioIdFlag, "", "", "Portfolio ID. Uses environment variable if blank")
-	listEntityActivitiesCmd.Flags().StringP(utils.EntityIdFlag, "", "", "Entity ID. Uses environment variable if blank")
+
+	utils.AddEntityIdFlag(listEntityActivitiesCmd)
+	utils.AddStartEndFlags(listEntityActivitiesCmd)
+	utils.AddPaginationFlags(listEntityActivitiesCmd, true)
 }

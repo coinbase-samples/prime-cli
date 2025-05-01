@@ -21,6 +21,7 @@ import (
 
 	"github.com/coinbase-samples/prime-cli/utils"
 	"github.com/coinbase-samples/prime-sdk-go/invoice"
+	"github.com/coinbase-samples/prime-sdk-go/model"
 
 	"github.com/spf13/cobra"
 )
@@ -34,7 +35,7 @@ var listInvoicesCmd = &cobra.Command{
 			return fmt.Errorf("failed to initialize client: %w", err)
 		}
 
-		invoiceService := invoice.NewInvoiceService(client)
+		svc := invoice.NewInvoiceService(client)
 
 		states, err := cmd.Flags().GetStringSlice(utils.InvoiceStatesFlag)
 		if err != nil {
@@ -60,49 +61,58 @@ var listInvoicesCmd = &cobra.Command{
 			billingMonth = int32(billingMonthSlice[0])
 		}
 
-		pagination, err := utils.GetPaginationParams(cmd)
-		if err != nil {
-			return fmt.Errorf("cannot get pagination params: %w", err)
-		}
+		return utils.HandleListCmd(
+			cmd,
+			func(paginationParams *model.PaginationParams) (*model.Pagination, error) {
+				response, err := listInvoices(svc, client.Credentials().EntityId, states, billingYear, billingMonth, paginationParams)
+				if err != nil {
+					return nil, err
+				}
 
-		ctx, cancel := utils.GetContextWithTimeout()
-		defer cancel()
+				if err := utils.PrintJsonDocs(cmd, response.Invoices); err != nil {
+					return nil, err
+				}
 
-		request := &invoice.ListInvoicesRequest{
-			EntityId:     client.Credentials().EntityId,
-			States:       states,
-			BillingYear:  billingYear,
-			BillingMonth: billingMonth,
-			Pagination:   pagination,
-		}
-
-		fmt.Println("Sending request: %+v", request)
-
-		response, err := invoiceService.ListInvoices(ctx, request)
-		if err != nil {
-			return fmt.Errorf("cannot list invoices: %w", err)
-		}
-
-		fmt.Println("Received response: %+v", response)
-
-		jsonResponse, err := utils.FormatResponseAsJson(cmd, response)
-		if err != nil {
-			return err
-		}
-
-		fmt.Println(jsonResponse)
-
-		return nil
+				return response.Pagination, nil
+			},
+		)
 	},
+}
+
+func listInvoices(
+	svc invoice.InvoiceService,
+	entityId string,
+	states []string,
+	billingYear,
+	billingMonth int32,
+	pagination *model.PaginationParams,
+) (*invoice.ListInvoicesResponse, error) {
+	ctx, cancel := utils.GetContextWithTimeout()
+	defer cancel()
+
+	request := &invoice.ListInvoicesRequest{
+		EntityId:     entityId,
+		States:       states,
+		BillingYear:  billingYear,
+		BillingMonth: billingMonth,
+		Pagination:   pagination,
+	}
+
+	response, err := svc.ListInvoices(ctx, request)
+	if err != nil {
+		return nil, fmt.Errorf("cannot list invoices: %w", err)
+	}
+
+	return response, nil
 }
 
 func init() {
 	rootCmd.AddCommand(listInvoicesCmd)
 
-	listInvoicesCmd.Flags().StringP(utils.CursorFlag, "c", "", "Pagination cursor")
-	listInvoicesCmd.Flags().StringP(utils.LimitFlag, "l", utils.LimitDefault, "Pagination limit")
-	listInvoicesCmd.Flags().StringP(utils.SortDirectionFlag, "d", utils.SortDirectionDefault, "Sort direction")
 	listInvoicesCmd.Flags().StringSliceP(utils.InvoiceStatesFlag, "s", []string{}, "List of states")
 	listInvoicesCmd.Flags().IntSliceP(utils.InvoiceBillingYear, "y", []int{}, "Billing year")
 	listInvoicesCmd.Flags().IntSliceP(utils.InvoiceBillingMonth, "m", []int{}, "Billing month")
+
+	utils.AddPaginationFlags(listInvoicesCmd, true)
+
 }

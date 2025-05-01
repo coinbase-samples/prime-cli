@@ -57,17 +57,7 @@ var listActivitiesCmd = &cobra.Command{
 			return err
 		}
 
-		startStr, err := cmd.Flags().GetString(utils.StartFlag)
-		if err != nil {
-			return err
-		}
-
-		endStr, err := cmd.Flags().GetString(utils.EndFlag)
-		if err != nil {
-			return err
-		}
-
-		start, end, err := utils.ParseDateRange(startStr, endStr)
+		start, end, err := utils.GetStartEndFlagsAsTime(cmd)
 		if err != nil {
 			return err
 		}
@@ -87,8 +77,6 @@ var listActivitiesCmd = &cobra.Command{
 				return response.Pagination, nil
 			},
 		)
-
-		return nil
 	},
 }
 
@@ -127,6 +115,8 @@ func init() {
 	rootCmd.AddCommand(listActivitiesCmd)
 
 	listActivitiesCmd.Flags().StringSliceP(utils.SymbolsFlag, "s", []string{}, "List of symbols")
+	listPortfolioFillsCmd.MarkFlagRequired(utils.StartFlag)
+
 	listActivitiesCmd.Flags().StringSliceP(utils.CategoriesFlag, "t", []string{}, "List of categories")
 	listActivitiesCmd.Flags().StringSliceP(utils.StatusesFlag, "u", []string{}, "List of statuses")
 

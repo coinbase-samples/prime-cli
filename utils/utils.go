@@ -82,9 +82,29 @@ func AddPortfolioIdFlag(cmd *cobra.Command) {
 	cmd.Flags().StringP(PortfolioIdFlag, "", "", "Portfolio ID. Uses environment variable if blank")
 }
 
+func AddEntityIdFlag(cmd *cobra.Command) {
+	cmd.Flags().StringP(EntityIdFlag, "", "", "Entity ID. Uses environment variable if blank")
+}
+
 func AddStartEndFlags(cmd *cobra.Command) {
 	cmd.Flags().StringP(StartFlag, "", "", "Start time in RFC3339 format")
 	cmd.Flags().StringP(EndFlag, "", "", "End time in RFC3339 format")
+}
+
+func GetStartEndFlagsAsTime(cmd *cobra.Command) (time.Time, time.Time, error) {
+	var now time.Time
+
+	startStr, err := cmd.Flags().GetString(StartFlag)
+	if err != nil {
+		return now, now, err
+	}
+
+	endStr, err := cmd.Flags().GetString(EndFlag)
+	if err != nil {
+		return now, now, err
+	}
+
+	return ParseDateRange(startStr, endStr)
 }
 
 func AddPaginationFlags(cmd *cobra.Command, includeSortLimit bool) {

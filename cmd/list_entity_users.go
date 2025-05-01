@@ -20,6 +20,7 @@ import (
 	"fmt"
 
 	"github.com/coinbase-samples/prime-cli/utils"
+	"github.com/coinbase-samples/prime-sdk-go/model"
 	"github.com/coinbase-samples/prime-sdk-go/users"
 
 	"github.com/spf13/cobra"
@@ -34,40 +35,55 @@ var listEntityUsersCmd = &cobra.Command{
 			return fmt.Errorf("failed to initialize client: %w", err)
 		}
 
-		usersService := users.NewUsersService(client)
+		svc := users.NewUsersService(client)
 
-		pagination, err := utils.GetPaginationParams(cmd)
+		entityId, err := utils.GetEntityId(cmd, client)
 		if err != nil {
-			return err
+			return fmt.Errorf("cannot get entity ID: %w", err)
 		}
 
-		ctx, cancel := utils.GetContextWithTimeout()
-		defer cancel()
+		return utils.HandleListCmd(
+			cmd,
+			func(paginationParams *model.PaginationParams) (*model.Pagination, error) {
+				response, err := listEntityUsers(svc, entityId, paginationParams)
+				if err != nil {
+					return nil, err
+				}
 
-		request := &users.ListEntityUsersRequest{
-			EntityId:   client.Credentials().EntityId,
-			Pagination: pagination,
-		}
+				if err := utils.PrintJsonDocs(cmd, response.Users); err != nil {
+					return nil, err
+				}
 
-		response, err := usersService.ListEntityUsers(ctx, request)
-		if err != nil {
-			return fmt.Errorf("cannot list users: %w", err)
-		}
-
-		jsonResponse, err := utils.FormatResponseAsJson(cmd, response)
-		if err != nil {
-			return err
-		}
-
-		fmt.Println(jsonResponse)
-		return nil
+				return response.Pagination, nil
+			},
+		)
 	},
+}
+
+func listEntityUsers(
+	svc users.UsersService,
+	entityId string,
+	pagination *model.PaginationParams,
+) (*users.ListEntityUsersResponse, error) {
+	ctx, cancel := utils.GetContextWithTimeout()
+	defer cancel()
+
+	request := &users.ListEntityUsersRequest{
+		EntityId:   entityId,
+		Pagination: pagination,
+	}
+
+	response, err := svc.ListEntityUsers(ctx, request)
+	if err != nil {
+		return nil, fmt.Errorf("cannot list users: %w", err)
+	}
+
+	return response, nil
 }
 
 func init() {
 	rootCmd.AddCommand(listEntityUsersCmd)
 
-	listEntityUsersCmd.Flags().StringP(utils.CursorFlag, "c", "", "Pagination cursor")
-	listEntityUsersCmd.Flags().StringP(utils.LimitFlag, "l", utils.LimitDefault, "Pagination limit")
-	listEntityUsersCmd.Flags().StringP(utils.SortDirectionFlag, "d", utils.SortDirectionDefault, "Sort direction")
+	utils.AddEntityIdFlag(listEntityUsersCmd)
+	utils.AddPaginationFlags(listEntityUsersCmd, true)
 }
