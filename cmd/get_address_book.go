@@ -21,6 +21,7 @@ import (
 
 	"github.com/coinbase-samples/prime-cli/utils"
 	"github.com/coinbase-samples/prime-sdk-go/addressbook"
+	"github.com/coinbase-samples/prime-sdk-go/model"
 
 	"github.com/spf13/cobra"
 )
@@ -34,50 +35,61 @@ var getAddressBookCmd = &cobra.Command{
 			return fmt.Errorf("failed to initialize client: %w", err)
 		}
 
-		addressBookService := addressbook.NewAddressBookService(client)
+		svc := addressbook.NewAddressBookService(client)
 
 		portfolioId, err := utils.GetPortfolioId(cmd, client)
 		if err != nil {
 			return err
 		}
 
-		pagination, err := utils.GetPaginationParams(cmd)
-		if err != nil {
-			return err
-		}
+		symbol := utils.GetFlagStringValue(cmd, utils.SymbolFlag)
+		search := utils.GetFlagStringValue(cmd, utils.SearchFlag)
 
-		ctx, cancel := utils.GetContextWithTimeout()
-		defer cancel()
+		return utils.HandleListCmd(
+			cmd,
+			func(paginationParams *model.PaginationParams) (*model.Pagination, error) {
+				response, err := getAddressBookEntries(svc, portfolioId, symbol, search, paginationParams)
+				if err != nil {
+					return nil, err
+				}
 
-		request := &addressbook.GetAddressBookRequest{
-			PortfolioId: portfolioId,
-			Symbol:      utils.GetFlagStringValue(cmd, utils.SymbolFlag),
-			Search:      utils.GetFlagStringValue(cmd, utils.SearchFlag),
-			Pagination:  pagination,
-		}
-		response, err := addressBookService.GetAddressBook(ctx, request)
-		if err != nil {
-			return fmt.Errorf("cannot get address book: %w", err)
-		}
+				if err := utils.PrintJsonDocs(cmd, response.Addresses); err != nil {
+					return nil, err
+				}
 
-		jsonResponse, err := utils.FormatResponseAsJson(cmd, response)
-		if err != nil {
-			return err
-		}
-
-		fmt.Println(jsonResponse)
-		return nil
+				return response.Pagination, nil
+			})
 	},
+}
+
+func getAddressBookEntries(
+	svc addressbook.AddressBookService,
+	portfolioId,
+	symbol,
+	search string,
+	pagination *model.PaginationParams,
+) (*addressbook.GetAddressBookResponse, error) {
+	ctx, cancel := utils.GetContextWithTimeout()
+	defer cancel()
+
+	request := &addressbook.GetAddressBookRequest{
+		PortfolioId: portfolioId,
+		Symbol:      symbol,
+		Search:      search,
+		Pagination:  pagination,
+	}
+	response, err := svc.GetAddressBook(ctx, request)
+	if err != nil {
+		return nil, fmt.Errorf("cannot get address book: %w", err)
+	}
+
+	return response, nil
 }
 
 func init() {
 	rootCmd.AddCommand(getAddressBookCmd)
-
 	getAddressBookCmd.Flags().StringP(utils.SymbolFlag, "s", "", "Currency symbol for filtering address book entries")
 	getAddressBookCmd.Flags().StringP(utils.SearchFlag, "e", "", "Search term for filtering address book entries")
-	getAddressBookCmd.Flags().StringP(utils.CursorFlag, "c", "", "Cursor for pagination")
-	getAddressBookCmd.Flags().StringP(utils.LimitFlag, "l", "", "Limit for pagination")
-	getAddressBookCmd.Flags().StringP(utils.SortDirectionFlag, "d", "", "Sort direction for pagination")
-	getAddressBookCmd.Flags().StringP(utils.PortfolioIdFlag, "", "", "Portfolio ID. Uses environment variable if blank")
-
+	utils.AddPortfolioIdFlag(getAddressBookCmd)
+	utils.AddPaginationFlags(getAddressBookCmd, true)
 }

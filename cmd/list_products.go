@@ -48,7 +48,7 @@ var listProductsCmd = &cobra.Command{
 			func(paginationParams *model.PaginationParams) (*model.Pagination, error) {
 				response, err := listProducts(svc, portfolioId, paginationParams)
 				if err != nil {
-					return nil, fmt.Errorf("unable to retrieve products: %w", err)
+					return nil, err
 				}
 
 				if err := utils.PrintJsonDocs(cmd, response.Products); err != nil {
@@ -83,13 +83,6 @@ func listProducts(
 
 func init() {
 	rootCmd.AddCommand(listProductsCmd)
-
-	listProductsCmd.Flags().StringP(utils.CursorFlag, "c", "", "Pagination cursor")
-	listProductsCmd.Flags().StringP(utils.LimitFlag, "l", utils.LimitDefault, "Pagination limit")
-	listProductsCmd.Flags().StringP(utils.SortDirectionFlag, "d", utils.SortDirectionDefault, "Sort direction")
-	listProductsCmd.Flags().StringP(utils.PortfolioIdFlag, "", "", "Portfolio ID. Uses environment variable if blank")
-
-	listProductsCmd.Flags().BoolP(utils.AllFlag, "", false, "Set to print all results without manually paging through results")
-	listProductsCmd.Flags().BoolP(utils.InteractiveFlag, "", false, "Iterate through all results by manually paging through results")
-
+	utils.AddPortfolioIdFlag(listProductsCmd)
+	utils.AddPaginationFlags(listProductsCmd, true)
 }

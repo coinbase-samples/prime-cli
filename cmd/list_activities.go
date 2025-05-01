@@ -18,9 +18,11 @@ package cmd
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/coinbase-samples/prime-cli/utils"
 	"github.com/coinbase-samples/prime-sdk-go/activities"
+	"github.com/coinbase-samples/prime-sdk-go/model"
 	"github.com/spf13/cobra"
 )
 
@@ -33,7 +35,7 @@ var listActivitiesCmd = &cobra.Command{
 			return fmt.Errorf("failed to initialize client: %w", err)
 		}
 
-		activitiesService := activities.NewActivitiesService(client)
+		svc := activities.NewActivitiesService(client)
 
 		portfolioId, err := utils.GetPortfolioId(cmd, client)
 		if err != nil {
@@ -55,11 +57,6 @@ var listActivitiesCmd = &cobra.Command{
 			return err
 		}
 
-		pagination, err := utils.GetPaginationParams(cmd)
-		if err != nil {
-			return err
-		}
-
 		startStr, err := cmd.Flags().GetString(utils.StartFlag)
 		if err != nil {
 			return err
@@ -75,46 +72,65 @@ var listActivitiesCmd = &cobra.Command{
 			return err
 		}
 
-		ctx, cancel := utils.GetContextWithTimeout()
-		defer cancel()
+		return utils.HandleListCmd(
+			cmd,
+			func(paginationParams *model.PaginationParams) (*model.Pagination, error) {
+				response, err := listActivities(svc, portfolioId, symbols, categories, statuses, start, end, paginationParams)
+				if err != nil {
+					return nil, err
+				}
 
-		request := &activities.ListActivitiesRequest{
-			PortfolioId: portfolioId,
-			Symbols:     symbols,
-			Categories:  categories,
-			Statuses:    statuses,
-			Start:       start,
-			End:         end,
-			Pagination:  pagination,
-		}
+				if err := utils.PrintJsonDocs(cmd, response.Activities); err != nil {
+					return nil, err
+				}
 
-		response, err := activitiesService.ListActivities(ctx, request)
-		if err != nil {
-			return fmt.Errorf("cannot list activities: %w", err)
-		}
+				return response.Pagination, nil
+			})
 
-		jsonResponse, err := utils.FormatResponseAsJson(cmd, response)
-		if err != nil {
-			return err
-		}
-
-		fmt.Println(jsonResponse)
 		return nil
 	},
+}
+
+func listActivities(
+	svc activities.ActivitiesService,
+	portfolioId string,
+	symbols,
+	categories,
+	statuses []string,
+	start,
+	end time.Time,
+	pagination *model.PaginationParams,
+) (*activities.ListActivitiesResponse, error) {
+	ctx, cancel := utils.GetContextWithTimeout()
+	defer cancel()
+
+	request := &activities.ListActivitiesRequest{
+		PortfolioId: portfolioId,
+		Symbols:     symbols,
+		Categories:  categories,
+		Statuses:    statuses,
+		Start:       start,
+		End:         end,
+		Pagination:  pagination,
+	}
+
+	response, err := svc.ListActivities(ctx, request)
+	if err != nil {
+		return nil, fmt.Errorf("cannot list activities: %w", err)
+	}
+
+	return response, nil
 }
 
 func init() {
 	rootCmd.AddCommand(listActivitiesCmd)
 
-	listActivitiesCmd.Flags().StringP(utils.CursorFlag, "c", "", "Pagination cursor")
-	listActivitiesCmd.Flags().StringP(utils.LimitFlag, "l", utils.LimitDefault, "Pagination limit")
-	listActivitiesCmd.Flags().StringP(utils.SortDirectionFlag, "d", utils.SortDirectionDefault, "Sort direction")
 	listActivitiesCmd.Flags().StringSliceP(utils.SymbolsFlag, "s", []string{}, "List of symbols")
 	listActivitiesCmd.Flags().StringSliceP(utils.CategoriesFlag, "t", []string{}, "List of categories")
 	listActivitiesCmd.Flags().StringSliceP(utils.StatusesFlag, "u", []string{}, "List of statuses")
-	listActivitiesCmd.Flags().StringP(utils.StartFlag, "r", "", "Start time in RFC3339 format")
-	listActivitiesCmd.Flags().StringP(utils.EndFlag, "e", "", "End time in RFC3339 format")
-	listActivitiesCmd.Flags().StringP(utils.PortfolioIdFlag, "", "", "Portfolio ID. Uses environment variable if blank")
 
-	rootCmd.AddCommand(listActivitiesCmd)
+	utils.AddStartEndFlags(listActivitiesCmd)
+
+	utils.AddPortfolioIdFlag(listActivitiesCmd)
+	utils.AddPaginationFlags(listActivitiesCmd, true)
 }
