@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package transactions
+package invoices
 
 import (
 	"github.com/spf13/cobra"
 )
 
 var Cmd = &cobra.Command{
-	Use:   "transactions",
-	Short: "The transactions commands",
+	Use:   "invoices",
+	Short: "The invoices commands",
 }
