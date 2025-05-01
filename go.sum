@@ -1,7 +1,7 @@
 github.com/coinbase-samples/core-go v0.2.1 h1:O5V7je5D95C2000GRC0CM8tNFBfRkaITvu56KHeZirc=
 github.com/coinbase-samples/core-go v0.2.1/go.mod h1:Owx2Pv2gQIUODJ5Ck+g3h/MQ8bftv9OuoTVP8VVH8SI=
-github.com/coinbase-samples/prime-sdk-go v0.3.6 h1:6QvTtR+SWpSEs7QYcp7lJHyJmCdcpIFAe7Fbz/kU5EU=
-github.com/coinbase-samples/prime-sdk-go v0.3.6/go.mod h1:orFTxU1U6RTFXDHam3NTDqx8qYbZ+KunDjh3EW6YJeo=
+github.com/coinbase-samples/prime-sdk-go v0.3.7 h1:Vgyuc7yLd27V24IAL+akxaLagBgSUgBoBXn/LqF6AWU=
+github.com/coinbase-samples/prime-sdk-go v0.3.7/go.mod h1:orFTxU1U6RTFXDHam3NTDqx8qYbZ+KunDjh3EW6YJeo=
 github.com/cpuguy83/go-md2man/v2 v2.0.6/go.mod h1:oOW0eioCTA6cOiMLiUPZOpcVxMig6NIQQ7OS05n1F4g=
 github.com/google/uuid v1.6.0 h1:NIvaJDMOsjHA8n1jAhLSgzrAzy1Hgr+hNrb57e+94F0=
 github.com/google/uuid v1.6.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
