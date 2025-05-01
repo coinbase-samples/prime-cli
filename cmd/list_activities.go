@@ -115,8 +115,6 @@ func init() {
 	rootCmd.AddCommand(listActivitiesCmd)
 
 	listActivitiesCmd.Flags().StringSliceP(utils.SymbolsFlag, "s", []string{}, "List of symbols")
-	listPortfolioFillsCmd.MarkFlagRequired(utils.StartFlag)
-
 	listActivitiesCmd.Flags().StringSliceP(utils.CategoriesFlag, "t", []string{}, "List of categories")
 	listActivitiesCmd.Flags().StringSliceP(utils.StatusesFlag, "u", []string{}, "List of statuses")
 

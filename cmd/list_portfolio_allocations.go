@@ -18,9 +18,11 @@ package cmd
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/coinbase-samples/prime-cli/utils"
 	"github.com/coinbase-samples/prime-sdk-go/allocations"
+	"github.com/coinbase-samples/prime-sdk-go/model"
 	"github.com/spf13/cobra"
 )
 
@@ -33,7 +35,7 @@ var listPortfolioAllocationsCmd = &cobra.Command{
 			return fmt.Errorf("failed to initialize client: %w", err)
 		}
 
-		allocationsService := allocations.NewAllocationsService(client)
+		svc := allocations.NewAllocationsService(client)
 
 		portfolioId, err := utils.GetPortfolioId(cmd, client)
 		if err != nil {
@@ -45,65 +47,71 @@ var listPortfolioAllocationsCmd = &cobra.Command{
 			return err
 		}
 
-		startStr, err := cmd.Flags().GetString(utils.StartFlag)
+		start, end, err := utils.GetStartEndFlagsAsTime(cmd)
 		if err != nil {
 			return err
 		}
 
-		endStr, err := cmd.Flags().GetString(utils.EndFlag)
-		if err != nil {
-			return err
-		}
+		side := utils.GetFlagStringValue(cmd, utils.OrderSideFlag)
 
-		start, end, err := utils.ParseDateRange(startStr, endStr)
-		if err != nil {
-			return err
-		}
+		return utils.HandleListCmd(
+			cmd,
+			func(paginationParams *model.PaginationParams) (*model.Pagination, error) {
+				response, err := listPortfolioAllocations(svc, portfolioId, productIds, side, start, end, paginationParams)
+				if err != nil {
+					return nil, err
+				}
 
-		pagination, err := utils.GetPaginationParams(cmd)
-		if err != nil {
-			return err
-		}
+				if err := utils.PrintJsonDocs(cmd, response.Allocations); err != nil {
+					return nil, err
+				}
 
-		ctx, cancel := utils.GetContextWithTimeout()
-		defer cancel()
+				return response.Pagination, nil
+			},
+		)
 
-		request := &allocations.ListPortfolioAllocationsRequest{
-			PortfolioId: portfolioId,
-			ProductIds:  productIds,
-			Side:        utils.GetFlagStringValue(cmd, utils.OrderSideFlag),
-			Start:       start,
-			End:         end,
-			Pagination:  pagination,
-		}
-
-		response, err := allocationsService.ListPortfolioAllocations(ctx, request)
-		if err != nil {
-			return fmt.Errorf("cannot list allocations: %w", err)
-		}
-
-		jsonResponse, err := utils.FormatResponseAsJson(cmd, response)
-		if err != nil {
-			return err
-		}
-
-		fmt.Println(jsonResponse)
-
-		return nil
 	},
+}
+
+func listPortfolioAllocations(
+	svc allocations.AllocationsService,
+	portfolioId string,
+	productIds []string,
+	side string,
+	start,
+	end time.Time,
+	pagination *model.PaginationParams,
+) (*allocations.ListPortfolioAllocationsResponse, error) {
+	ctx, cancel := utils.GetContextWithTimeout()
+	defer cancel()
+
+	request := &allocations.ListPortfolioAllocationsRequest{
+		PortfolioId: portfolioId,
+		ProductIds:  productIds,
+		Side:        side,
+		Start:       start,
+		End:         end,
+		Pagination:  pagination,
+	}
+
+	response, err := svc.ListPortfolioAllocations(ctx, request)
+	if err != nil {
+		return nil, fmt.Errorf("cannot list allocations: %w", err)
+	}
+
+	return response, nil
+
 }
 
 func init() {
 	rootCmd.AddCommand(listPortfolioAllocationsCmd)
 
-	listPortfolioAllocationsCmd.Flags().StringSliceP(utils.ProductIdsFlag, "p", []string{}, "List of product IDs")
-	listPortfolioAllocationsCmd.Flags().StringP(utils.CursorFlag, "c", "", "Pagination cursor")
-	listPortfolioAllocationsCmd.Flags().StringP(utils.LimitFlag, "l", utils.LimitDefault, "Pagination limit")
-	listPortfolioAllocationsCmd.Flags().StringP(utils.SortDirectionFlag, "d", utils.SortDirectionDefault, "Sort direction")
-	listPortfolioAllocationsCmd.Flags().StringP(utils.StartFlag, "s", "", "Start time in RFC3339 format (Required)")
-	listPortfolioAllocationsCmd.Flags().StringP(utils.EndFlag, "e", "", "End time in RFC3339 format")
-	listPortfolioAllocationsCmd.Flags().StringP(utils.OrderSideFlag, "o", "", "Side of orders")
-	listPortfolioAllocationsCmd.Flags().StringP(utils.PortfolioIdFlag, "", "", "Portfolio ID. Uses environment variable if blank")
+	listPortfolioAllocationsCmd.Flags().StringSliceP(utils.ProductIdsFlag, "", []string{}, "List of product IDs")
+	listPortfolioAllocationsCmd.Flags().StringP(utils.OrderSideFlag, "", "", "Side of orders")
+
+	utils.AddPortfolioIdFlag(listPortfolioAllocationsCmd)
+	utils.AddPaginationFlags(listPortfolioAllocationsCmd, true)
+	utils.AddStartEndFlags(listPortfolioAllocationsCmd)
 
 	listPortfolioAllocationsCmd.MarkFlagRequired(utils.StartFlag)
 }
