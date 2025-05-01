@@ -89,7 +89,7 @@ var createWithdrawalCmd = &cobra.Command{
 }
 
 func init() {
-	TransactionsCmd.AddCommand(createWithdrawalCmd)
+	Cmd.AddCommand(createWithdrawalCmd)
 
 	createWithdrawalCmd.Flags().StringP(utils.SourceWalletIdFlag, "1", "", "ID of the source wallet (Required)")
 	createWithdrawalCmd.Flags().StringP(utils.SymbolFlag, "s", "", "Symbol of the currency (Required)")

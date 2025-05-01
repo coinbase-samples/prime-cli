@@ -73,7 +73,7 @@ var createTransferCmd = &cobra.Command{
 }
 
 func init() {
-	TransactionsCmd.AddCommand(createTransferCmd)
+	Cmd.AddCommand(createTransferCmd)
 
 	createTransferCmd.Flags().StringP(utils.SourceWalletIdFlag, "1", "", "ID of the source wallet (Required)")
 	createTransferCmd.Flags().StringP(utils.SymbolFlag, "s", "", "Symbol of the asset to be transferred (Required)")

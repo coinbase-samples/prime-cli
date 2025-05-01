@@ -106,7 +106,7 @@ func listWalletTransactions(
 }
 
 func init() {
-	TransactionsCmd.AddCommand(listWalletTransactionsCmd)
+	Cmd.AddCommand(listWalletTransactionsCmd)
 
 	listWalletTransactionsCmd.Flags().StringP(utils.WalletIdFlag, "i", "", "ID for given wallet")
 	listWalletTransactionsCmd.Flags().StringSliceP(utils.TypesFlag, "t", []string{}, "Types of transactions")

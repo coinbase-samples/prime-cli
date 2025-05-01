@@ -74,7 +74,7 @@ var createConversionCmd = &cobra.Command{
 }
 
 func init() {
-	TransactionsCmd.AddCommand(createConversionCmd)
+	Cmd.AddCommand(createConversionCmd)
 
 	createConversionCmd.Flags().StringP(utils.SourceWalletIdFlag, "i", "", "ID of the source wallet (Required)")
 	createConversionCmd.Flags().StringP(utils.SourceSymbolFlag, "s", "", "Symbol of the source wallet (Required)")

@@ -89,7 +89,7 @@ var createOnchainTransactionCmd = &cobra.Command{
 }
 
 func init() {
-	TransactionsCmd.AddCommand(createOnchainTransactionCmd)
+	Cmd.AddCommand(createOnchainTransactionCmd)
 
 	createOnchainTransactionCmd.Flags().StringP(utils.RawUnsignedTransactionFlag, "r", "", "Raw unsigned transaction (Required)")
 	createOnchainTransactionCmd.Flags().StringP(utils.UrlFlag, "u", "", "RPC URL")

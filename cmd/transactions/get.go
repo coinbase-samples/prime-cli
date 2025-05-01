@@ -66,7 +66,7 @@ var getTransactionCmd = &cobra.Command{
 }
 
 func init() {
-	TransactionsCmd.AddCommand(getTransactionCmd)
+	Cmd.AddCommand(getTransactionCmd)
 
 	getTransactionCmd.Flags().StringP(utils.TransactionIdFlag, "i", "", "Transaction ID (Required)")
 	getTransactionCmd.Flags().StringP(utils.PortfolioIdFlag, "", "", "Portfolio ID. Uses environment variable if blank")
