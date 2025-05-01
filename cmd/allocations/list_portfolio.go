@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package cmd
+package allocations
 
 import (
 	"fmt"
@@ -27,7 +27,7 @@ import (
 )
 
 var listPortfolioAllocationsCmd = &cobra.Command{
-	Use:   "list-portfolio-allocations",
+	Use:   "list-portfolio",
 	Short: "A brief description of your command",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		client, err := utils.GetClientFromEnv()
@@ -104,7 +104,7 @@ func listPortfolioAllocations(
 }
 
 func init() {
-	rootCmd.AddCommand(listPortfolioAllocationsCmd)
+	AllocationsCmd.AddCommand(listPortfolioAllocationsCmd)
 
 	listPortfolioAllocationsCmd.Flags().StringSliceP(utils.ProductIdsFlag, "", []string{}, "List of product IDs")
 	listPortfolioAllocationsCmd.Flags().StringP(utils.OrderSideFlag, "", "", "Side of orders")

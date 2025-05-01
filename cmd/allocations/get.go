@@ -1,5 +1,5 @@
 /**
- * Copyright 2025-present Coinbase Global, Inc.
+ * Copyright 2023-present Coinbase Global, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package cmd
+package allocations
 
 import (
 	"fmt"
@@ -25,9 +25,9 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var getNetAllocationCmd = &cobra.Command{
-	Use:   "get-net-allocation",
-	Short: "Get a net allocation using a net allocation ID",
+var getAllocationCmd = &cobra.Command{
+	Use:   "get",
+	Short: "Get an allocation using an allocation ID",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		client, err := utils.GetClientFromEnv()
 		if err != nil {
@@ -44,14 +44,14 @@ var getNetAllocationCmd = &cobra.Command{
 		ctx, cancel := utils.GetContextWithTimeout()
 		defer cancel()
 
-		request := &allocations.GetPortfolioNetAllocationRequest{
-			PortfolioId: portfolioId,
-			NettingId:   utils.GetFlagStringValue(cmd, utils.NettingIdFlag),
+		request := &allocations.GetPortfolioAllocationRequest{
+			PortfolioId:  portfolioId,
+			AllocationId: utils.GetFlagStringValue(cmd, utils.AllocationIdFlag),
 		}
 
-		response, err := allocationsService.GetPortfolioNetAllocation(ctx, request)
+		response, err := allocationsService.GetPortfolioAllocation(ctx, request)
 		if err != nil {
-			return fmt.Errorf("cannot get net allocation: %w", err)
+			return fmt.Errorf("cannot get allocation: %w", err)
 		}
 
 		jsonResponse, err := utils.FormatResponseAsJson(cmd, response)
@@ -65,10 +65,10 @@ var getNetAllocationCmd = &cobra.Command{
 }
 
 func init() {
-	rootCmd.AddCommand(getNetAllocationCmd)
+	AllocationsCmd.AddCommand(getAllocationCmd)
 
-	getNetAllocationCmd.Flags().StringP(utils.AllocationIdFlag, "i", "", "ID for allocation lookup (Required)")
-	getNetAllocationCmd.Flags().StringP(utils.PortfolioIdFlag, "", "", "Portfolio ID. Uses environment variable if blank")
+	getAllocationCmd.Flags().StringP(utils.AllocationIdFlag, "i", "", "ID for allocation lookup (Required)")
+	getAllocationCmd.Flags().StringP(utils.PortfolioIdFlag, "", "", "Portfolio ID. Uses environment variable if blank")
 
-	getNetAllocationCmd.MarkFlagRequired(utils.AllocationIdFlag)
+	getAllocationCmd.MarkFlagRequired(utils.AllocationIdFlag)
 }

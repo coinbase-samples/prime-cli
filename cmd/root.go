@@ -19,6 +19,7 @@ import (
 	"os"
 
 	"github.com/coinbase-samples/prime-cli/cmd/activities"
+	"github.com/coinbase-samples/prime-cli/cmd/allocations"
 	"github.com/coinbase-samples/prime-cli/cmd/balances"
 	"github.com/coinbase-samples/prime-cli/cmd/orders"
 	"github.com/coinbase-samples/prime-cli/cmd/portfolios"
@@ -49,4 +50,5 @@ func init() {
 	rootCmd.AddCommand(transactions.TransactionsCmd)
 	rootCmd.AddCommand(activities.ActivitiesCmd)
 	rootCmd.AddCommand(portfolios.PortfoliosCmd)
+	rootCmd.AddCommand(allocations.AllocationsCmd)
 }

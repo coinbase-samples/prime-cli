@@ -13,7 +13,7 @@
 * limitations under the License.
  */
 
-package cmd
+package allocations
 
 import (
 	"encoding/json"
@@ -26,7 +26,7 @@ import (
 )
 
 var createAllocationCmd = &cobra.Command{
-	Use:   "create-allocation",
+	Use:   "create",
 	Short: "Create a portfolio allocation.",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		client, err := utils.GetClientFromEnv()
@@ -80,7 +80,7 @@ var createAllocationCmd = &cobra.Command{
 }
 
 func init() {
-	rootCmd.AddCommand(createAllocationCmd)
+	AllocationsCmd.AddCommand(createAllocationCmd)
 
 	createAllocationCmd.Flags().StringP(utils.AllocationIdFlag, "i", "", "ID of the allocation (Required)")
 	createAllocationCmd.Flags().StringP(utils.SourcePortfolioIdFlag, "s", "", "ID of the source portfolio (Required)")
