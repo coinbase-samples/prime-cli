@@ -21,6 +21,7 @@ import (
 	"github.com/coinbase-samples/prime-cli/cmd/activities"
 	"github.com/coinbase-samples/prime-cli/cmd/allocations"
 	"github.com/coinbase-samples/prime-cli/cmd/balances"
+	"github.com/coinbase-samples/prime-cli/cmd/commission"
 	"github.com/coinbase-samples/prime-cli/cmd/orders"
 	"github.com/coinbase-samples/prime-cli/cmd/portfolios"
 	"github.com/coinbase-samples/prime-cli/cmd/transactions"
@@ -44,11 +45,12 @@ func Execute() {
 
 func init() {
 	rootCmd.PersistentFlags().BoolP(utils.FormatFlag, "z", false, "Set to include formatted JSON. Default is false")
-	rootCmd.AddCommand(orders.OrdersCmd)
-	rootCmd.AddCommand(wallets.WalletsCmd)
-	rootCmd.AddCommand(balances.BalancesCmd)
-	rootCmd.AddCommand(transactions.TransactionsCmd)
-	rootCmd.AddCommand(activities.ActivitiesCmd)
-	rootCmd.AddCommand(portfolios.PortfoliosCmd)
-	rootCmd.AddCommand(allocations.AllocationsCmd)
+	rootCmd.AddCommand(orders.Cmd)
+	rootCmd.AddCommand(wallets.Cmd)
+	rootCmd.AddCommand(balances.Cmd)
+	rootCmd.AddCommand(transactions.Cmd)
+	rootCmd.AddCommand(activities.Cmd)
+	rootCmd.AddCommand(portfolios.Cmd)
+	rootCmd.AddCommand(allocations.Cmd)
+	rootCmd.AddCommand(commission.Cmd)
 }
