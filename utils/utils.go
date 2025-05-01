@@ -83,8 +83,8 @@ func AddPortfolioIdFlag(cmd *cobra.Command) {
 }
 
 func AddStartEndFlags(cmd *cobra.Command) {
-	cmd.Flags().StringP(StartFlag, "r", "", "Start time in RFC3339 format")
-	cmd.Flags().StringP(EndFlag, "e", "", "End time in RFC3339 format")
+	cmd.Flags().StringP(StartFlag, "", "", "Start time in RFC3339 format")
+	cmd.Flags().StringP(EndFlag, "", "", "End time in RFC3339 format")
 }
 
 func AddPaginationFlags(cmd *cobra.Command, includeSortLimit bool) {
