@@ -17,6 +17,8 @@
 package utils
 
 const (
+	CursorFlag = "cursor" // REMOVE
+
 	OrderIdFlag       = "order-id"
 	ProductIdFlag     = "product-id"
 	GenericIdFlag     = "id"
@@ -62,7 +64,6 @@ const (
 
 	JsonIndent        = "  "
 	SearchFlag        = "search"
-	CursorFlag        = "cursor"
 	LimitFlag         = "limit"
 	SortDirectionFlag = "sort-direction"
 

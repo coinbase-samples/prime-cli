@@ -78,12 +78,27 @@ func PrintJsonDocs[T any](cmd *cobra.Command, items []T) error {
 	return nil
 }
 
-func GetPaginationParams(cmd *cobra.Command) (*model.PaginationParams, error) {
-	cursor, err := cmd.Flags().GetString("cursor")
-	if err != nil {
-		return nil, fmt.Errorf("cannot parse cursor: %w", err)
+func AddPortfolioIdFlag(cmd *cobra.Command) {
+	cmd.Flags().StringP(PortfolioIdFlag, "", "", "Portfolio ID. Uses environment variable if blank")
+}
+
+func AddStartEndFlags(cmd *cobra.Command) {
+	cmd.Flags().StringP(StartFlag, "r", "", "Start time in RFC3339 format")
+	cmd.Flags().StringP(EndFlag, "e", "", "End time in RFC3339 format")
+}
+
+func AddPaginationFlags(cmd *cobra.Command, includeSortLimit bool) {
+
+	if includeSortLimit {
+		cmd.Flags().StringP(LimitFlag, "l", LimitDefault, "Pagination limit")
+		cmd.Flags().StringP(SortDirectionFlag, "d", SortDirectionDefault, "Sort direction")
 	}
 
+	cmd.Flags().BoolP(AllFlag, "", false, "Set to print all results without manually paging through results")
+	cmd.Flags().BoolP(InteractiveFlag, "", false, "Iterate through all results by manually paging through results")
+}
+
+func GetPaginationParams(cmd *cobra.Command) (*model.PaginationParams, error) {
 	limitStr, err := cmd.Flags().GetString("limit")
 	if err != nil {
 		return nil, fmt.Errorf("cannot parse limit: %w", err)
@@ -100,7 +115,7 @@ func GetPaginationParams(cmd *cobra.Command) (*model.PaginationParams, error) {
 	}
 
 	return &model.PaginationParams{
-		Cursor:        cursor,
+		Cursor:        "",
 		Limit:         int32(limit),
 		SortDirection: sortDirection,
 	}, nil
