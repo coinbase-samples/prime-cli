@@ -78,7 +78,7 @@ var createOrderPreviewCmd = &cobra.Command{
 }
 
 func init() {
-	OrdersCmd.AddCommand(createOrderPreviewCmd)
+	Cmd.AddCommand(createOrderPreviewCmd)
 
 	createOrderPreviewCmd.Flags().StringP(utils.SideFlag, "s", "", "Order side (Required)")
 	createOrderPreviewCmd.Flags().StringP(utils.ProductIdFlag, "i", "", "ID of the product (Required)")

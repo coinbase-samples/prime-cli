@@ -1,5 +1,5 @@
 /**
- * Copyright 2023-present Coinbase Global, Inc.
+ * Copyright 2025-present Coinbase Global, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package orders
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/coinbase-samples/prime-cli/utils"
 	"github.com/coinbase-samples/prime-sdk-go/model"
@@ -25,9 +26,9 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var getOrderFillsCmd = &cobra.Command{
-	Use:   "list-fills",
-	Short: "Get fills from a given Order ID",
+var listPortfolioFillsCmd = &cobra.Command{
+	Use:   "list-portfolio-fills",
+	Short: "Get fills from a given portfolio ID",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		client, err := utils.GetClientFromEnv()
 		if err != nil {
@@ -41,12 +42,15 @@ var getOrderFillsCmd = &cobra.Command{
 			return err
 		}
 
-		orderId := utils.GetFlagStringValue(cmd, utils.OrderIdFlag)
+		start, end, err := utils.GetStartEndFlagsAsTime(cmd)
+		if err != nil {
+			return err
+		}
 
 		return utils.HandleListCmd(
 			cmd,
 			func(paginationParams *model.PaginationParams) (*model.Pagination, error) {
-				response, err := getOrderFills(svc, portfolioId, orderId, paginationParams)
+				response, err := listPortfolioFills(svc, portfolioId, start, end, paginationParams)
 				if err != nil {
 					return nil, err
 				}
@@ -61,36 +65,37 @@ var getOrderFillsCmd = &cobra.Command{
 	},
 }
 
-func getOrderFills(
+func listPortfolioFills(
 	svc orders.OrdersService,
-	portfolioId,
-	orderId string,
+	portfolioId string,
+	start,
+	end time.Time,
 	pagination *model.PaginationParams,
-) (*orders.ListOrderFillsResponse, error) {
+) (*orders.ListPortfolioFillsResponse, error) {
 	ctx, cancel := utils.GetContextWithTimeout()
 	defer cancel()
 
-	request := &orders.ListOrderFillsRequest{
+	request := &orders.ListPortfolioFillsRequest{
 		PortfolioId: portfolioId,
-		OrderId:     orderId,
+		Start:       start,
+		End:         end,
 		Pagination:  pagination,
 	}
 
-	response, err := svc.ListOrderFills(ctx, request)
+	response, err := svc.ListPortfolioFills(ctx, request)
 	if err != nil {
-		return nil, fmt.Errorf("cannot get order fills: %w", err)
+		return nil, fmt.Errorf("cannot list portfolio fills: %w", err)
 	}
 
-	return response, err
+	return response, nil
 }
 
 func init() {
-	Cmd.AddCommand(getOrderFillsCmd)
+	Cmd.AddCommand(listPortfolioFillsCmd)
 
-	getOrderFillsCmd.Flags().StringP(utils.OrderIdFlag, "i", "", "Order ID (Required)")
+	utils.AddPortfolioIdFlag(listPortfolioFillsCmd)
+	utils.AddPaginationFlags(listPortfolioFillsCmd, true)
+	utils.AddStartEndFlags(listPortfolioFillsCmd)
 
-	utils.AddPortfolioIdFlag(getOrderFillsCmd)
-	utils.AddPaginationFlags(getOrderFillsCmd, true)
-
-	getOrderFillsCmd.MarkFlagRequired(utils.OrderIdFlag)
+	listPortfolioFillsCmd.MarkFlagRequired(utils.StartFlag)
 }

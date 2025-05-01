@@ -66,7 +66,7 @@ var getOrderCmd = &cobra.Command{
 }
 
 func init() {
-	OrdersCmd.AddCommand(getOrderCmd)
+	Cmd.AddCommand(getOrderCmd)
 
 	getOrderCmd.Flags().StringP(utils.OrderIdFlag, "i", "", "Order ID (Required)")
 	getOrderCmd.Flags().StringP(utils.PortfolioIdFlag, "", "", "Portfolio ID. Uses environment variable if blank")

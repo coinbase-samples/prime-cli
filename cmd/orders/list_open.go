@@ -25,21 +25,16 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var cancelOrderCmd = &cobra.Command{
-	Use:   "cancel",
-	Short: "Attempt to cancel an open order.",
+var listOpenOrdersCmd = &cobra.Command{
+	Use:   "list-open",
+	Short: "Lists open orders meeting filter criteria.",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		client, err := utils.GetClientFromEnv()
 		if err != nil {
-			return fmt.Errorf("cannot get client from environment: %w", err)
+			return fmt.Errorf("failed to initialize client: %w", err)
 		}
 
 		ordersService := orders.NewOrdersService(client)
-
-		orderId, err := cmd.Flags().GetString(utils.OrderIdFlag)
-		if err != nil {
-			return fmt.Errorf("cannot cancel order: %w", err)
-		}
 
 		portfolioId, err := utils.GetPortfolioId(cmd, client)
 		if err != nil {
@@ -49,14 +44,14 @@ var cancelOrderCmd = &cobra.Command{
 		ctx, cancel := utils.GetContextWithTimeout()
 		defer cancel()
 
-		request := &orders.CancelOrderRequest{
+		request := &orders.ListOpenOrdersRequest{
 			PortfolioId: portfolioId,
-			OrderId:     orderId,
+			ProductId:   utils.GetFlagStringValue(cmd, utils.ProductIdFlag),
 		}
 
-		response, err := ordersService.CancelOrder(ctx, request)
+		response, err := ordersService.ListOpenOrders(ctx, request)
 		if err != nil {
-			return fmt.Errorf("cannot cancel order: %w", err)
+			return fmt.Errorf("cannot list open orders: %w", err)
 		}
 
 		jsonResponse, err := utils.FormatResponseAsJson(cmd, response)
@@ -70,20 +65,10 @@ var cancelOrderCmd = &cobra.Command{
 }
 
 func init() {
-	Cmd.AddCommand(cancelOrderCmd)
+	Cmd.AddCommand(listOpenOrdersCmd)
 
-	cancelOrderCmd.Flags().StringP(utils.OrderIdFlag, "i", "", "ID of the order to cancel (Required)")
-	err := cancelOrderCmd.MarkFlagRequired(utils.OrderIdFlag)
-	if err != nil {
-		return
-	}
+	listOpenOrdersCmd.Flags().StringP(utils.ProductIdFlag, "i", "", "ID of the product")
+	listOpenOrdersCmd.Flags().StringP(utils.PortfolioIdFlag, "", "", "Portfolio ID. Uses environment variable if blank")
 
-	cancelOrderCmd.PreRunE = func(cmd *cobra.Command, args []string) error {
-		if err := utils.ValidateUUIDFlag(cmd, utils.OrderIdFlag); err != nil {
-			return err
-		}
-		return nil
-	}
-
-	cancelOrderCmd.Flags().StringP(utils.PortfolioIdFlag, "", "", "Portfolio ID. Uses environment variable if blank")
+	listOpenOrdersCmd.MarkFlagRequired(utils.ProductIdFlag)
 }

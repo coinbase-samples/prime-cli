@@ -84,7 +84,7 @@ var createOrderCmd = &cobra.Command{
 }
 
 func init() {
-	OrdersCmd.AddCommand(createOrderCmd)
+	Cmd.AddCommand(createOrderCmd)
 
 	createOrderCmd.Flags().StringP(utils.SideFlag, "s", "", "Order side, e.g. BUY (Required)")
 	createOrderCmd.Flags().StringP(utils.ProductIdFlag, "i", "", "ID of the product, e.g. ETH-USD (Required)")

@@ -134,7 +134,7 @@ func listOrders(
 }
 
 func init() {
-	OrdersCmd.AddCommand(listOrdersCmd)
+	Cmd.AddCommand(listOrdersCmd)
 
 	listOrdersCmd.Flags().StringSliceP(utils.OrderStatusesFlag, "r", []string{}, "List of statuses")
 	listOrdersCmd.Flags().StringSliceP(utils.ProductIdsFlag, "p", []string{}, "List of product IDs")
