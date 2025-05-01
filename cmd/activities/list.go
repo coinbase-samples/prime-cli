@@ -112,7 +112,7 @@ func listActivities(
 }
 
 func init() {
-	ActivitiesCmd.AddCommand(listActivitiesCmd)
+	Cmd.AddCommand(listActivitiesCmd)
 
 	listActivitiesCmd.Flags().StringSliceP(utils.SymbolsFlag, "s", []string{}, "List of symbols")
 	listActivitiesCmd.Flags().StringSliceP(utils.CategoriesFlag, "t", []string{}, "List of categories")

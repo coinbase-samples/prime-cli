@@ -119,7 +119,7 @@ func listEntityActivities(
 }
 
 func init() {
-	ActivitiesCmd.AddCommand(listEntityActivitiesCmd)
+	Cmd.AddCommand(listEntityActivitiesCmd)
 
 	listEntityActivitiesCmd.Flags().StringP(utils.ActivityLevelFlag, "a", "", "Activity level")
 	listEntityActivitiesCmd.Flags().StringSliceP(utils.SymbolsFlag, "s", []string{}, "List of symbols")
