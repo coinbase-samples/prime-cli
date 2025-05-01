@@ -20,7 +20,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var WalletsCmd = &cobra.Command{
+var Cmd = &cobra.Command{
 	Use:   "wallets",
 	Short: "The wallets commands",
 }

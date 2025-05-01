@@ -93,7 +93,7 @@ func listWallets(
 }
 
 func init() {
-	WalletsCmd.AddCommand(listWalletsCmd)
+	Cmd.AddCommand(listWalletsCmd)
 
 	listWalletsCmd.Flags().StringP(utils.TypeFlag, "t", "", "Type of balance (Required)")
 	listWalletsCmd.Flags().StringSliceP(utils.SymbolsFlag, "s", []string{}, "List of symbols")
