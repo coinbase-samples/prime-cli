@@ -85,7 +85,8 @@ var listActivitiesCmd = &cobra.Command{
 				}
 
 				return response.Pagination, nil
-			})
+			},
+		)
 
 		return nil
 	},

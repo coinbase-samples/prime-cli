@@ -58,7 +58,8 @@ var getAddressBookCmd = &cobra.Command{
 				}
 
 				return response.Pagination, nil
-			})
+			},
+		)
 	},
 }
 

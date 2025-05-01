@@ -19,8 +19,10 @@ package cmd
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/coinbase-samples/prime-cli/utils"
+	"github.com/coinbase-samples/prime-sdk-go/model"
 	"github.com/coinbase-samples/prime-sdk-go/orders"
 	"github.com/spf13/cobra"
 )
@@ -34,7 +36,7 @@ var listOrdersCmd = &cobra.Command{
 			return fmt.Errorf("failed to initialize client: %w", err)
 		}
 
-		ordersService := orders.NewOrdersService(client)
+		svc := orders.NewOrdersService(client)
 
 		portfolioId, err := utils.GetPortfolioId(cmd, client)
 		if err != nil {
@@ -65,11 +67,6 @@ var listOrdersCmd = &cobra.Command{
 			return err
 		}
 
-		pagination, err := utils.GetPaginationParams(cmd)
-		if err != nil {
-			return err
-		}
-
 		startStr, err := cmd.Flags().GetString(utils.StartFlag)
 		if err != nil {
 			return err
@@ -85,49 +82,69 @@ var listOrdersCmd = &cobra.Command{
 			return err
 		}
 
-		ctx, cancel := utils.GetContextWithTimeout()
-		defer cancel()
+		return utils.HandleListCmd(
+			cmd,
+			func(paginationParams *model.PaginationParams) (*model.Pagination, error) {
+				response, err := listOrders(svc, portfolioId, productIds, statuses, orderType, orderSide, start, end, paginationParams)
+				if err != nil {
+					return nil, err
+				}
 
-		request := &orders.ListOrdersRequest{
-			PortfolioId: portfolioId,
-			Statuses:    statuses,
-			ProductIds:  productIds,
-			Type:        orderType,
-			OrderSide:   orderSide,
-			Start:       start,
-			End:         end,
-			Pagination:  pagination,
-		}
+				if err := utils.PrintJsonDocs(cmd, response.Orders); err != nil {
+					return nil, err
+				}
 
-		response, err := ordersService.ListOrders(ctx, request)
-		if err != nil {
-			return fmt.Errorf("cannot list orders: %w", err)
-		}
-
-		jsonResponse, err := utils.FormatResponseAsJson(cmd, response)
-		if err != nil {
-			return err
-		}
-
-		fmt.Println(jsonResponse)
-
-		return nil
+				return response.Pagination, nil
+			},
+		)
 	},
+}
+
+func listOrders(
+	svc orders.OrdersService,
+	portfolioId string,
+	productIds,
+	statuses []string,
+	orderType,
+	orderSide string,
+	start,
+	end time.Time,
+	pagination *model.PaginationParams,
+) (*orders.ListOrdersResponse, error) {
+	ctx, cancel := utils.GetContextWithTimeout()
+	defer cancel()
+
+	request := &orders.ListOrdersRequest{
+		PortfolioId: portfolioId,
+		Statuses:    statuses,
+		ProductIds:  productIds,
+		Type:        orderType,
+		OrderSide:   orderSide,
+		Start:       start,
+		End:         end,
+		Pagination:  pagination,
+	}
+
+	response, err := svc.ListOrders(ctx, request)
+	if err != nil {
+		return nil, fmt.Errorf("cannot list orders: %w", err)
+	}
+
+	return response, nil
 }
 
 func init() {
 	rootCmd.AddCommand(listOrdersCmd)
 
-	listOrdersCmd.Flags().StringP(utils.CursorFlag, "c", "", "Pagination cursor")
-	listOrdersCmd.Flags().StringP(utils.LimitFlag, "l", utils.LimitDefault, "Pagination limit")
-	listOrdersCmd.Flags().StringP(utils.SortDirectionFlag, "d", utils.SortDirectionDefault, "Sort direction")
 	listOrdersCmd.Flags().StringSliceP(utils.OrderStatusesFlag, "r", []string{}, "List of statuses")
 	listOrdersCmd.Flags().StringSliceP(utils.ProductIdsFlag, "p", []string{}, "List of product IDs")
 	listOrdersCmd.Flags().StringP(utils.OrderTypeFlag, "t", "", "Type of orders")
 	listOrdersCmd.Flags().StringP(utils.OrderSideFlag, "o", "", "Side of orders")
-	listOrdersCmd.Flags().StringP(utils.StartFlag, "s", "", "Start time in RFC3339 format")
-	listOrdersCmd.Flags().StringP(utils.EndFlag, "e", "", "End time in RFC3339 format")
-	listOrdersCmd.Flags().StringP(utils.PortfolioIdFlag, "", "", "Portfolio ID. Uses environment variable if blank")
 
+	utils.AddStartEndFlags(listOrdersCmd)
 	listOrdersCmd.MarkFlagRequired(utils.StartFlag)
+
+	utils.AddPortfolioIdFlag(listOrdersCmd)
+	utils.AddPaginationFlags(listOrdersCmd, true)
+
 }

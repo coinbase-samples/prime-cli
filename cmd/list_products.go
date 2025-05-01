@@ -56,7 +56,8 @@ var listProductsCmd = &cobra.Command{
 				}
 
 				return response.Pagination, nil
-			})
+			},
+		)
 	},
 }
 
