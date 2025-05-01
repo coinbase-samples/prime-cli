@@ -104,7 +104,7 @@ func listPortfolioAllocations(
 }
 
 func init() {
-	AllocationsCmd.AddCommand(listPortfolioAllocationsCmd)
+	Cmd.AddCommand(listPortfolioAllocationsCmd)
 
 	listPortfolioAllocationsCmd.Flags().StringSliceP(utils.ProductIdsFlag, "", []string{}, "List of product IDs")
 	listPortfolioAllocationsCmd.Flags().StringP(utils.OrderSideFlag, "", "", "Side of orders")

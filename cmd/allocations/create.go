@@ -80,7 +80,7 @@ var createAllocationCmd = &cobra.Command{
 }
 
 func init() {
-	AllocationsCmd.AddCommand(createAllocationCmd)
+	Cmd.AddCommand(createAllocationCmd)
 
 	createAllocationCmd.Flags().StringP(utils.AllocationIdFlag, "i", "", "ID of the allocation (Required)")
 	createAllocationCmd.Flags().StringP(utils.SourcePortfolioIdFlag, "s", "", "ID of the source portfolio (Required)")

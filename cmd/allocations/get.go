@@ -65,7 +65,7 @@ var getAllocationCmd = &cobra.Command{
 }
 
 func init() {
-	AllocationsCmd.AddCommand(getAllocationCmd)
+	Cmd.AddCommand(getAllocationCmd)
 
 	getAllocationCmd.Flags().StringP(utils.AllocationIdFlag, "i", "", "ID for allocation lookup (Required)")
 	getAllocationCmd.Flags().StringP(utils.PortfolioIdFlag, "", "", "Portfolio ID. Uses environment variable if blank")

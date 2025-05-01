@@ -65,7 +65,7 @@ var getNetAllocationCmd = &cobra.Command{
 }
 
 func init() {
-	AllocationsCmd.AddCommand(getNetAllocationCmd)
+	Cmd.AddCommand(getNetAllocationCmd)
 
 	getNetAllocationCmd.Flags().StringP(utils.AllocationIdFlag, "i", "", "ID for allocation lookup (Required)")
 	getNetAllocationCmd.Flags().StringP(utils.PortfolioIdFlag, "", "", "Portfolio ID. Uses environment variable if blank")
