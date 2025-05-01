@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package cmd
+package assets
 
 import (
 	"fmt"
@@ -63,7 +63,7 @@ var listAssetsCmd = &cobra.Command{
 }
 
 func init() {
-	rootCmd.AddCommand(listAssetsCmd)
+	Cmd.AddCommand(listAssetsCmd)
 
 	listAssetsCmd.Flags().StringP(utils.EntityIdFlag, "", "", "Entity ID. Uses environment variable if blank")
 
