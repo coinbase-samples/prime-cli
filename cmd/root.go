@@ -18,7 +18,9 @@ package cmd
 import (
 	"os"
 
+	"github.com/coinbase-samples/prime-cli/cmd/balances"
 	"github.com/coinbase-samples/prime-cli/cmd/orders"
+	"github.com/coinbase-samples/prime-cli/cmd/transactions"
 	"github.com/coinbase-samples/prime-cli/cmd/wallets"
 	"github.com/coinbase-samples/prime-cli/utils"
 
@@ -41,4 +43,6 @@ func init() {
 	rootCmd.PersistentFlags().BoolP(utils.FormatFlag, "z", false, "Set to include formatted JSON. Default is false")
 	rootCmd.AddCommand(orders.OrdersCmd)
 	rootCmd.AddCommand(wallets.WalletsCmd)
+	rootCmd.AddCommand(balances.BalancesCmd)
+	rootCmd.AddCommand(transactions.TransactionsCmd)
 }
