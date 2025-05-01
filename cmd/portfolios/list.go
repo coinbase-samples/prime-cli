@@ -57,5 +57,5 @@ var listPortfoliosCmd = &cobra.Command{
 }
 
 func init() {
-	PortfoliosCmd.AddCommand(listPortfoliosCmd)
+	Cmd.AddCommand(listPortfoliosCmd)
 }
