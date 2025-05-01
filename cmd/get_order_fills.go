@@ -20,6 +20,7 @@ import (
 	"fmt"
 
 	"github.com/coinbase-samples/prime-cli/utils"
+	"github.com/coinbase-samples/prime-sdk-go/model"
 	"github.com/coinbase-samples/prime-sdk-go/orders"
 	"github.com/spf13/cobra"
 )
@@ -33,51 +34,63 @@ var getOrderFillsCmd = &cobra.Command{
 			return fmt.Errorf("failed to initialize client: %w", err)
 		}
 
-		ordersService := orders.NewOrdersService(client)
+		svc := orders.NewOrdersService(client)
 
 		portfolioId, err := utils.GetPortfolioId(cmd, client)
 		if err != nil {
 			return err
 		}
 
-		pagination, err := utils.GetPaginationParams(cmd)
-		if err != nil {
-			return err
-		}
+		orderId := utils.GetFlagStringValue(cmd, utils.OrderIdFlag)
 
-		ctx, cancel := utils.GetContextWithTimeout()
-		defer cancel()
+		return utils.HandleListCmd(
+			cmd,
+			func(paginationParams *model.PaginationParams) (*model.Pagination, error) {
+				response, err := getOrderFills(svc, portfolioId, orderId, paginationParams)
+				if err != nil {
+					return nil, err
+				}
 
-		request := &orders.ListOrderFillsRequest{
-			PortfolioId: portfolioId,
-			OrderId:     utils.GetFlagStringValue(cmd, utils.OrderIdFlag),
-			Pagination:  pagination,
-		}
+				if err := utils.PrintJsonDocs(cmd, response.Fills); err != nil {
+					return nil, err
+				}
 
-		response, err := ordersService.ListOrderFills(ctx, request)
-		if err != nil {
-			return fmt.Errorf("cannot get order fills: %w", err)
-		}
-
-		jsonResponse, err := utils.FormatResponseAsJson(cmd, response)
-		if err != nil {
-			return err
-		}
-
-		fmt.Println(jsonResponse)
-
-		return nil
+				return response.Pagination, nil
+			},
+		)
 	},
+}
+
+func getOrderFills(
+	svc orders.OrdersService,
+	portfolioId,
+	orderId string,
+	pagination *model.PaginationParams,
+) (*orders.ListOrderFillsResponse, error) {
+	ctx, cancel := utils.GetContextWithTimeout()
+	defer cancel()
+
+	request := &orders.ListOrderFillsRequest{
+		PortfolioId: portfolioId,
+		OrderId:     orderId,
+		Pagination:  pagination,
+	}
+
+	response, err := svc.ListOrderFills(ctx, request)
+	if err != nil {
+		return nil, fmt.Errorf("cannot get order fills: %w", err)
+	}
+
+	return response, err
 }
 
 func init() {
 	rootCmd.AddCommand(getOrderFillsCmd)
 
 	getOrderFillsCmd.Flags().StringP(utils.OrderIdFlag, "i", "", "Order ID (Required)")
-	getOrderFillsCmd.Flags().StringP(utils.CursorFlag, "c", "", "Pagination cursor")
-	getOrderFillsCmd.Flags().StringP(utils.LimitFlag, "l", utils.LimitDefault, "Pagination limit")
-	getOrderFillsCmd.Flags().StringP(utils.SortDirectionFlag, "d", utils.SortDirectionDefault, "Sort direction")
-	getOrderFillsCmd.Flags().StringP(utils.PortfolioIdFlag, "", "", "Portfolio ID. Uses environment variable if blank")
+
+	utils.AddPortfolioIdFlag(getOrderFillsCmd)
+	utils.AddPaginationFlags(getOrderFillsCmd, true)
 
 	getOrderFillsCmd.MarkFlagRequired(utils.OrderIdFlag)
 }

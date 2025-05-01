@@ -21,6 +21,7 @@ import (
 	"time"
 
 	"github.com/coinbase-samples/prime-cli/utils"
+	"github.com/coinbase-samples/prime-sdk-go/model"
 	"github.com/coinbase-samples/prime-sdk-go/orders"
 	"github.com/spf13/cobra"
 )
@@ -34,73 +35,67 @@ var listPortfolioFillsCmd = &cobra.Command{
 			return fmt.Errorf("failed to initialize client: %w", err)
 		}
 
-		ordersService := orders.NewOrdersService(client)
+		svc := orders.NewOrdersService(client)
 
 		portfolioId, err := utils.GetPortfolioId(cmd, client)
 		if err != nil {
 			return err
 		}
 
-		startDateStr, err := cmd.Flags().GetString(utils.StartFlag)
+		start, end, err := utils.GetStartEndFlagsAsTime(cmd)
 		if err != nil {
 			return err
 		}
 
-		endDateStr, err := cmd.Flags().GetString(utils.EndFlag)
-		if err != nil {
-			return err
-		}
+		return utils.HandleListCmd(
+			cmd,
+			func(paginationParams *model.PaginationParams) (*model.Pagination, error) {
+				response, err := listPortfolioFills(svc, portfolioId, start, end, paginationParams)
+				if err != nil {
+					return nil, err
+				}
 
-		startDate, err := time.Parse(time.RFC3339, startDateStr)
-		if err != nil {
-			return fmt.Errorf("invalid start date format: %w", err)
-		}
+				if err := utils.PrintJsonDocs(cmd, response.Fills); err != nil {
+					return nil, err
+				}
 
-		endDate, err := time.Parse(time.RFC3339, endDateStr)
-		if err != nil {
-			return fmt.Errorf("invalid end date format: %w", err)
-		}
-
-		pagination, err := utils.GetPaginationParams(cmd)
-		if err != nil {
-			return err
-		}
-
-		ctx, cancel := utils.GetContextWithTimeout()
-		defer cancel()
-
-		request := &orders.ListPortfolioFillsRequest{
-			PortfolioId: portfolioId,
-			Start:       startDate,
-			End:         endDate,
-			Pagination:  pagination,
-		}
-
-		response, err := ordersService.ListPortfolioFills(ctx, request)
-		if err != nil {
-			return fmt.Errorf("cannot list portfolio fills: %w", err)
-		}
-
-		jsonResponse, err := utils.FormatResponseAsJson(cmd, response)
-		if err != nil {
-			return err
-		}
-
-		fmt.Println(jsonResponse)
-
-		return nil
+				return response.Pagination, nil
+			},
+		)
 	},
+}
+
+func listPortfolioFills(
+	svc orders.OrdersService,
+	portfolioId string,
+	start,
+	end time.Time,
+	pagination *model.PaginationParams,
+) (*orders.ListPortfolioFillsResponse, error) {
+	ctx, cancel := utils.GetContextWithTimeout()
+	defer cancel()
+
+	request := &orders.ListPortfolioFillsRequest{
+		PortfolioId: portfolioId,
+		Start:       start,
+		End:         end,
+		Pagination:  pagination,
+	}
+
+	response, err := svc.ListPortfolioFills(ctx, request)
+	if err != nil {
+		return nil, fmt.Errorf("cannot list portfolio fills: %w", err)
+	}
+
+	return response, nil
 }
 
 func init() {
 	rootCmd.AddCommand(listPortfolioFillsCmd)
 
-	listPortfolioFillsCmd.Flags().StringP(utils.StartFlag, "s", "", "Start date (Required)")
-	listPortfolioFillsCmd.Flags().StringP(utils.EndFlag, "e", "", "End date (Required)")
-	listPortfolioFillsCmd.Flags().StringP(utils.CursorFlag, "c", "", "Pagination cursor")
-	listPortfolioFillsCmd.Flags().StringP(utils.LimitFlag, "l", utils.LimitDefault, "Pagination limit")
-	listPortfolioFillsCmd.Flags().StringP(utils.SortDirectionFlag, "d", utils.SortDirectionDefault, "Sort direction")
-	listPortfolioFillsCmd.Flags().StringP(utils.PortfolioIdFlag, "", "", "Portfolio ID. Uses environment variable if blank")
+	utils.AddPortfolioIdFlag(listPortfolioFillsCmd)
+	utils.AddPaginationFlags(listPortfolioFillsCmd, true)
+	utils.AddStartEndFlags(listPortfolioFillsCmd)
 
 	listPortfolioFillsCmd.MarkFlagRequired(utils.StartFlag)
 }
