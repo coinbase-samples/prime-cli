@@ -96,7 +96,7 @@ func init() {
 	createOnchainTransactionCmd.Flags().BoolP(utils.SkipBroadcastFlag, "b", false, "Skip broadcast")
 	createOnchainTransactionCmd.Flags().StringP(utils.ChainIdFlag, "c", "", "Chain ID")
 	createOnchainTransactionCmd.Flags().StringP(utils.WalletIdFlag, "w", "", "Wallet ID (Required)")
-	createOnchainTransactionCmd.Flags().StringP(utils.PortfolioIdFlag, "p", "", "Portfolio ID. Uses environment variable if blank")
+	utils.AddPortfolioIdFlag(createOnchainTransactionCmd)
 	createOnchainTransactionCmd.Flags().BoolP(utils.DisableDynamicGasFlag, "d", false, "Disable dynamic gas")
 	createOnchainTransactionCmd.Flags().StringP(utils.ReplacedTransactionIdFlag, "i", "", "Replaced transaction ID")
 

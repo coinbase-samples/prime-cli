@@ -94,7 +94,7 @@ var updateOnchainAddressBookEntryCmd = &cobra.Command{
 func init() {
 	Cmd.AddCommand(updateOnchainAddressBookEntryCmd)
 
-	updateOnchainAddressBookEntryCmd.Flags().StringP(utils.PortfolioIdFlag, "p", "", "Portfolio ID. Uses environment variable if blank")
+	utils.AddPortfolioIdFlag(updateOnchainAddressBookEntryCmd)
 	updateOnchainAddressBookEntryCmd.Flags().StringP(utils.GenericIdFlag, "i", "", "Address group ID (Required)")
 	updateOnchainAddressBookEntryCmd.Flags().StringP(utils.AddressFlag, "a", "", "Address (Required)")
 	updateOnchainAddressBookEntryCmd.Flags().StringP(utils.NetworkTypeFlag, "t", "", "Network type (Required)")

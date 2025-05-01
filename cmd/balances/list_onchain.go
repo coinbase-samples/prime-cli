@@ -75,7 +75,7 @@ func init() {
 	Cmd.AddCommand(listOnchainBalancesCmd)
 
 	listOnchainBalancesCmd.Flags().StringP(utils.WalletIdFlag, "", "", "Wallet ID")
-	listOnchainBalancesCmd.Flags().StringP(utils.PortfolioIdFlag, "", "", "Portfolio ID. Uses environment variable if blank")
+	utils.AddPortfolioIdFlag(listOnchainBalancesCmd)
 
 	listOnchainBalancesCmd.MarkFlagRequired(utils.WalletIdFlag)
 }

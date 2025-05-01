@@ -68,7 +68,7 @@ func init() {
 	Cmd.AddCommand(getAllocationCmd)
 
 	getAllocationCmd.Flags().StringP(utils.AllocationIdFlag, "i", "", "ID for allocation lookup (Required)")
-	getAllocationCmd.Flags().StringP(utils.PortfolioIdFlag, "", "", "Portfolio ID. Uses environment variable if blank")
+	utils.AddPortfolioIdFlag(getAllocationCmd)
 
 	getAllocationCmd.MarkFlagRequired(utils.AllocationIdFlag)
 }

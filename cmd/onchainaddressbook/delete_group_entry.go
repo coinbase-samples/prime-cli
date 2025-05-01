@@ -71,7 +71,7 @@ var deleteOnchainAddressBookEntryCmd = &cobra.Command{
 func init() {
 	Cmd.AddCommand(deleteOnchainAddressBookEntryCmd)
 
-	deleteOnchainAddressBookEntryCmd.Flags().StringP(utils.PortfolioIdFlag, "p", "", "Portfolio ID. Uses environment variable if blank")
+	utils.AddPortfolioIdFlag(deleteOnchainAddressBookEntryCmd)
 	deleteOnchainAddressBookEntryCmd.Flags().StringP(utils.GenericIdFlag, "i", "", "Address group ID (Required)")
 
 	deleteOnchainAddressBookEntryCmd.MarkFlagRequired(utils.GenericIdFlag)

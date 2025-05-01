@@ -108,8 +108,8 @@ func init() {
 	createWalletCmd.Flags().StringP(utils.NameFlag, "n", "", "Name for the wallet (Required)")
 	createWalletCmd.Flags().StringP(utils.SymbolFlag, "s", "", "Symbol for the wallet")
 	createWalletCmd.Flags().StringP(utils.TypeFlag, "t", "", "Type of wallet, e.g. VAULT, ONCHAIN (Required)")
-	createWalletCmd.Flags().StringP(utils.PortfolioIdFlag, "", "", "Portfolio ID. Uses environment variable if blank")
-	createWalletCmd.Flags().StringP(utils.IdempotencyKeyFlag, "", "", "Idempotency key is a UUID. The CLI generates one if not passed")
+	utils.AddPortfolioIdFlag(createWalletCmd)
+	utils.AddIdempotencyKeyFlag(createWalletCmd)
 
 	createWalletCmd.Flags().StringP(utils.NetworkFamilyFlag, "", "", "Network family. Required for ONCHAIN wallet. Supported values: NETWORK_FAMILY_EVM or NETWORK_FAMILY_SOLANA")
 	createWalletCmd.Flags().StringP(utils.NetworkIdFlag, "", "", "The network id: base, bitcoin, ethereum, solana etc.")

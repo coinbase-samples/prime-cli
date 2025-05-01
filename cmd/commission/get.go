@@ -66,7 +66,5 @@ var getCommissionCmd = &cobra.Command{
 
 func init() {
 	Cmd.AddCommand(getCommissionCmd)
-
-	getCommissionCmd.Flags().StringP(utils.PortfolioIdFlag, "", "", "Portfolio ID. Uses environment variable if blank")
-
+	utils.AddPortfolioIdFlag(getCommissionCmd)
 }

@@ -64,6 +64,5 @@ var listOnchainAddressGroupsCmd = &cobra.Command{
 
 func init() {
 	Cmd.AddCommand(listOnchainAddressGroupsCmd)
-
-	listOnchainAddressGroupsCmd.Flags().StringP(utils.PortfolioIdFlag, "p", "", "Portfolio ID. Uses environment variable if blank")
+	utils.AddPortfolioIdFlag(listOnchainAddressGroupsCmd)
 }

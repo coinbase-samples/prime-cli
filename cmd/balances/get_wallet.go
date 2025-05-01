@@ -69,7 +69,7 @@ func init() {
 	Cmd.AddCommand(getWalletBalanceCmd)
 
 	getWalletBalanceCmd.Flags().StringP(utils.WalletIdFlag, "i", "", "Wallet ID (Required)")
-	getWalletBalanceCmd.Flags().StringP(utils.PortfolioIdFlag, "", "", "Portfolio ID. Uses environment variable if blank")
+	utils.AddPortfolioIdFlag(getWalletBalanceCmd)
 
 	getWalletBalanceCmd.MarkFlagRequired(utils.WalletIdFlag)
 }

@@ -68,7 +68,6 @@ func init() {
 	Cmd.AddCommand(getActivityCmd)
 
 	getActivityCmd.Flags().StringP(utils.GenericIdFlag, "i", "", "Activity ID (Required)")
-	getActivityCmd.Flags().StringP(utils.PortfolioIdFlag, "", "", "Portfolio ID. Uses environment variable if blank")
-
+	utils.AddPortfolioIdFlag(getActivityCmd)
 	getActivityCmd.MarkFlagRequired(utils.GenericIdFlag)
 }

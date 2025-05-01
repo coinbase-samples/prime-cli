@@ -69,7 +69,7 @@ func init() {
 	Cmd.AddCommand(getOrderCmd)
 
 	getOrderCmd.Flags().StringP(utils.OrderIdFlag, "i", "", "Order ID (Required)")
-	getOrderCmd.Flags().StringP(utils.PortfolioIdFlag, "", "", "Portfolio ID. Uses environment variable if blank")
+	utils.AddPortfolioIdFlag(getOrderCmd)
 
 	getOrderCmd.MarkFlagRequired(utils.OrderIdFlag)
 }

@@ -85,5 +85,5 @@ func init() {
 		return nil
 	}
 
-	cancelOrderCmd.Flags().StringP(utils.PortfolioIdFlag, "", "", "Portfolio ID. Uses environment variable if blank")
+	utils.AddPortfolioIdFlag(cancelOrderCmd)
 }

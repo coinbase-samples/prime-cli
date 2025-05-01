@@ -77,5 +77,5 @@ func init() {
 
 	listPortfolioBalancesCmd.Flags().StringArrayP(utils.TypeFlag, "t", []string{}, "Type of balance")
 	listPortfolioBalancesCmd.Flags().StringSliceP(utils.SymbolsFlag, "s", []string{}, "List of symbols")
-	listPortfolioBalancesCmd.Flags().StringP(utils.PortfolioIdFlag, "", "", "Portfolio ID. Uses environment variable if blank")
+	utils.AddPortfolioIdFlag(listPortfolioBalancesCmd)
 }

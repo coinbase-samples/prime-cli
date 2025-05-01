@@ -65,7 +65,5 @@ var getCreditCmd = &cobra.Command{
 
 func init() {
 	Cmd.AddCommand(getCreditCmd)
-
-	getCreditCmd.Flags().StringP(utils.PortfolioIdFlag, "", "", "Portfolio ID. Uses environment variable if blank")
-
+	utils.AddPortfolioIdFlag(getCreditCmd)
 }
