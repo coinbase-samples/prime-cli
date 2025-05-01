@@ -17,14 +17,11 @@
 package cmd
 
 import (
-	"bufio"
 	"fmt"
-	"os"
 
 	"github.com/coinbase-samples/prime-cli/utils"
 	"github.com/coinbase-samples/prime-sdk-go/model"
 	"github.com/coinbase-samples/prime-sdk-go/products"
-	"golang.org/x/term"
 
 	"github.com/spf13/cobra"
 )
@@ -46,62 +43,20 @@ var listProductsCmd = &cobra.Command{
 			return err
 		}
 
-		pagination, err := utils.GetPaginationParams(cmd)
-		if err != nil {
-			return err
-		}
-
-		noCliPager, err := utils.IsNoCliPagerFlagSet(cmd)
-		if err != nil {
-			return err
-		}
-
-		var nextCursor string
-		for {
-
-			pagination.Cursor = nextCursor
-
-			response, err := listProducts(svc, portfolioId, pagination)
-			if err != nil {
-				return fmt.Errorf("unable to retrieve products: %w", err)
-			}
-
-			for _, p := range response.Products {
-				docStr, err := utils.FormatResponseAsJson(cmd, p)
+		return utils.HandleListCmd(
+			cmd,
+			func(paginationParams *model.PaginationParams) (*model.Pagination, error) {
+				response, err := listProducts(svc, portfolioId, paginationParams)
 				if err != nil {
-					return err
+					return nil, fmt.Errorf("unable to retrieve products: %w", err)
 				}
-				fmt.Println(docStr)
-			}
 
-			nextCursor = response.Pagination.NextCursor
+				if err := utils.PrintJsonDocs(cmd, response.Products); err != nil {
+					return nil, err
+				}
 
-			if len(nextCursor) == 0 {
-				break
-			}
-
-			if noCliPager {
-				continue
-			}
-
-			fmt.Print("Press space to continue, q to quit: ")
-
-			rawState, _ := term.MakeRaw(int(os.Stdin.Fd()))
-			input, err := bufio.NewReader(os.Stdin).ReadByte()
-			term.Restore(int(os.Stdin.Fd()), rawState)
-
-			if err != nil {
-				return fmt.Errorf("unable to read from terminal: %w", err)
-			}
-
-			if input == 'q' {
-				break
-			}
-
-			fmt.Print("\r\n")
-		}
-
-		return nil
+				return response.Pagination, nil
+			})
 	},
 }
 
@@ -134,5 +89,7 @@ func init() {
 	listProductsCmd.Flags().StringP(utils.SortDirectionFlag, "d", utils.SortDirectionDefault, "Sort direction")
 	listProductsCmd.Flags().StringP(utils.PortfolioIdFlag, "", "", "Portfolio ID. Uses environment variable if blank")
 
-	listProductsCmd.Flags().BoolP(utils.NoCliPagerFlag, "", false, "Set to print all results without manually paging through results")
+	listProductsCmd.Flags().BoolP(utils.AllFlag, "", false, "Set to print all results without manually paging through results")
+	listProductsCmd.Flags().BoolP(utils.InteractiveFlag, "", false, "Iterate through all results by manually paging through results")
+
 }

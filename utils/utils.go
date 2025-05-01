@@ -17,6 +17,7 @@
 package utils
 
 import (
+	"bufio"
 	"context"
 	"encoding/json"
 	"errors"
@@ -31,6 +32,7 @@ import (
 	"github.com/coinbase-samples/prime-sdk-go/model"
 	"github.com/google/uuid"
 	"github.com/spf13/cobra"
+	"golang.org/x/term"
 )
 
 func getDefaultTimeoutDuration() time.Duration {
@@ -61,6 +63,19 @@ func GetClientFromEnv() (client.RestClient, error) {
 func GetFlagStringValue(cmd *cobra.Command, flagName string) string {
 	value, _ := cmd.Flags().GetString(flagName)
 	return value
+}
+
+func PrintJsonDocs[T any](cmd *cobra.Command, items []T) error {
+
+	for _, item := range items {
+		docStr, err := FormatResponseAsJson(cmd, item)
+		if err != nil {
+			return err
+		}
+		fmt.Println(docStr)
+	}
+
+	return nil
 }
 
 func GetPaginationParams(cmd *cobra.Command) (*model.PaginationParams, error) {
@@ -124,12 +139,142 @@ func CheckFormatFlag(cmd *cobra.Command) (bool, error) {
 	return formatFlagValue, nil
 }
 
-func IsNoCliPagerFlagSet(cmd *cobra.Command) (bool, error) {
-	flag, err := cmd.Flags().GetBool(NoCliPagerFlag)
+func isAllFlagSet(cmd *cobra.Command) (bool, error) {
+	return isBoolFlagSet(cmd, AllFlag)
+}
+
+func isInteractiveFlagSet(cmd *cobra.Command) (bool, error) {
+	return isBoolFlagSet(cmd, InteractiveFlag)
+}
+
+func isBoolFlagSet(cmd *cobra.Command, name string) (bool, error) {
+	flag, err := cmd.Flags().GetBool(name)
 	if err != nil {
-		return false, fmt.Errorf("cannot read no cli pager flag: %w", err)
+		return false, fmt.Errorf("cannot read %s flag: %w", name, err)
 	}
 	return flag, nil
+}
+
+func printInteractivePrompt() {
+	fmt.Print("Press space to continue, q to quit: ")
+}
+
+type ListCmdCallback func(paginationParams *model.PaginationParams) (*model.Pagination, error)
+
+func HandleListCmd(cmd *cobra.Command, callback ListCmdCallback) error {
+
+	paginationParams, err := GetPaginationParams(cmd)
+	if err != nil {
+		return err
+	}
+
+	all, err := isAllFlagSet(cmd)
+	if err != nil {
+		return err
+	}
+
+	interactive, err := isInteractiveFlagSet(cmd)
+	if err != nil {
+		return err
+	}
+
+	var nextCursor string
+	for {
+
+		paginationParams.Cursor = nextCursor
+
+		pagination, err := callback(paginationParams)
+		if err != nil {
+			return err
+		}
+
+		shouldContinue, shouldBreak, cursor, err := continueBreakInteractive(
+			all,
+			interactive,
+			pagination,
+		)
+		if err != nil {
+			return err
+		}
+
+		nextCursor = cursor
+
+		if shouldBreak {
+			break
+		}
+
+		if shouldContinue {
+			continue
+		}
+	}
+
+	return nil
+}
+
+func continueBreakInteractive(
+	all,
+	interactive bool,
+	pagination *model.Pagination,
+) (shouldContinue bool, shouldBreak bool, nextCursor string, err error) {
+
+	if !all && !interactive {
+		shouldBreak = true
+		return
+	}
+
+	nextCursor = pagination.NextCursor
+
+	if len(nextCursor) == 0 {
+		shouldBreak = true
+		return
+	}
+
+	if !interactive {
+		shouldContinue = true
+		return
+	}
+
+	var quit bool
+
+	if quit, err = interactiveCheck(); err != nil {
+		return
+	} else if quit {
+		shouldBreak = true
+		return
+	}
+
+	printInteractiveNewline()
+	return
+}
+
+func printInteractiveNewline() {
+	fmt.Print("\r\n")
+}
+
+func isInteractiveQuit(input byte) bool {
+	return input == 'q'
+}
+
+func interactiveCheck() (bool, error) {
+
+	printInteractivePrompt()
+
+	input, err := readRawStateByte()
+	if err != nil {
+		return false, err
+	}
+
+	return isInteractiveQuit(input), nil
+}
+
+func readRawStateByte() (input byte, err error) {
+	rawState, _ := term.MakeRaw(int(os.Stdin.Fd()))
+	defer term.Restore(int(os.Stdin.Fd()), rawState)
+	input, err = bufio.NewReader(os.Stdin).ReadByte()
+	if err != nil {
+		err = fmt.Errorf("unable to read from terminal: %w", err)
+	}
+	return
 }
 
 func GetPortfolioId(cmd *cobra.Command, client client.RestClient) (string, error) {

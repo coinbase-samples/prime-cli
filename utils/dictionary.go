@@ -95,8 +95,9 @@ const (
 	TifGoodUntilCancelled = "GOOD_UNTIL_CANCELLED"
 	TifImmediateOrCancel  = "IMMEDIATE_OR_CANCEL"
 
-	FormatFlag     = "format"
-	NoCliPagerFlag = "no-cli-pager"
+	FormatFlag      = "format"
+	AllFlag         = "all"
+	InteractiveFlag = "interactive"
 
 	PortfolioIdFlag           = "portfolio-id"
 	EntityIdFlag              = "entity-id"
