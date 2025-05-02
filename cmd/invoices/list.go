@@ -109,9 +109,9 @@ func listInvoices(
 func init() {
 	Cmd.AddCommand(listInvoicesCmd)
 
-	listInvoicesCmd.Flags().StringSliceP(utils.InvoiceStatesFlag, "s", []string{}, "List of states")
-	listInvoicesCmd.Flags().IntSliceP(utils.InvoiceBillingYear, "y", []int{}, "Billing year")
-	listInvoicesCmd.Flags().IntSliceP(utils.InvoiceBillingMonth, "m", []int{}, "Billing month")
+	listInvoicesCmd.Flags().StringSliceP(utils.InvoiceStatesFlag, "", []string{}, "List of states")
+	listInvoicesCmd.Flags().IntSliceP(utils.InvoiceBillingYear, "", []int{}, "Billing year")
+	listInvoicesCmd.Flags().IntSliceP(utils.InvoiceBillingMonth, "", []int{}, "Billing month")
 
 	utils.AddPaginationFlags(listInvoicesCmd, true)
 

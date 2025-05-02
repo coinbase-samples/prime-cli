@@ -67,7 +67,7 @@ var listOpenOrdersCmd = &cobra.Command{
 func init() {
 	Cmd.AddCommand(listOpenOrdersCmd)
 
-	listOpenOrdersCmd.Flags().StringP(utils.ProductIdFlag, "i", "", "ID of the product")
+	listOpenOrdersCmd.Flags().StringP(utils.ProductIdFlag, "", "", "ID of the product")
 	utils.AddPortfolioIdFlag(listOpenOrdersCmd)
 
 	listOpenOrdersCmd.MarkFlagRequired(utils.ProductIdFlag)

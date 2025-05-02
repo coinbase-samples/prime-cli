@@ -69,10 +69,10 @@ var createAddressBookEntryCmd = &cobra.Command{
 func init() {
 	Cmd.AddCommand(createAddressBookEntryCmd)
 
-	createAddressBookEntryCmd.Flags().StringP(utils.AddressFlag, "a", "", "The address to add to the address book (Required)")
-	createAddressBookEntryCmd.Flags().StringP(utils.SymbolFlag, "s", "", "The currency symbol (Required)")
-	createAddressBookEntryCmd.Flags().StringP(utils.NameFlag, "n", "", "Name for the address book entry (Required)")
-	createAddressBookEntryCmd.Flags().StringP(utils.AccountIdFlag, "i", "", "Account identifier for the address")
+	createAddressBookEntryCmd.Flags().StringP(utils.AddressFlag, "", "", "The address to add to the address book (Required)")
+	createAddressBookEntryCmd.Flags().StringP(utils.SymbolFlag, "", "", "The currency symbol (Required)")
+	createAddressBookEntryCmd.Flags().StringP(utils.NameFlag, "", "", "Name for the address book entry (Required)")
+	createAddressBookEntryCmd.Flags().StringP(utils.AccountIdFlag, "", "", "Account identifier for the address")
 	utils.AddPortfolioIdFlag(createAddressBookEntryCmd)
 
 	createAddressBookEntryCmd.MarkFlagRequired(utils.AddressFlag)

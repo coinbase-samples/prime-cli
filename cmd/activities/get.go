@@ -66,8 +66,7 @@ var getActivityCmd = &cobra.Command{
 
 func init() {
 	Cmd.AddCommand(getActivityCmd)
-
-	getActivityCmd.Flags().StringP(utils.GenericIdFlag, "i", "", "Activity ID (Required)")
+	utils.AddActivityIdFlag(getActivityCmd)
 	utils.AddPortfolioIdFlag(getActivityCmd)
 	getActivityCmd.MarkFlagRequired(utils.GenericIdFlag)
 }

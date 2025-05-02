@@ -105,9 +105,9 @@ var createWalletCmd = &cobra.Command{
 func init() {
 	Cmd.AddCommand(createWalletCmd)
 
-	createWalletCmd.Flags().StringP(utils.NameFlag, "n", "", "Name for the wallet (Required)")
-	createWalletCmd.Flags().StringP(utils.SymbolFlag, "s", "", "Symbol for the wallet")
-	createWalletCmd.Flags().StringP(utils.TypeFlag, "t", "", "Type of wallet, e.g. VAULT, ONCHAIN (Required)")
+	createWalletCmd.Flags().StringP(utils.NameFlag, "", "", "Name for the wallet (Required)")
+	createWalletCmd.Flags().StringP(utils.SymbolFlag, "", "", "Symbol for the wallet")
+	createWalletCmd.Flags().StringP(utils.TypeFlag, "", "", "Type of wallet, e.g. VAULT, ONCHAIN (Required)")
 	utils.AddPortfolioIdFlag(createWalletCmd)
 	utils.AddIdempotencyKeyFlag(createWalletCmd)
 

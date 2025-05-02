@@ -107,8 +107,8 @@ func listPortfolioTransactions(
 func init() {
 	Cmd.AddCommand(listPortfolioTransactionsCmd)
 
-	listPortfolioTransactionsCmd.Flags().StringSliceP(utils.TypesFlag, "t", []string{}, "Types of transactions")
-	listPortfolioTransactionsCmd.Flags().StringP(utils.SymbolsFlag, "y", "", "Asset symbols")
+	listPortfolioTransactionsCmd.Flags().StringSliceP(utils.TypesFlag, "", []string{}, "Types of transactions")
+	listPortfolioTransactionsCmd.Flags().StringP(utils.SymbolsFlag, "", "", "Asset symbols")
 	listPortfolioTransactionsCmd.MarkFlagRequired(utils.SymbolsFlag)
 
 	utils.AddPortfolioIdFlag(listPortfolioTransactionsCmd)

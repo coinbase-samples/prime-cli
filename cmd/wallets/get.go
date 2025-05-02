@@ -68,7 +68,7 @@ var getWalletCmd = &cobra.Command{
 func init() {
 	Cmd.AddCommand(getWalletCmd)
 
-	getWalletCmd.Flags().StringP(utils.WalletIdFlag, "i", "", "Wallet ID (Required)")
+	getWalletCmd.Flags().StringP(utils.WalletIdFlag, "", "", "Wallet ID (Required)")
 	utils.AddPortfolioIdFlag(getWalletCmd)
 
 	getWalletCmd.MarkFlagRequired(utils.WalletIdFlag)

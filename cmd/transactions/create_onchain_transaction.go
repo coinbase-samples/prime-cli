@@ -91,14 +91,14 @@ var createOnchainTransactionCmd = &cobra.Command{
 func init() {
 	Cmd.AddCommand(createOnchainTransactionCmd)
 
-	createOnchainTransactionCmd.Flags().StringP(utils.RawUnsignedTransactionFlag, "r", "", "Raw unsigned transaction (Required)")
-	createOnchainTransactionCmd.Flags().StringP(utils.UrlFlag, "u", "", "RPC URL")
-	createOnchainTransactionCmd.Flags().BoolP(utils.SkipBroadcastFlag, "b", false, "Skip broadcast")
-	createOnchainTransactionCmd.Flags().StringP(utils.ChainIdFlag, "c", "", "Chain ID")
-	createOnchainTransactionCmd.Flags().StringP(utils.WalletIdFlag, "w", "", "Wallet ID (Required)")
+	createOnchainTransactionCmd.Flags().StringP(utils.RawUnsignedTransactionFlag, "", "", "Raw unsigned transaction (Required)")
+	createOnchainTransactionCmd.Flags().StringP(utils.UrlFlag, "", "", "RPC URL")
+	createOnchainTransactionCmd.Flags().BoolP(utils.SkipBroadcastFlag, "", false, "Skip broadcast")
+	createOnchainTransactionCmd.Flags().StringP(utils.ChainIdFlag, "", "", "Chain ID")
+	createOnchainTransactionCmd.Flags().StringP(utils.WalletIdFlag, "", "", "Wallet ID (Required)")
 	utils.AddPortfolioIdFlag(createOnchainTransactionCmd)
-	createOnchainTransactionCmd.Flags().BoolP(utils.DisableDynamicGasFlag, "d", false, "Disable dynamic gas")
-	createOnchainTransactionCmd.Flags().StringP(utils.ReplacedTransactionIdFlag, "i", "", "Replaced transaction ID")
+	createOnchainTransactionCmd.Flags().BoolP(utils.DisableDynamicGasFlag, "", false, "Disable dynamic gas")
+	createOnchainTransactionCmd.Flags().StringP(utils.ReplacedTransactionIdFlag, "", "", "Replaced transaction ID")
 
 	createOnchainTransactionCmd.MarkFlagRequired(utils.RawUnsignedTransactionFlag)
 	createOnchainTransactionCmd.MarkFlagRequired(utils.WalletIdFlag)

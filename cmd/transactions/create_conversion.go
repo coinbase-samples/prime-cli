@@ -76,11 +76,11 @@ var createConversionCmd = &cobra.Command{
 func init() {
 	Cmd.AddCommand(createConversionCmd)
 
-	createConversionCmd.Flags().StringP(utils.SourceWalletIdFlag, "i", "", "ID of the source wallet (Required)")
-	createConversionCmd.Flags().StringP(utils.SourceSymbolFlag, "s", "", "Symbol of the source wallet (Required)")
-	createConversionCmd.Flags().StringP(utils.DestinationWalletIdFlag, "d", "", "ID of the destination wallet (Required)")
-	createConversionCmd.Flags().StringP(utils.DestinationSymbolFlag, "f", "", "Symbol of the destination wallet (Required)")
-	createConversionCmd.Flags().StringP(utils.AmountFlag, "a", "", "Conversion size (Required)")
+	createConversionCmd.Flags().StringP(utils.SourceWalletIdFlag, "", "", "ID of the source wallet (Required)")
+	createConversionCmd.Flags().StringP(utils.SourceSymbolFlag, "", "", "Symbol of the source wallet (Required)")
+	createConversionCmd.Flags().StringP(utils.DestinationWalletIdFlag, "", "", "ID of the destination wallet (Required)")
+	createConversionCmd.Flags().StringP(utils.DestinationSymbolFlag, "", "", "Symbol of the destination wallet (Required)")
+	createConversionCmd.Flags().StringP(utils.AmountFlag, "", "", "Conversion size (Required)")
 	utils.AddPortfolioIdFlag(createConversionCmd)
 	utils.AddIdempotencyKeyFlag(createConversionCmd)
 

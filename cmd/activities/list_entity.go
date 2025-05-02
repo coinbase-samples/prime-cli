@@ -121,10 +121,10 @@ func listEntityActivities(
 func init() {
 	Cmd.AddCommand(listEntityActivitiesCmd)
 
-	listEntityActivitiesCmd.Flags().StringP(utils.ActivityLevelFlag, "a", "", "Activity level")
-	listEntityActivitiesCmd.Flags().StringSliceP(utils.SymbolsFlag, "s", []string{}, "List of symbols")
-	listEntityActivitiesCmd.Flags().StringSliceP(utils.CategoriesFlag, "t", []string{}, "List of categories")
-	listEntityActivitiesCmd.Flags().StringSliceP(utils.StatusesFlag, "u", []string{}, "List of statuses")
+	listEntityActivitiesCmd.Flags().StringP(utils.ActivityLevelFlag, "", "", "Activity level")
+	listEntityActivitiesCmd.Flags().StringSliceP(utils.SymbolsFlag, "", []string{}, "List of symbols")
+	listEntityActivitiesCmd.Flags().StringSliceP(utils.CategoriesFlag, "", []string{}, "List of categories")
+	listEntityActivitiesCmd.Flags().StringSliceP(utils.StatusesFlag, "", []string{}, "List of statuses")
 
 	utils.AddEntityIdFlag(listEntityActivitiesCmd)
 	utils.AddStartEndFlags(listEntityActivitiesCmd)

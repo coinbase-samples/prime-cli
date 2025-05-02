@@ -68,7 +68,7 @@ var getOrderCmd = &cobra.Command{
 func init() {
 	Cmd.AddCommand(getOrderCmd)
 
-	getOrderCmd.Flags().StringP(utils.OrderIdFlag, "i", "", "Order ID (Required)")
+	getOrderCmd.Flags().StringP(utils.OrderIdFlag, "", "", "Order ID (Required)")
 	utils.AddPortfolioIdFlag(getOrderCmd)
 
 	getOrderCmd.MarkFlagRequired(utils.OrderIdFlag)

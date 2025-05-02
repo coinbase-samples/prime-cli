@@ -68,7 +68,7 @@ var getTransactionCmd = &cobra.Command{
 func init() {
 	Cmd.AddCommand(getTransactionCmd)
 
-	getTransactionCmd.Flags().StringP(utils.TransactionIdFlag, "i", "", "Transaction ID (Required)")
+	getTransactionCmd.Flags().StringP(utils.TransactionIdFlag, "", "", "Transaction ID (Required)")
 	utils.AddPortfolioIdFlag(getTransactionCmd)
 
 	getTransactionCmd.MarkFlagRequired(utils.TransactionIdFlag)

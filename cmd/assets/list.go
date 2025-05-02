@@ -25,7 +25,7 @@ import (
 )
 
 var listAssetsCmd = &cobra.Command{
-	Use:   "list-assets",
+	Use:   "list",
 	Short: "List assets for associated entity.",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		client, err := utils.GetClientFromEnv()

@@ -136,10 +136,10 @@ func listOrders(
 func init() {
 	Cmd.AddCommand(listOrdersCmd)
 
-	listOrdersCmd.Flags().StringSliceP(utils.OrderStatusesFlag, "r", []string{}, "List of statuses")
-	listOrdersCmd.Flags().StringSliceP(utils.ProductIdsFlag, "p", []string{}, "List of product IDs")
-	listOrdersCmd.Flags().StringP(utils.OrderTypeFlag, "t", "", "Type of orders")
-	listOrdersCmd.Flags().StringP(utils.OrderSideFlag, "o", "", "Side of orders")
+	listOrdersCmd.Flags().StringSliceP(utils.OrderStatusesFlag, "", []string{}, "List of statuses")
+	listOrdersCmd.Flags().StringSliceP(utils.ProductIdsFlag, "", []string{}, "List of product IDs")
+	listOrdersCmd.Flags().StringP(utils.OrderTypeFlag, "", "", "Type of orders")
+	listOrdersCmd.Flags().StringP(utils.OrderSideFlag, "", "", "Side of orders")
 
 	utils.AddStartEndFlags(listOrdersCmd)
 	listOrdersCmd.MarkFlagRequired(utils.StartFlag)
