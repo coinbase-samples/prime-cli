@@ -39,8 +39,8 @@ import (
 )
 
 var rootCmd = &cobra.Command{
-	Use:   "prime-cli",
-	Short: "Root of prime cli",
+	Use:   "primectl",
+	Short: "The command-line utility for Coinbase Prime",
 }
 
 func Execute() {
