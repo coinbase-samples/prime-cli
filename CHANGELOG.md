@@ -10,3 +10,4 @@
   - Removed the `--cursor` argument
 - **Breaking change:** Commands are now grouped by function
   - E.g., `primectl create-order` is now `primectl orders create`
+- **Breaking change:** Removed all command-line argument abbreviations
