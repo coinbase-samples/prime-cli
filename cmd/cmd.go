@@ -51,6 +51,7 @@ func Execute() {
 }
 
 func init() {
+	rootCmd.PersistentFlags().Bool("help", false, "Show help for command")
 	rootCmd.PersistentFlags().Bool(utils.FormatFlag, false, "Set to include formatted JSON. Default is false")
 	rootCmd.AddCommand(activities.Cmd)
 	rootCmd.AddCommand(addressbook.Cmd)
@@ -67,4 +68,13 @@ func init() {
 	rootCmd.AddCommand(transactions.Cmd)
 	rootCmd.AddCommand(users.Cmd)
 	rootCmd.AddCommand(wallets.Cmd)
+}
+
+func stripHelpShort(cmd *cobra.Command) {
+	if f := cmd.Flags().Lookup("help"); f != nil {
+		f.Shorthand = "" // remove "-h"
+	}
+	for _, c := range cmd.Commands() { // recurse so sub‑cmds lose it too
+		stripHelpShort(c)
+	}
 }
