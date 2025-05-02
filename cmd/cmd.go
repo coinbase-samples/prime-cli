@@ -51,7 +51,7 @@ func Execute() {
 }
 
 func init() {
-	rootCmd.PersistentFlags().BoolP(utils.FormatFlag, "z", false, "Set to include formatted JSON. Default is false")
+	rootCmd.PersistentFlags().BoolP(utils.FormatFlag, "", false, "Set to include formatted JSON. Default is false")
 	rootCmd.AddCommand(activities.Cmd)
 	rootCmd.AddCommand(addressbook.Cmd)
 	rootCmd.AddCommand(allocations.Cmd)
