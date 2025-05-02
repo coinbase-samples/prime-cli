@@ -1,8 +1,8 @@
-# Prime CLI README
+# Prime CLI
 
 ## Overview
 
-The Prime CLI is a sample Command Line Interface (CLI) application that generates requests to and receives responses from [Coinbase Prime's](https://prime.coinbase.com/) [REST APIs](https://docs.cloud.coinbase.com/prime/reference). The Prime CLI is written in Go, using [Cobra](https://github.com/spf13/cobra) in conjunction with the [Prime Go SDK](https://github.com/coinbase-samples/prime-sdk-go). 
+A Coinbase Prime command-line interface (CLI) application that generates requests to and receives responses from [Coinbase Prime's](https://prime.coinbase.com/) [REST APIs](https://docs.cloud.coinbase.com/prime/reference).
 
 ## License
 
@@ -64,13 +64,13 @@ primectl
 Finally, to run commands for each endpoint, use the following format to test each endpoint. Please note that many endpoints require flags, which are detailed with the `--help` flag. 
 
 ```
-primectl list-portfolios
+primectl portfolios list
 ```
 
 ```
-primectl create-order --help
+primectl orders create --help
 ```
 
 ```
-primectl create-order-preview -b 0.001 -i ETH-USD -s BUY -t MARKET
+primectl orders create-preview -b 0.001 -i ETH-USD -s BUY -t MARKET
 ```
