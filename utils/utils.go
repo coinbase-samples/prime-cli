@@ -83,7 +83,7 @@ func AddPortfolioIdFlag(cmd *cobra.Command) {
 }
 
 func AddActivityIdFlag(cmd *cobra.Command) {
-	cmd.Flags().StringP(utils.GenericIdFlag, "", "", "Activity ID (Required)")
+	cmd.Flags().StringP(GenericIdFlag, "", "", "Activity ID (Required)")
 }
 
 func AddEntityIdFlag(cmd *cobra.Command) {
