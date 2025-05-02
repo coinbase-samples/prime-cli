@@ -89,8 +89,8 @@ func getAddressBookEntries(
 
 func init() {
 	Cmd.AddCommand(listAddressBookCmd)
-	listAddressBookCmd.Flags().StringP(utils.SymbolFlag, "", "", "Currency symbol for filtering address book entries")
-	listAddressBookCmd.Flags().StringP(utils.SearchFlag, "", "", "Search term for filtering address book entries")
+	listAddressBookCmd.Flags().String(utils.SymbolFlag, "", "Currency symbol for filtering address book entries")
+	listAddressBookCmd.Flags().String(utils.SearchFlag, "", "Search term for filtering address book entries")
 	utils.AddPortfolioIdFlag(listAddressBookCmd)
 	utils.AddPaginationFlags(listAddressBookCmd, true)
 }

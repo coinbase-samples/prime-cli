@@ -105,15 +105,15 @@ var createWalletCmd = &cobra.Command{
 func init() {
 	Cmd.AddCommand(createWalletCmd)
 
-	createWalletCmd.Flags().StringP(utils.NameFlag, "", "", "Name for the wallet (Required)")
-	createWalletCmd.Flags().StringP(utils.SymbolFlag, "", "", "Symbol for the wallet")
-	createWalletCmd.Flags().StringP(utils.TypeFlag, "", "", "Type of wallet, e.g. VAULT, ONCHAIN (Required)")
+	createWalletCmd.Flags().String(utils.NameFlag, "", "Name for the wallet (Required)")
+	createWalletCmd.Flags().String(utils.SymbolFlag, "", "Symbol for the wallet")
+	createWalletCmd.Flags().String(utils.TypeFlag, "", "Type of wallet, e.g. VAULT, ONCHAIN (Required)")
 	utils.AddPortfolioIdFlag(createWalletCmd)
 	utils.AddIdempotencyKeyFlag(createWalletCmd)
 
-	createWalletCmd.Flags().StringP(utils.NetworkFamilyFlag, "", "", "Network family. Required for ONCHAIN wallet. Supported values: NETWORK_FAMILY_EVM or NETWORK_FAMILY_SOLANA")
-	createWalletCmd.Flags().StringP(utils.NetworkIdFlag, "", "", "The network id: base, bitcoin, ethereum, solana etc.")
-	createWalletCmd.Flags().StringP(utils.NetworkTypeFlag, "", "", "The network type: mainnet or testnet")
+	createWalletCmd.Flags().String(utils.NetworkFamilyFlag, "", "Network family. Required for ONCHAIN wallet. Supported values: NETWORK_FAMILY_EVM or NETWORK_FAMILY_SOLANA")
+	createWalletCmd.Flags().String(utils.NetworkIdFlag, "", "The network id: base, bitcoin, ethereum, solana etc.")
+	createWalletCmd.Flags().String(utils.NetworkTypeFlag, "", "The network type: mainnet or testnet")
 
 	createWalletCmd.MarkFlagRequired(utils.NameFlag)
 	createWalletCmd.MarkFlagRequired(utils.TypeFlag)

@@ -91,13 +91,13 @@ var createWithdrawalCmd = &cobra.Command{
 func init() {
 	Cmd.AddCommand(createWithdrawalCmd)
 
-	createWithdrawalCmd.Flags().StringP(utils.SourceWalletIdFlag, "", "", "ID of the source wallet (Required)")
-	createWithdrawalCmd.Flags().StringP(utils.SymbolFlag, "", "", "Symbol of the currency (Required)")
-	createWithdrawalCmd.Flags().StringP(utils.DestinationTypeFlag, "t", "", "Type of the destination (Required)")
-	createWithdrawalCmd.Flags().StringP(utils.AmountFlag, "", "", "Amount to withdraw (Required)")
-	createWithdrawalCmd.Flags().StringP(utils.PaymentMethodIdFlag, "", "", "ID of the payment method")
-	createWithdrawalCmd.Flags().StringP(utils.BlockchainAddressFlag, "", "", "Blockchain address")
-	createWithdrawalCmd.Flags().StringP(utils.AccountIdentifierFlag, "", "", "Account identifier")
+	createWithdrawalCmd.Flags().String(utils.SourceWalletIdFlag, "", "ID of the source wallet (Required)")
+	createWithdrawalCmd.Flags().String(utils.SymbolFlag, "", "Symbol of the currency (Required)")
+	createWithdrawalCmd.Flags().String(utils.DestinationTypeFlag, "", "Type of the destination (Required)")
+	createWithdrawalCmd.Flags().String(utils.AmountFlag, "", "Amount to withdraw (Required)")
+	createWithdrawalCmd.Flags().String(utils.PaymentMethodIdFlag, "", "ID of the payment method")
+	createWithdrawalCmd.Flags().String(utils.BlockchainAddressFlag, "", "Blockchain address")
+	createWithdrawalCmd.Flags().String(utils.AccountIdentifierFlag, "", "Account identifier")
 	utils.AddPortfolioIdFlag(createWithdrawalCmd)
 	utils.AddIdempotencyKeyFlag(createWithdrawalCmd)
 

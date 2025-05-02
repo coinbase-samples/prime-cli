@@ -87,7 +87,7 @@ func getOrderFills(
 func init() {
 	Cmd.AddCommand(getOrderFillsCmd)
 
-	getOrderFillsCmd.Flags().StringP(utils.OrderIdFlag, "", "", "Order ID (Required)")
+	getOrderFillsCmd.Flags().String(utils.OrderIdFlag, "", "Order ID (Required)")
 
 	utils.AddPortfolioIdFlag(getOrderFillsCmd)
 	utils.AddPaginationFlags(getOrderFillsCmd, true)

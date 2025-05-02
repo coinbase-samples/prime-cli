@@ -108,9 +108,9 @@ func listWalletTransactions(
 func init() {
 	Cmd.AddCommand(listWalletTransactionsCmd)
 
-	listWalletTransactionsCmd.Flags().StringP(utils.WalletIdFlag, "", "", "ID for given wallet")
-	listWalletTransactionsCmd.Flags().StringSliceP(utils.TypesFlag, "", []string{}, "Types of transactions")
-	listWalletTransactionsCmd.Flags().StringP(utils.SymbolsFlag, "", "", "Asset symbols")
+	listWalletTransactionsCmd.Flags().String(utils.WalletIdFlag, "", "ID for given wallet")
+	listWalletTransactionsCmd.Flags().StringSlice(utils.TypesFlag, []string{}, "Types of transactions")
+	listWalletTransactionsCmd.Flags().String(utils.SymbolsFlag, "", "Asset symbols")
 
 	utils.AddPortfolioIdFlag(listWalletTransactionsCmd)
 	utils.AddPaginationFlags(listWalletTransactionsCmd, true)

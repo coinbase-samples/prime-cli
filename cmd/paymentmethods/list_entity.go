@@ -64,5 +64,5 @@ var listEntityPaymentMethodsCmd = &cobra.Command{
 
 func init() {
 	Cmd.AddCommand(listEntityPaymentMethodsCmd)
-	listEntityPaymentMethodsCmd.Flags().StringP(utils.EntityIdFlag, "", "", "Entity ID. Uses environment variable if blank")
+	listEntityPaymentMethodsCmd.Flags().String(utils.EntityIdFlag, "", "Entity ID. Uses environment variable if blank")
 }

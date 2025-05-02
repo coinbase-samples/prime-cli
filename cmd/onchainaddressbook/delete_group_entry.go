@@ -72,7 +72,7 @@ func init() {
 	Cmd.AddCommand(deleteOnchainAddressBookEntryCmd)
 
 	utils.AddPortfolioIdFlag(deleteOnchainAddressBookEntryCmd)
-	deleteOnchainAddressBookEntryCmd.Flags().StringP(utils.GenericIdFlag, "", "", "Address group ID (Required)")
+	deleteOnchainAddressBookEntryCmd.Flags().String(utils.GenericIdFlag, "", "Address group ID (Required)")
 
 	deleteOnchainAddressBookEntryCmd.MarkFlagRequired(utils.GenericIdFlag)
 }

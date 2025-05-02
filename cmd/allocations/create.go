@@ -82,13 +82,13 @@ var createAllocationCmd = &cobra.Command{
 func init() {
 	Cmd.AddCommand(createAllocationCmd)
 
-	createAllocationCmd.Flags().StringP(utils.AllocationIdFlag, "", "", "ID of the allocation (Required)")
-	createAllocationCmd.Flags().StringP(utils.SourcePortfolioIdFlag, "", "", "ID of the source portfolio (Required)")
-	createAllocationCmd.Flags().StringP(utils.ProductIdFlag, "", "", "ID of the product (Required)")
-	createAllocationCmd.Flags().StringP(utils.SizeTypeFlag, "", "", "Size type of the allocation (Required)")
-	createAllocationCmd.Flags().StringP(utils.RemainderDestPortfolioIdFlag, "", "", "ID of the remainder destination portfolio (Required)")
-	createAllocationCmd.Flags().StringP(utils.AllocationLegsFlag, "", "", "JSON string of allocation legs (Required)")
-	createAllocationCmd.Flags().StringArrayP(utils.OrderIdsFlag, "", []string{}, "List of order IDs")
+	createAllocationCmd.Flags().String(utils.AllocationIdFlag, "", "ID of the allocation (Required)")
+	createAllocationCmd.Flags().String(utils.SourcePortfolioIdFlag, "", "ID of the source portfolio (Required)")
+	createAllocationCmd.Flags().String(utils.ProductIdFlag, "", "ID of the product (Required)")
+	createAllocationCmd.Flags().String(utils.SizeTypeFlag, "", "Size type of the allocation (Required)")
+	createAllocationCmd.Flags().String(utils.RemainderDestPortfolioIdFlag, "", "ID of the remainder destination portfolio (Required)")
+	createAllocationCmd.Flags().String(utils.AllocationLegsFlag, "", "JSON string of allocation legs (Required)")
+	createAllocationCmd.Flags().StringArray(utils.OrderIdsFlag, []string{}, "List of order IDs")
 
 	createAllocationCmd.MarkFlagRequired(utils.AllocationIdFlag)
 	createAllocationCmd.MarkFlagRequired(utils.SourcePortfolioIdFlag)

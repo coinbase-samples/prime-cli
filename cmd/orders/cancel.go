@@ -72,7 +72,7 @@ var cancelOrderCmd = &cobra.Command{
 func init() {
 	Cmd.AddCommand(cancelOrderCmd)
 
-	cancelOrderCmd.Flags().StringP(utils.OrderIdFlag, "", "", "ID of the order to cancel (Required)")
+	cancelOrderCmd.Flags().String(utils.OrderIdFlag, "", "ID of the order to cancel (Required)")
 	err := cancelOrderCmd.MarkFlagRequired(utils.OrderIdFlag)
 	if err != nil {
 		return

@@ -95,8 +95,8 @@ func listWallets(
 func init() {
 	Cmd.AddCommand(listWalletsCmd)
 
-	listWalletsCmd.Flags().StringP(utils.TypeFlag, "", "", "Type of balance (Required)")
-	listWalletsCmd.Flags().StringSliceP(utils.SymbolsFlag, "", []string{}, "List of symbols")
+	listWalletsCmd.Flags().String(utils.TypeFlag, "", "Type of balance (Required)")
+	listWalletsCmd.Flags().StringSlice(utils.SymbolsFlag, []string{}, "List of symbols")
 
 	utils.AddPortfolioIdFlag(listWalletsCmd)
 	utils.AddPaginationFlags(listWalletsCmd, true)

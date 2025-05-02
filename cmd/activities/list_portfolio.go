@@ -114,9 +114,9 @@ func listActivities(
 func init() {
 	Cmd.AddCommand(listActivitiesCmd)
 
-	listActivitiesCmd.Flags().StringSliceP(utils.SymbolsFlag, "", []string{}, "List of symbols")
-	listActivitiesCmd.Flags().StringSliceP(utils.CategoriesFlag, "", []string{}, "List of categories")
-	listActivitiesCmd.Flags().StringSliceP(utils.StatusesFlag, "", []string{}, "List of statuses")
+	listActivitiesCmd.Flags().StringSlice(utils.SymbolsFlag, []string{}, "List of symbols")
+	listActivitiesCmd.Flags().StringSlice(utils.CategoriesFlag, []string{}, "List of categories")
+	listActivitiesCmd.Flags().StringSlice(utils.StatusesFlag, []string{}, "List of statuses")
 
 	utils.AddStartEndFlags(listActivitiesCmd)
 

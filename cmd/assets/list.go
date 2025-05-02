@@ -65,6 +65,6 @@ var listAssetsCmd = &cobra.Command{
 func init() {
 	Cmd.AddCommand(listAssetsCmd)
 
-	listAssetsCmd.Flags().StringP(utils.EntityIdFlag, "", "", "Entity ID. Uses environment variable if blank")
+	listAssetsCmd.Flags().String(utils.EntityIdFlag, "", "Entity ID. Uses environment variable if blank")
 
 }

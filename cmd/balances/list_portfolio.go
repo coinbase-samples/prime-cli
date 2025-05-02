@@ -75,7 +75,7 @@ var listPortfolioBalancesCmd = &cobra.Command{
 func init() {
 	Cmd.AddCommand(listPortfolioBalancesCmd)
 
-	listPortfolioBalancesCmd.Flags().StringArrayP(utils.TypeFlag, "", []string{}, "Type of balance")
-	listPortfolioBalancesCmd.Flags().StringSliceP(utils.SymbolsFlag, "", []string{}, "List of symbols")
+	listPortfolioBalancesCmd.Flags().StringArray(utils.TypeFlag, []string{}, "Type of balance")
+	listPortfolioBalancesCmd.Flags().StringSlice(utils.SymbolsFlag, []string{}, "List of symbols")
 	utils.AddPortfolioIdFlag(listPortfolioBalancesCmd)
 }

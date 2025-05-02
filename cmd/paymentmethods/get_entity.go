@@ -62,7 +62,7 @@ var getEntityPaymentMethodCmd = &cobra.Command{
 func init() {
 	Cmd.AddCommand(getEntityPaymentMethodCmd)
 
-	getEntityPaymentMethodCmd.Flags().StringP(utils.PaymentMethodIdFlag, "", "", "Payment Method ID (Required)")
+	getEntityPaymentMethodCmd.Flags().String(utils.PaymentMethodIdFlag, "", "Payment Method ID (Required)")
 
 	getEntityPaymentMethodCmd.MarkFlagRequired(utils.PaymentMethodIdFlag)
 }

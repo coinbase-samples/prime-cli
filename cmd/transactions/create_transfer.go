@@ -75,10 +75,10 @@ var createTransferCmd = &cobra.Command{
 func init() {
 	Cmd.AddCommand(createTransferCmd)
 
-	createTransferCmd.Flags().StringP(utils.SourceWalletIdFlag, "", "", "ID of the source wallet (Required)")
-	createTransferCmd.Flags().StringP(utils.SymbolFlag, "", "", "Symbol of the asset to be transferred (Required)")
-	createTransferCmd.Flags().StringP(utils.DestinationWalletIdFlag, "", "", "ID of the destination wallet (Required)")
-	createTransferCmd.Flags().StringP(utils.AmountFlag, "", "", "Conversion size (Required)")
+	createTransferCmd.Flags().String(utils.SourceWalletIdFlag, "", "ID of the source wallet (Required)")
+	createTransferCmd.Flags().String(utils.SymbolFlag, "", "Symbol of the asset to be transferred (Required)")
+	createTransferCmd.Flags().String(utils.DestinationWalletIdFlag, "", "ID of the destination wallet (Required)")
+	createTransferCmd.Flags().String(utils.AmountFlag, "", "Conversion size (Required)")
 	utils.AddPortfolioIdFlag(createTransferCmd)
 	utils.AddIdempotencyKeyFlag(createTransferCmd)
 

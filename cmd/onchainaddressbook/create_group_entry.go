@@ -95,10 +95,10 @@ func init() {
 	Cmd.AddCommand(createOnchainAddressBookEntryCmd)
 
 	utils.AddPortfolioIdFlag(createOnchainAddressBookEntryCmd)
-	createOnchainAddressBookEntryCmd.Flags().StringP(utils.GenericIdFlag, "", "", "Address group ID (Required)")
-	createOnchainAddressBookEntryCmd.Flags().StringP(utils.AddressFlag, "", "", "Address (Required)")
-	createOnchainAddressBookEntryCmd.Flags().StringP(utils.NetworkTypeFlag, "", "", "Network type (Required)")
-	createOnchainAddressBookEntryCmd.Flags().StringP(utils.NameFlag, "", "", "Name for the address group")
+	createOnchainAddressBookEntryCmd.Flags().String(utils.GenericIdFlag, "", "Address group ID (Required)")
+	createOnchainAddressBookEntryCmd.Flags().String(utils.AddressFlag, "", "Address (Required)")
+	createOnchainAddressBookEntryCmd.Flags().String(utils.NetworkTypeFlag, "", "Network type (Required)")
+	createOnchainAddressBookEntryCmd.Flags().String(utils.NameFlag, "", "Name for the address group")
 
 	createOnchainAddressBookEntryCmd.MarkFlagRequired(utils.GenericIdFlag)
 	createOnchainAddressBookEntryCmd.MarkFlagRequired(utils.AddressFlag)
