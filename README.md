@@ -48,29 +48,22 @@ To ensure your project's dependencies are up-to-date, run:
 go mod tidy
 ```
 
-To make your application easily accessible from any location, move the binary you created to a directory that's already in your system's PATH. For example, these are the commands to move `primectl` to `/usr/local/bin`, as well as set permissions to reduce risk:
-
-```
-sudo mv primectl /usr/local/bin/
-chmod 755 /usr/local/bin/primectl
-```
-
 To verify that your application is installed correctly and accessible from any location, run the following command. It will include all available requests:
 
 ```
-primectl
+./primectl
 ```
 
 Finally, to run commands for each endpoint, use the following format to test each endpoint. Please note that many endpoints require flags, which are detailed with the `--help` flag. 
 
 ```
-primectl portfolios list
+./primectl portfolios list
 ```
 
 ```
-primectl orders create --help
+./primectl orders create --help
 ```
 
 ```
-primectl orders create-preview -b 0.001 -i ETH-USD -s BUY -t MARKET
+./primectl orders create-preview -b 0.001 -i ETH-USD -s BUY -t MARKET
 ```
