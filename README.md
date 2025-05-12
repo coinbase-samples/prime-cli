@@ -12,7 +12,7 @@ The application and code are only available for demonstration purposes.
 
 ## Installation
 
-# MacOS
+### MacOS
 
 Ensure that you have [Homebrew](https://brew.sh/) installed.
 
@@ -28,7 +28,7 @@ Next, install the Homebrew formula:
 brew install prime-cli
 ```
 
-# Other Platforms
+### Other Platforms
 
 To install the Prime CLI on other platforms, clone this repoistory, build and then add the binary to the [path](https://en.wikipedia.org/wiki/PATH_(variable)).
 
@@ -38,7 +38,7 @@ cd prime-cli
 go build -o primectl
 ```
 
-## Usage
+## Configuration
 
 Once you have the CLI installed, configure your environment.
 
@@ -59,6 +59,8 @@ export PRIME_CREDENTIALS='{
 ```
 
 You may also pass an environment variable called `primeCliTimeout` which will override the default request timeout of 7 seconds. This value should be an integer in seconds.
+
+## Usage
 
 Build the application binary and specify an output name, e.g. `primectl`:
 
