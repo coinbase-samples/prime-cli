@@ -167,7 +167,7 @@ func ParseDateRange(startStr, endStr string) (time.Time, time.Time, error) {
 	return start, end, nil
 }
 
-func MarshalJSON(data interface{}, format bool) ([]byte, error) {
+func marshalJson(data interface{}, format bool) ([]byte, error) {
 	if format {
 		return json.MarshalIndent(data, "", JsonIndent)
 	}
@@ -366,12 +366,34 @@ func FormatResponseAsJson(cmd *cobra.Command, response interface{}) (string, err
 		return "", err
 	}
 
-	jsonResponse, err := MarshalJSON(response, shouldFormat)
+	raw, err := marshalJson(response, shouldFormat)
 	if err != nil {
 		return "", fmt.Errorf("cannot marshal response to JSON: %w", err)
 	}
 
-	return string(jsonResponse), nil
+	output, err := removeRequestField(raw, shouldFormat)
+	if err != nil {
+		return "", fmt.Errorf("cannot marshal response to JSON: %w", err)
+	}
+
+	return output, nil
+}
+
+func removeRequestField(raw []byte, shouldFormat bool) (string, error) {
+
+	var m map[string]any
+	if err := json.Unmarshal(raw, &m); err != nil {
+		return "", fmt.Errorf("cannot unmarshal response to JSON: %w", err)
+	}
+
+	delete(m, "request")
+
+	output, err := marshalJson(m, shouldFormat)
+	if err != nil {
+		return "", fmt.Errorf("cannot marshal response to JSON: %w", err)
+	}
+
+	return string(output), nil
 }
 
 func GetFlagBoolValue(cmd *cobra.Command, flagName string) bool {
