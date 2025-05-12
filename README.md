@@ -10,7 +10,7 @@ The Prime CLI is free and open source and released under the [Apache License, Ve
 
 The application and code are only available for demonstration purposes.
 
-## Usage
+## Installation
 
 # MacOS
 
@@ -40,14 +40,9 @@ go build -o primectl
 
 ## Usage
 
-To begin, navigate to your preferred directory for development and clone the Prime CLI repository and enter the directory using the following commands:
+Once you have the CLI installed, configure your environment.
 
-```
-git clone https://github.com/coinbase-samples/prime-cli
-cd prime-cli
-```
-
-Next, pass an environment variable via your terminal called `PRIME_CREDENTIALS` with your API and portfolio information.
+Set an environment variable in your shell called `PRIME_CREDENTIALS` with your API and portfolio information.
 
 Coinbase Prime API credentials can be created in the Prime web console under Settings -> APIs. Entity ID can be retrieved by calling [Get Portfolio](https://docs.cloud.coinbase.com/prime/reference/primerestapi_getportfolio). If you are not configured yet to call this endpoint, you may proceed without including the `entityId` key and value for the time being, but certain endpoints such as List Invoices and List Assets require it.
 
