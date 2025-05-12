@@ -2,7 +2,7 @@
 
 ## Overview
 
-A Coinbase Prime command-line interface (CLI) application that generates requests to and receives responses from [Coinbase Prime's](https://prime.coinbase.com/) [REST APIs](https://docs.cloud.coinbase.com/prime/reference).
+The Coinbase Prime command-line interface (CLI) to simplify programmatic interaction with [Coinbase Prime's](https://prime.coinbase.com/) [REST APIs](https://docs.cloud.coinbase.com/prime/reference).
 
 ## License
 
@@ -11,6 +11,8 @@ The Prime CLI is free and open source and released under the [Apache License, Ve
 The application and code are only available for demonstration purposes.
 
 ## Installation
+
+Install the Prime CLI binary on your computer.
 
 ### MacOS
 
@@ -22,7 +24,7 @@ Install the Coinbase Samples Homebrew tap:
 brew tap coinbase-samples/homebrew-tap
 ```
 
-Next, install the Homebrew formula:
+Next, install the Prime CLI Homebrew formula:
 
 ```
 brew install prime-cli
