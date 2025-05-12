@@ -18,9 +18,12 @@ package assets
 
 import (
 	"fmt"
+	"sort"
+	"strings"
 
 	"github.com/coinbase-samples/prime-cli/utils"
 	"github.com/coinbase-samples/prime-sdk-go/assets"
+	"github.com/coinbase-samples/prime-sdk-go/model"
 	"github.com/spf13/cobra"
 )
 
@@ -33,38 +36,78 @@ var listAssetsCmd = &cobra.Command{
 			return fmt.Errorf("failed to initialize client: %w", err)
 		}
 
-		assetsService := assets.NewAssetsService(client)
-
 		entityId, err := utils.GetEntityId(cmd, client)
 		if err != nil {
 			return fmt.Errorf("cannot get entity ID: %w", err)
 		}
 
-		ctx, cancel := utils.GetContextWithTimeout()
-		defer cancel()
+		svc := assets.NewAssetsService(client)
 
-		request := &assets.ListAssetsRequest{
-			EntityId: entityId,
-		}
-
-		response, err := assetsService.ListAssets(ctx, request)
-		if err != nil {
-			return fmt.Errorf("cannot list assets: %w", err)
-		}
-
-		jsonResponse, err := utils.FormatResponseAsJson(cmd, response)
+		vals, err := listAssets(svc, entityId)
 		if err != nil {
 			return err
 		}
 
-		fmt.Println(jsonResponse)
-		return nil
+		return utils.HandleListCmd(
+			cmd,
+			func(paginationParams *model.PaginationParams) (*model.Pagination, error) {
+
+				limit := paginationParams.Limit
+
+				sortItemsByName(vals, paginationParams.SortDirection)
+
+				var toPrint []*model.Asset
+				next := ""
+
+				if int32(len(vals)) >= limit {
+
+					toPrint = vals[:limit]
+					vals = vals[limit:]
+					next = "true"
+
+				} else {
+					toPrint = vals
+					vals = nil
+				}
+
+				if err := utils.PrintJsonDocs(cmd, toPrint); err != nil {
+					return nil, err
+				}
+
+				return &model.Pagination{NextCursor: next}, nil
+			},
+		)
 	},
 }
 
+func listAssets(svc assets.AssetsService, entityId string) ([]*model.Asset, error) {
+	ctx, cancel := utils.GetContextWithTimeout()
+	defer cancel()
+
+	request := &assets.ListAssetsRequest{
+		EntityId: entityId,
+	}
+
+	response, err := svc.ListAssets(ctx, request)
+	if err != nil {
+		return nil, fmt.Errorf("cannot list assets: %w", err)
+	}
+
+	return response.Assets, nil
+}
+
+func sortItemsByName(items []*model.Asset, direction string) {
+	sort.Slice(items, func(i, j int) bool {
+		if strings.ToLower(direction) == "asc" {
+			return items[i].Name < items[j].Name
+		}
+		return items[i].Name > items[j].Name
+	})
+}
+
 func init() {
+
+	utils.AddPaginationFlags(listAssetsCmd, true)
+	utils.AddEntityIdFlag(listAssetsCmd)
 	Cmd.AddCommand(listAssetsCmd)
-
-	listAssetsCmd.Flags().String(utils.EntityIdFlag, "", "Entity ID. Uses environment variable if blank")
-
 }
