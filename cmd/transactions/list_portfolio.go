@@ -28,7 +28,7 @@ import (
 )
 
 var listPortfolioTransactionsCmd = &cobra.Command{
-	Use:   "list-portfolio",
+	Use:   "list",
 	Short: "Lists portfolio transactions that meet filter criteria",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		client, err := utils.GetClientFromEnv()
