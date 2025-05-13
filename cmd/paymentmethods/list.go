@@ -25,8 +25,8 @@ import (
 )
 
 var listEntityPaymentMethodsCmd = &cobra.Command{
-	Use:   "list-entity",
-	Short: "Lists payment methods meeting filter criteria.",
+	Use:   "list",
+	Short: "Lists the entity payment methods meeting filter criteria.",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		client, err := utils.GetClientFromEnv()
 		if err != nil {
