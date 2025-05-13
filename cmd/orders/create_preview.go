@@ -81,7 +81,7 @@ func init() {
 	Cmd.AddCommand(createOrderPreviewCmd)
 
 	createOrderPreviewCmd.Flags().String(utils.SideFlag, "", "Order side (Required)")
-	createOrderPreviewCmd.Flags().String(utils.ProductIdFlag, "", "ID of the product (Required)")
+	utils.AddProductIdFlag(createOrderPreviewCmd)
 	createOrderPreviewCmd.Flags().String(utils.TypeFlag, "", "Type of the order (Required)")
 	createOrderPreviewCmd.Flags().String(utils.BaseQuantityFlag, "", "Order size in base asset units")
 	createOrderPreviewCmd.Flags().String(utils.QuoteValueFlag, "", "Order size in quote asset units")
