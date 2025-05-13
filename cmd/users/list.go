@@ -27,7 +27,7 @@ import (
 )
 
 var listPortfolioUsersCmd = &cobra.Command{
-	Use:   "list-portfolio",
+	Use:   "list",
 	Short: "List users associated with portfolio",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		client, err := utils.GetClientFromEnv()
