@@ -87,7 +87,7 @@ func init() {
 	Cmd.AddCommand(createOrderCmd)
 
 	createOrderCmd.Flags().String(utils.SideFlag, "", "Order side, e.g. BUY (Required)")
-	createOrderCmd.Flags().String(utils.ProductIdFlag, "", "ID of the product, e.g. ETH-USD (Required)")
+	utils.AddProductIdFlag(createOrderCmd)
 	createOrderCmd.Flags().String(utils.TypeFlag, "", "Type of the order, e.g. MARKET (Required)")
 	createOrderCmd.Flags().String(utils.BaseQuantityFlag, "", "Order size in base asset units")
 	createOrderCmd.Flags().String(utils.QuoteValueFlag, "", "Order size in quote asset units")
