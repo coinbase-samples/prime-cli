@@ -74,8 +74,6 @@ var listOnchainBalancesCmd = &cobra.Command{
 func init() {
 	Cmd.AddCommand(listOnchainBalancesCmd)
 
-	listOnchainBalancesCmd.Flags().String(utils.WalletIdFlag, "", "Wallet ID")
+	utils.AddWalletIdFlag(listOnchainBalancesCmd)
 	utils.AddPortfolioIdFlag(listOnchainBalancesCmd)
-
-	listOnchainBalancesCmd.MarkFlagRequired(utils.WalletIdFlag)
 }
