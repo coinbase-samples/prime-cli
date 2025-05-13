@@ -18,8 +18,6 @@ package orders
 
 import (
 	"fmt"
-	"strings"
-	"time"
 
 	"github.com/coinbase-samples/prime-cli/utils"
 	"github.com/coinbase-samples/prime-sdk-go/model"
@@ -58,10 +56,6 @@ var listOrdersCmd = &cobra.Command{
 			return err
 		}
 
-		if strings.ToUpper(orderType) == utils.OrderStatusOpen {
-			return fmt.Errorf("invalid order type: 'OPEN' cannot be used")
-		}
-
 		orderSide, err := cmd.Flags().GetString(utils.OrderSideFlag)
 		if err != nil {
 			return err
@@ -82,10 +76,23 @@ var listOrdersCmd = &cobra.Command{
 			return err
 		}
 
+		request := &orders.ListOrdersRequest{
+			PortfolioId: portfolioId,
+			Statuses:    statuses,
+			ProductIds:  productIds,
+			Type:        orderType,
+			OrderSide:   orderSide,
+			Start:       start,
+			End:         end,
+		}
+
 		return utils.HandleListCmd(
 			cmd,
 			func(paginationParams *model.PaginationParams) (*model.Pagination, error) {
-				response, err := listOrders(svc, portfolioId, productIds, statuses, orderType, orderSide, start, end, paginationParams)
+
+				request.Pagination = paginationParams
+
+				response, err := listOrders(svc, request)
 				if err != nil {
 					return nil, err
 				}
@@ -102,30 +109,13 @@ var listOrdersCmd = &cobra.Command{
 
 func listOrders(
 	svc orders.OrdersService,
-	portfolioId string,
-	productIds,
-	statuses []string,
-	orderType,
-	orderSide string,
-	start,
-	end time.Time,
-	pagination *model.PaginationParams,
+	req *orders.ListOrdersRequest,
 ) (*orders.ListOrdersResponse, error) {
+
 	ctx, cancel := utils.GetContextWithTimeout()
 	defer cancel()
 
-	request := &orders.ListOrdersRequest{
-		PortfolioId: portfolioId,
-		Statuses:    statuses,
-		ProductIds:  productIds,
-		Type:        orderType,
-		OrderSide:   orderSide,
-		Start:       start,
-		End:         end,
-		Pagination:  pagination,
-	}
-
-	response, err := svc.ListOrders(ctx, request)
+	response, err := svc.ListOrders(ctx, req)
 	if err != nil {
 		return nil, fmt.Errorf("cannot list orders: %w", err)
 	}
@@ -137,14 +127,15 @@ func init() {
 	Cmd.AddCommand(listOrdersCmd)
 
 	listOrdersCmd.Flags().StringSlice(utils.OrderStatusesFlag, []string{}, "List of statuses")
-	listOrdersCmd.Flags().StringSlice(utils.ProductIdsFlag, []string{}, "List of product IDs")
-	listOrdersCmd.Flags().String(utils.OrderTypeFlag, "", "Type of orders")
-	listOrdersCmd.Flags().String(utils.OrderSideFlag, "", "Side of orders")
+
+	utils.AddProductIdsFlag(listOrdersCmd)
+
+	utils.AddOrderSideFlag(listOrdersCmd)
+	utils.AddOrderTypeFlag(listOrdersCmd)
 
 	utils.AddStartEndFlags(listOrdersCmd)
 	listOrdersCmd.MarkFlagRequired(utils.StartFlag)
 
 	utils.AddPortfolioIdFlag(listOrdersCmd)
 	utils.AddPaginationFlags(listOrdersCmd, true)
-
 }
