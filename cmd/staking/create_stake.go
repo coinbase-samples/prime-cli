@@ -1,5 +1,5 @@
 /**
- * Copyright 2023-present Coinbase Global, Inc.
+ * Copyright 2025-present Coinbase Global, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,8 +25,8 @@ import (
 )
 
 var createStakeCmd = &cobra.Command{
-	Use:   "create",
-	Short: "Create a staking or delegate request",
+	Use:   "stake",
+	Short: "Creates a request to stake or delegate funds to a validator",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		client, err := utils.GetClientFromEnv()
 		if err != nil {
@@ -49,9 +49,11 @@ var createStakeCmd = &cobra.Command{
 			PortfolioId:    portfolioId,
 			WalletId:       utils.GetFlagStringValue(cmd, utils.WalletIdFlag),
 			IdempotencyKey: idempotencyKey,
-			Inputs: primeStaking.CreateStakeInputs{
-				Amount: utils.GetFlagStringValue(cmd, utils.AmountFlag),
-			},
+		}
+
+		amount := utils.GetFlagStringValue(cmd, utils.AmountFlag)
+		if len(amount) > 0 {
+			request.Inputs = primeStaking.CreateStakeInputs{Amount: amount}
 		}
 
 		ctx, cancel := utils.GetContextWithTimeout()
@@ -79,6 +81,5 @@ func init() {
 	utils.AddWalletIdFlag(createStakeCmd)
 	utils.AddIdempotencyKeyFlag(createStakeCmd)
 
-	createStakeCmd.Flags().String(utils.AmountFlag, "", "Amount to stake or delegate (Required)")
-	createStakeCmd.MarkFlagRequired(utils.WalletIdFlag)
+	createStakeCmd.Flags().String(utils.AmountFlag, "", "Optional amount to stake. If omitted, the wallet will stake or unstake the maximum amount available")
 }
