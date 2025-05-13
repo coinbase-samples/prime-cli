@@ -68,8 +68,6 @@ var getWalletBalanceCmd = &cobra.Command{
 func init() {
 	Cmd.AddCommand(getWalletBalanceCmd)
 
-	getWalletBalanceCmd.Flags().String(utils.WalletIdFlag, "", "Wallet ID (Required)")
+	utils.AddWalletIdFlag(getWalletBalanceCmd)
 	utils.AddPortfolioIdFlag(getWalletBalanceCmd)
-
-	getWalletBalanceCmd.MarkFlagRequired(utils.WalletIdFlag)
 }
