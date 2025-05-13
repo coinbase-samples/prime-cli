@@ -85,6 +85,11 @@ func AddPortfolioIdFlag(cmd *cobra.Command) {
 	cmd.Flags().String(PortfolioIdFlag, "", "Portfolio ID. Uses environment variable if blank")
 }
 
+func AddWalletIdFlag(cmd *cobra.Command) {
+	cmd.Flags().String(WalletIdFlag, "", "Wallet ID (Required)")
+	cmd.MarkFlagRequired(WalletIdFlag)
+}
+
 func AddProductIdFlag(cmd *cobra.Command) {
 	cmd.Flags().String(ProductIdFlag, "", "ID of the product (Required)")
 }
