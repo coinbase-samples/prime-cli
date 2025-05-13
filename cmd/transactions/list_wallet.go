@@ -11,8 +11,7 @@
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+ * limitations under the License.  */
 
 package transactions
 
@@ -108,13 +107,12 @@ func listWalletTransactions(
 func init() {
 	Cmd.AddCommand(listWalletTransactionsCmd)
 
-	listWalletTransactionsCmd.Flags().String(utils.WalletIdFlag, "", "ID for given wallet")
 	listWalletTransactionsCmd.Flags().StringSlice(utils.TypesFlag, []string{}, "Types of transactions")
 	listWalletTransactionsCmd.Flags().String(utils.SymbolsFlag, "", "Asset symbols")
 
+	utils.AddWalletIdFlag(listWalletTransactionsCmd)
 	utils.AddPortfolioIdFlag(listWalletTransactionsCmd)
 	utils.AddPaginationFlags(listWalletTransactionsCmd, true)
 	utils.AddStartEndFlags(listWalletTransactionsCmd)
 
-	listWalletTransactionsCmd.MarkFlagRequired(utils.WalletIdFlag)
 }
