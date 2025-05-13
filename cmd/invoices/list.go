@@ -27,7 +27,7 @@ import (
 )
 
 var listInvoicesCmd = &cobra.Command{
-	Use:   "list-invoices",
+	Use:   "list",
 	Short: "List invoices matching filter criteria",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		client, err := utils.GetClientFromEnv()
