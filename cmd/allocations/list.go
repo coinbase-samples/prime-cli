@@ -27,8 +27,8 @@ import (
 )
 
 var listPortfolioAllocationsCmd = &cobra.Command{
-	Use:   "list-portfolio",
-	Short: "A brief description of your command",
+	Use:   "list",
+	Short: "List the portfolio allocations",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		client, err := utils.GetClientFromEnv()
 		if err != nil {
