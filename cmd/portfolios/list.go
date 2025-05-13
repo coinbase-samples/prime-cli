@@ -18,8 +18,11 @@ package portfolios
 
 import (
 	"fmt"
+	"sort"
+	"strings"
 
 	"github.com/coinbase-samples/prime-cli/utils"
+	"github.com/coinbase-samples/prime-sdk-go/model"
 	"github.com/coinbase-samples/prime-sdk-go/portfolios"
 	"github.com/spf13/cobra"
 )
@@ -33,29 +36,63 @@ var listPortfoliosCmd = &cobra.Command{
 			return fmt.Errorf("cannot get client from environment: %w", err)
 		}
 
-		portfoliosService := portfolios.NewPortfoliosService(client)
-
-		ctx, cancel := utils.GetContextWithTimeout()
-		defer cancel()
-
-		request := &portfolios.ListPortfoliosRequest{}
-
-		response, err := portfoliosService.ListPortfolios(ctx, request)
-		if err != nil {
-			return fmt.Errorf("listing portfolios: %w", err)
-		}
-
-		jsonResponse, err := utils.FormatResponseAsJson(cmd, response)
+		vals, err := listPortfolios(portfolios.NewPortfoliosService(client))
 		if err != nil {
 			return err
 		}
 
-		fmt.Println(jsonResponse)
+		return utils.HandleListCmd(
+			cmd,
+			func(paginationParams *model.PaginationParams) (*model.Pagination, error) {
 
-		return nil
+				limit := paginationParams.Limit
+
+				sortItemsByName(vals, paginationParams.SortDirection)
+
+				var toPrint []*model.Portfolio
+				next := ""
+
+				if int32(len(vals)) >= limit {
+					toPrint = vals[:limit]
+					vals = vals[limit:]
+					next = "true"
+				} else {
+					toPrint = vals
+					vals = nil
+				}
+
+				if err := utils.PrintJsonDocs(cmd, toPrint); err != nil {
+					return nil, err
+				}
+
+				return &model.Pagination{NextCursor: next}, nil
+			},
+		)
 	},
 }
 
+func listPortfolios(svc portfolios.PortfoliosService) ([]*model.Portfolio, error) {
+	ctx, cancel := utils.GetContextWithTimeout()
+	defer cancel()
+
+	response, err := svc.ListPortfolios(ctx, &portfolios.ListPortfoliosRequest{})
+	if err != nil {
+		return nil, fmt.Errorf("cannot list portfolios: %w", err)
+	}
+
+	return response.Portfolios, nil
+}
+
+func sortItemsByName(items []*model.Portfolio, direction string) {
+	sort.Slice(items, func(i, j int) bool {
+		if strings.ToLower(direction) == "asc" {
+			return items[i].Name < items[j].Name
+		}
+		return items[i].Name > items[j].Name
+	})
+}
+
 func init() {
+	utils.AddPaginationFlags(listPortfoliosCmd, true)
 	Cmd.AddCommand(listPortfoliosCmd)
 }

@@ -60,11 +60,9 @@ var listAssetsCmd = &cobra.Command{
 				next := ""
 
 				if int32(len(vals)) >= limit {
-
 					toPrint = vals[:limit]
 					vals = vals[limit:]
 					next = "true"
-
 				} else {
 					toPrint = vals
 					vals = nil
