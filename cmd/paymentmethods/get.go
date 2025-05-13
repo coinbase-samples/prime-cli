@@ -26,7 +26,7 @@ import (
 )
 
 var getEntityPaymentMethodCmd = &cobra.Command{
-	Use:   "get-entity",
+	Use:   "get",
 	Short: "Returns entity information from payment method ID",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		client, err := utils.GetClientFromEnv()
