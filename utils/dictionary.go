@@ -62,7 +62,6 @@ const (
 
 	JsonIndent        = "  "
 	SearchFlag        = "search"
-	CursorFlag        = "cursor"
 	LimitFlag         = "limit"
 	SortDirectionFlag = "sort-direction"
 
@@ -95,8 +94,9 @@ const (
 	TifGoodUntilCancelled = "GOOD_UNTIL_CANCELLED"
 	TifImmediateOrCancel  = "IMMEDIATE_OR_CANCEL"
 
-	FormatFlag = "format"
-	ToggleFlag = "toggle"
+	FormatFlag      = "format"
+	AllFlag         = "all"
+	InteractiveFlag = "interactive"
 
 	PortfolioIdFlag           = "portfolio-id"
 	EntityIdFlag              = "entity-id"
