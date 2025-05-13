@@ -25,6 +25,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/coinbase-samples/prime-sdk-go/client"
@@ -34,6 +35,8 @@ import (
 	"github.com/spf13/cobra"
 	"golang.org/x/term"
 )
+
+const defaultPaginationLimit = 100
 
 func getDefaultTimeoutDuration() time.Duration {
 	envTimeout := os.Getenv("primeCliTimeout")
@@ -82,6 +85,22 @@ func AddPortfolioIdFlag(cmd *cobra.Command) {
 	cmd.Flags().String(PortfolioIdFlag, "", "Portfolio ID. Uses environment variable if blank")
 }
 
+func AddProductIdFlag(cmd *cobra.Command) {
+	cmd.Flags().String(ProductIdFlag, "", "ID of the product (Required)")
+}
+
+func AddOrderTypeFlag(cmd *cobra.Command) {
+	cmd.Flags().String(OrderTypeFlag, "", "Type of orders")
+}
+
+func AddOrderSideFlag(cmd *cobra.Command) {
+	cmd.Flags().String(OrderSideFlag, "", "Side of orders")
+}
+
+func AddProductIdsFlag(cmd *cobra.Command) {
+	cmd.Flags().StringSlice(ProductIdsFlag, []string{}, "List of product IDs")
+}
+
 func AddActivityIdFlag(cmd *cobra.Command) {
 	cmd.Flags().String(GenericIdFlag, "", "Activity ID (Required)")
 }
@@ -119,22 +138,30 @@ func AddPaginationFlags(cmd *cobra.Command, includeSortLimit bool) {
 
 	if includeSortLimit {
 		cmd.Flags().String(LimitFlag, LimitDefault, "Pagination limit")
-		cmd.Flags().String(SortDirectionFlag, SortDirectionDefault, "Sort direction")
+		AddSortDirectionFlag(cmd)
 	}
 
 	cmd.Flags().Bool(AllFlag, false, "Set to print all results without manually paging through results")
 	cmd.Flags().Bool(InteractiveFlag, false, "Iterate through all results by manually paging through results")
 }
 
-func GetPaginationParams(cmd *cobra.Command) (*model.PaginationParams, error) {
-	limitStr, err := cmd.Flags().GetString("limit")
-	if err != nil {
-		return nil, fmt.Errorf("cannot parse limit: %w", err)
-	}
+func AddSortDirectionFlag(cmd *cobra.Command) {
+	cmd.Flags().String(SortDirectionFlag, SortDirectionDefault, "Sort direction")
+}
 
-	limit, err := strconv.Atoi(limitStr)
-	if err != nil {
-		return nil, fmt.Errorf("invalid limit value: %w", err)
+func GetPaginationParams(cmd *cobra.Command) (*model.PaginationParams, error) {
+
+	// Limit isn't supported by all endpoints.
+	limitStr, _ := cmd.Flags().GetString("limit")
+
+	limit := defaultPaginationLimit
+
+	if len(limitStr) > 0 {
+		l, err := strconv.Atoi(limitStr)
+		if err != nil {
+			return nil, fmt.Errorf("invalid limit value: %w", err)
+		}
+		limit = l
 	}
 
 	sortDirection, err := cmd.Flags().GetString("sort-direction")
@@ -145,7 +172,7 @@ func GetPaginationParams(cmd *cobra.Command) (*model.PaginationParams, error) {
 	return &model.PaginationParams{
 		Cursor:        "",
 		Limit:         int32(limit),
-		SortDirection: sortDirection,
+		SortDirection: strings.ToUpper(sortDirection),
 	}, nil
 }
 
@@ -371,29 +398,7 @@ func FormatResponseAsJson(cmd *cobra.Command, response interface{}) (string, err
 		return "", fmt.Errorf("cannot marshal response to JSON: %w", err)
 	}
 
-	output, err := removeRequestField(raw, shouldFormat)
-	if err != nil {
-		return "", fmt.Errorf("cannot marshal response to JSON: %w", err)
-	}
-
-	return output, nil
-}
-
-func removeRequestField(raw []byte, shouldFormat bool) (string, error) {
-
-	var m map[string]any
-	if err := json.Unmarshal(raw, &m); err != nil {
-		return "", fmt.Errorf("cannot unmarshal response to JSON: %w", err)
-	}
-
-	delete(m, "request")
-
-	output, err := marshalJson(m, shouldFormat)
-	if err != nil {
-		return "", fmt.Errorf("cannot marshal response to JSON: %w", err)
-	}
-
-	return string(output), nil
+	return string(raw), nil
 }
 
 func GetFlagBoolValue(cmd *cobra.Command, flagName string) bool {
