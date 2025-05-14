@@ -80,13 +80,13 @@ var createOrderPreviewCmd = &cobra.Command{
 func init() {
 	Cmd.AddCommand(createOrderPreviewCmd)
 
-	createOrderPreviewCmd.Flags().String(utils.SideFlag, "", "Order side (Required)")
+	utils.AddOrderSideFlag(createOrderPreviewCmd)
 	utils.AddProductIdFlag(createOrderPreviewCmd)
 	createOrderPreviewCmd.Flags().String(utils.TypeFlag, "", "Type of the order (Required)")
-	createOrderPreviewCmd.Flags().String(utils.BaseQuantityFlag, "", "Order size in base asset units")
-	createOrderPreviewCmd.Flags().String(utils.QuoteValueFlag, "", "Order size in quote asset units")
+	utils.AddBaseQuantityFlag(createOrderPreviewCmd)
+	utils.AddQuoteValueFlag(createOrderPreviewCmd)
 	createOrderPreviewCmd.Flags().String(utils.TimeInForceFlag, "", "Determine order fill strategy")
-	createOrderPreviewCmd.Flags().String(utils.LimitPriceFlag, "", "Limit price for the order")
+	utils.AddLimitPriceFlag(createOrderPreviewCmd)
 	createOrderPreviewCmd.Flags().String(utils.StartTimeFlag, "", "Start time of the order in UTC (TWAP only)")
 	createOrderPreviewCmd.Flags().String(utils.ExpiryTimeFlag, "", "Expiry time of the order in UTC (TWAP and limit GTDT only)")
 	utils.AddPortfolioIdFlag(createOrderPreviewCmd)

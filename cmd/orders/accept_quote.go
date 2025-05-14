@@ -14,50 +14,51 @@
  * limitations under the License.
  */
 
-package balances
+package orders
 
 import (
 	"fmt"
 
 	"github.com/coinbase-samples/prime-cli/utils"
-	"github.com/coinbase-samples/prime-sdk-go/balances"
-
+	"github.com/coinbase-samples/prime-sdk-go/orders"
 	"github.com/spf13/cobra"
 )
 
-var listOnchainBalancesCmd = &cobra.Command{
-	Use:   "list-onchain",
-	Short: "Lists onchain balances that meet filter criteria",
+var acceptQuoteCmd = &cobra.Command{
+	Use:   "accept-quote",
+	Short: "Accept a quote request",
 	RunE: func(cmd *cobra.Command, args []string) error {
-
 		client, err := utils.GetClientFromEnv()
 		if err != nil {
 			return fmt.Errorf("failed to initialize client: %w", err)
 		}
 
-		balancesService := balances.NewBalancesService(client)
+		svc := orders.NewOrdersService(client)
+
+		clientOrderId := utils.GetFlagStringValue(cmd, utils.ClientOrderIdFlag)
+		if clientOrderId == "" {
+			clientOrderId = utils.NewUuidStr()
+		}
 
 		portfolioId, err := utils.GetPortfolioId(cmd, client)
 		if err != nil {
 			return err
 		}
 
-		walletId, err := cmd.Flags().GetString(utils.WalletIdFlag)
-		if err != nil {
-			return fmt.Errorf("cannot get wallet id: %w", err)
+		request := &orders.AcceptQuoteRequest{
+			PortfolioId:   portfolioId,
+			ProductId:     utils.GetFlagStringValue(cmd, utils.ProductIdFlag),
+			QuoteId:       utils.GetFlagStringValue(cmd, utils.QuoteIdFlag),
+			ClientOrderId: clientOrderId,
+			Side:          utils.GetFlagStringValue(cmd, utils.SideFlag),
 		}
 
 		ctx, cancel := utils.GetContextWithTimeout()
 		defer cancel()
 
-		request := &balances.ListOnchainWalletBalancesRequest{
-			PortfolioId: portfolioId,
-			WalletId:    walletId,
-		}
-
-		response, err := balancesService.ListOnchainWalletBalances(ctx, request)
+		response, err := svc.AcceptQuote(ctx, request)
 		if err != nil {
-			return fmt.Errorf("cannot list onchain balances: %w", err)
+			return fmt.Errorf("cannot accept quote: %w", err)
 		}
 
 		jsonResponse, err := utils.FormatResponseAsJson(cmd, response)
@@ -72,8 +73,15 @@ var listOnchainBalancesCmd = &cobra.Command{
 }
 
 func init() {
-	Cmd.AddCommand(listOnchainBalancesCmd)
+	Cmd.AddCommand(acceptQuoteCmd)
+	utils.AddPortfolioIdFlag(acceptQuoteCmd)
+	utils.AddProductIdFlag(acceptQuoteCmd)
+	utils.AddOrderSideFlag(acceptQuoteCmd)
+	utils.AddClientOrderId(acceptQuoteCmd)
 
-	utils.AddWalletIdFlag(listOnchainBalancesCmd)
-	utils.AddPortfolioIdFlag(listOnchainBalancesCmd)
+	acceptQuoteCmd.Flags().String(utils.QuoteIdFlag, "", "The quote id returned by the create quote request")
+
+	acceptQuoteCmd.MarkFlagRequired(utils.SideFlag)
+	acceptQuoteCmd.MarkFlagRequired(utils.ProductIdFlag)
+	acceptQuoteCmd.MarkFlagRequired(utils.QuoteIdFlag)
 }

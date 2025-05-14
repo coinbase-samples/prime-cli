@@ -32,7 +32,7 @@ brew install prime-cli
 
 ### Other Platforms
 
-To install the Prime CLI on other platforms, clone this repoistory, build and then add the binary to the [path](https://en.wikipedia.org/wiki/PATH_(variable)).
+To install the Prime CLI on other platforms, clone this repository, build, and then add the binary to the [path](https://en.wikipedia.org/wiki/PATH_(variable)).
 
 ```
 git clone git@github.com:coinbase-samples/prime-cli.git

@@ -14,50 +14,54 @@
  * limitations under the License.
  */
 
-package balances
+package staking
 
 import (
 	"fmt"
 
 	"github.com/coinbase-samples/prime-cli/utils"
-	"github.com/coinbase-samples/prime-sdk-go/balances"
-
+	primeStaking "github.com/coinbase-samples/prime-sdk-go/staking"
 	"github.com/spf13/cobra"
 )
 
-var listOnchainBalancesCmd = &cobra.Command{
-	Use:   "list-onchain",
-	Short: "Lists onchain balances that meet filter criteria",
+var createUnstakeCmd = &cobra.Command{
+	Use:   "unstake",
+	Short: "Creates a request to unstake delegated or staked funds in a wallet",
 	RunE: func(cmd *cobra.Command, args []string) error {
-
 		client, err := utils.GetClientFromEnv()
 		if err != nil {
 			return fmt.Errorf("failed to initialize client: %w", err)
 		}
 
-		balancesService := balances.NewBalancesService(client)
+		svc := primeStaking.NewStakingService(client)
+
+		idempotencyKey := utils.GetFlagStringValue(cmd, utils.IdempotencyKeyFlag)
+		if idempotencyKey == "" {
+			idempotencyKey = utils.NewUuidStr()
+		}
 
 		portfolioId, err := utils.GetPortfolioId(cmd, client)
 		if err != nil {
 			return err
 		}
 
-		walletId, err := cmd.Flags().GetString(utils.WalletIdFlag)
-		if err != nil {
-			return fmt.Errorf("cannot get wallet id: %w", err)
+		request := &primeStaking.CreateUnstakeRequest{
+			PortfolioId:    portfolioId,
+			WalletId:       utils.GetFlagStringValue(cmd, utils.WalletIdFlag),
+			IdempotencyKey: idempotencyKey,
+		}
+
+		amount := utils.GetFlagStringValue(cmd, utils.AmountFlag)
+		if len(amount) > 0 {
+			request.Inputs = primeStaking.CreateUnstakeInputs{Amount: amount}
 		}
 
 		ctx, cancel := utils.GetContextWithTimeout()
 		defer cancel()
 
-		request := &balances.ListOnchainWalletBalancesRequest{
-			PortfolioId: portfolioId,
-			WalletId:    walletId,
-		}
-
-		response, err := balancesService.ListOnchainWalletBalances(ctx, request)
+		response, err := svc.CreateUnstake(ctx, request)
 		if err != nil {
-			return fmt.Errorf("cannot list onchain balances: %w", err)
+			return fmt.Errorf("cannot create staking request: %w", err)
 		}
 
 		jsonResponse, err := utils.FormatResponseAsJson(cmd, response)
@@ -72,8 +76,10 @@ var listOnchainBalancesCmd = &cobra.Command{
 }
 
 func init() {
-	Cmd.AddCommand(listOnchainBalancesCmd)
+	Cmd.AddCommand(createUnstakeCmd)
+	utils.AddPortfolioIdFlag(createUnstakeCmd)
+	utils.AddWalletIdFlag(createUnstakeCmd)
+	utils.AddIdempotencyKeyFlag(createUnstakeCmd)
 
-	utils.AddWalletIdFlag(listOnchainBalancesCmd)
-	utils.AddPortfolioIdFlag(listOnchainBalancesCmd)
+	createUnstakeCmd.Flags().String(utils.AmountFlag, "", "Optional amount to stake. If omitted, the wallet will stake or unstake the maximum amount available")
 }

@@ -69,10 +69,10 @@ var getWalletDepositInstructionsCmd = &cobra.Command{
 func init() {
 	Cmd.AddCommand(getWalletDepositInstructionsCmd)
 
-	getWalletDepositInstructionsCmd.Flags().String(utils.WalletIdFlag, "", "Wallet ID (Required)")
+	utils.AddWalletIdFlag(getWalletDepositInstructionsCmd)
+
 	getWalletDepositInstructionsCmd.Flags().String(utils.DepositTypeFlag, "", "Wallet deposit type (Required)")
 	utils.AddPortfolioIdFlag(getWalletDepositInstructionsCmd)
 
-	getWalletDepositInstructionsCmd.MarkFlagRequired(utils.WalletIdFlag)
 	getWalletDepositInstructionsCmd.MarkFlagRequired(utils.DepositTypeFlag)
 }

@@ -30,6 +30,7 @@ import (
 	"github.com/coinbase-samples/prime-cli/cmd/paymentmethods"
 	"github.com/coinbase-samples/prime-cli/cmd/portfolios"
 	"github.com/coinbase-samples/prime-cli/cmd/products"
+	"github.com/coinbase-samples/prime-cli/cmd/staking"
 	"github.com/coinbase-samples/prime-cli/cmd/transactions"
 	"github.com/coinbase-samples/prime-cli/cmd/users"
 	"github.com/coinbase-samples/prime-cli/cmd/wallets"
@@ -69,5 +70,5 @@ func init() {
 	rootCmd.AddCommand(transactions.Cmd)
 	rootCmd.AddCommand(users.Cmd)
 	rootCmd.AddCommand(wallets.Cmd)
-
+	rootCmd.AddCommand(staking.Cmd)
 }
