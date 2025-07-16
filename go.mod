@@ -5,7 +5,7 @@ go 1.23.0
 toolchain go1.24.2
 
 require (
-	github.com/coinbase-samples/prime-sdk-go v0.5.0
+	github.com/coinbase-samples/prime-sdk-go v0.5.3
 	github.com/google/uuid v1.6.0
 	github.com/spf13/cobra v1.9.1
 	golang.org/x/term v0.31.0
