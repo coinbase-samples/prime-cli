@@ -24,9 +24,9 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var listInterestAccrualsCmd = &cobra.Command{
-	Use:   "list-interest-accruals",
-	Short: "List interest accruals for an entity",
+var listMarginConversionsCmd = &cobra.Command{
+	Use:   "list-margin-conversions",
+	Short: "List margin conversions for an entity",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		client, err := utils.GetClientFromEnv()
 		if err != nil {
@@ -55,19 +55,19 @@ var listInterestAccrualsCmd = &cobra.Command{
 			return err
 		}
 
-		request := &prime.ListInterestAccrualsRequest{
+		request := &prime.ListMarginConversionsRequest{
 			EntityId:    entityId,
 			PortfolioId: portfolioId,
 			StartDate:   startDate,
 			EndDate:     endDate,
 		}
 
-		response, err := listInterestAccruals(svc, request)
+		response, err := listMarginConversions(svc, request)
 		if err != nil {
 			return err
 		}
 
-		if err := utils.PrintJsonDocs(cmd, response.Accruals); err != nil {
+		if err := utils.PrintJsonDocs(cmd, response.Conversions); err != nil {
 			return err
 		}
 
@@ -75,29 +75,29 @@ var listInterestAccrualsCmd = &cobra.Command{
 	},
 }
 
-func listInterestAccruals(
+func listMarginConversions(
 	svc prime.FinancingService,
-	req *prime.ListInterestAccrualsRequest,
-) (*prime.ListInterestAccrualsResponse, error) {
+	req *prime.ListMarginConversionsRequest,
+) (*prime.ListMarginConversionsResponse, error) {
 
 	ctx, cancel := utils.GetContextWithTimeout()
 	defer cancel()
 
-	response, err := svc.ListInterestAccruals(ctx, req)
+	response, err := svc.ListMarginConversions(ctx, req)
 	if err != nil {
-		return nil, fmt.Errorf("cannot list interest accruals: %w", err)
+		return nil, fmt.Errorf("cannot list margin conversions: %w", err)
 	}
 
 	return response, nil
 }
 
 func init() {
-	Cmd.AddCommand(listInterestAccrualsCmd)
+	Cmd.AddCommand(listMarginConversionsCmd)
 
-	utils.AddEntityIdFlag(listInterestAccrualsCmd)
+	utils.AddEntityIdFlag(listMarginConversionsCmd)
 
-	listInterestAccrualsCmd.Flags().String("portfolio-id", "", "Portfolio ID")
+	listMarginConversionsCmd.Flags().String("portfolio-id", "", "Portfolio ID")
 
-	listInterestAccrualsCmd.Flags().String("start-date", "", "Start date in RFC3339 format")
-	listInterestAccrualsCmd.Flags().String("end-date", "", "End date in RFC3339 format")
+	listMarginConversionsCmd.Flags().String("start-date", "", "Start date in RFC3339 format")
+	listMarginConversionsCmd.Flags().String("end-date", "", "End date in RFC3339 format")
 }
