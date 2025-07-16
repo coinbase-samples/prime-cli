@@ -40,11 +40,11 @@ var getMarginInformationCmd = &cobra.Command{
 			return err
 		}
 
-		request := &prime.GetMarginInformationRequest{
+		request := &prime.GetMarginInfoRequest{
 			EntityId: entityId,
 		}
 
-		response, err := getMarginInformation(svc, request)
+		response, err := getMarginInfo(svc, request)
 		if err != nil {
 			return err
 		}
@@ -60,15 +60,15 @@ var getMarginInformationCmd = &cobra.Command{
 	},
 }
 
-func getMarginInformation(
+func getMarginInfo(
 	svc prime.FinancingService,
-	req *prime.GetMarginInformationRequest,
-) (*prime.GetMarginInformationResponse, error) {
+	req *prime.GetMarginInfoRequest,
+) (*prime.GetMarginInfoResponse, error) {
 
 	ctx, cancel := utils.GetContextWithTimeout()
 	defer cancel()
 
-	response, err := svc.GetMarginInformation(ctx, req)
+	response, err := svc.GetMarginInfo(ctx, req)
 	if err != nil {
 		return nil, fmt.Errorf("cannot get margin information: %w", err)
 	}

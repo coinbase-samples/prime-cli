@@ -55,14 +55,14 @@ var createLocateCmd = &cobra.Command{
 			return err
 		}
 
-		request := &prime.CreateNewLocatesRequest{
+		request := &prime.CreateLocateRequest{
 			PortfolioId: portfolioId,
 			Symbol:      symbol,
 			Amount:      amount,
 			LocateDate:  locateDate,
 		}
 
-		response, err := createLocates(svc, request)
+		response, err := createLocate(svc, request)
 		if err != nil {
 			return err
 		}
@@ -78,15 +78,15 @@ var createLocateCmd = &cobra.Command{
 	},
 }
 
-func createLocates(
+func createLocate(
 	svc prime.FinancingService,
-	req *prime.CreateNewLocatesRequest,
-) (*prime.CreateNewLocatesResponse, error) {
+	req *prime.CreateLocateRequest,
+) (*prime.CreateLocateResponse, error) {
 
 	ctx, cancel := utils.GetContextWithTimeout()
 	defer cancel()
 
-	response, err := svc.CreateNewLocates(ctx, req)
+	response, err := svc.CreateLocate(ctx, req)
 	if err != nil {
 		return nil, fmt.Errorf("cannot create new locate: %w", err)
 	}

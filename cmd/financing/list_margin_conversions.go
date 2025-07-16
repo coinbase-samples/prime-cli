@@ -35,11 +35,6 @@ var listMarginConversionsCmd = &cobra.Command{
 
 		svc := prime.NewFinancingService(client)
 
-		entityId, err := utils.GetEntityId(cmd, client)
-		if err != nil {
-			return err
-		}
-
 		portfolioId, err := cmd.Flags().GetString("portfolio-id")
 		if err != nil {
 			return err
@@ -56,7 +51,6 @@ var listMarginConversionsCmd = &cobra.Command{
 		}
 
 		request := &prime.ListMarginConversionsRequest{
-			EntityId:    entityId,
 			PortfolioId: portfolioId,
 			StartDate:   startDate,
 			EndDate:     endDate,

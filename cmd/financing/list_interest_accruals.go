@@ -99,5 +99,8 @@ func init() {
 	listInterestAccrualsCmd.Flags().String("portfolio-id", "", "Portfolio ID")
 
 	listInterestAccrualsCmd.Flags().String("start-date", "", "Start date in RFC3339 format")
+	listInterestAccrualsCmd.MarkFlagRequired("start-date")
+
 	listInterestAccrualsCmd.Flags().String("end-date", "", "End date in RFC3339 format")
+	listInterestAccrualsCmd.MarkFlagRequired("end-date")
 }

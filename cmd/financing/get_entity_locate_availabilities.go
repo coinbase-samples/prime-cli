@@ -80,6 +80,5 @@ func init() {
 	Cmd.AddCommand(getEnityLocateAvailabilitiesCmd)
 
 	utils.AddEntityIdFlag(getEnityLocateAvailabilitiesCmd)
-
-	cmd.MarkFlagRequired(utils.EntityIdFlagName)
+	getEnityLocateAvailabilitiesCmd.MarkFlagRequired(utils.EntityIdFlag)
 }

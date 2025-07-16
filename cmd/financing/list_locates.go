@@ -50,7 +50,7 @@ var listLocatesCmd = &cobra.Command{
 			return err
 		}
 
-		request := &prime.ListExistingLocatesRequest{
+		request := &prime.ListLocatesRequest{
 			PortfolioId: portfolioId,
 			LocateDate:  locateDate,
 			LocateIds:   locateIds,
@@ -71,13 +71,13 @@ var listLocatesCmd = &cobra.Command{
 
 func listLocates(
 	svc prime.FinancingService,
-	req *prime.ListExistingLocatesRequest,
-) (*prime.ListExistingLocatesResponse, error) {
+	req *prime.ListLocatesRequest,
+) (*prime.ListLocatesResponse, error) {
 
 	ctx, cancel := utils.GetContextWithTimeout()
 	defer cancel()
 
-	response, err := svc.ListExistingLocates(ctx, req)
+	response, err := svc.ListLocates(ctx, req)
 	if err != nil {
 		return nil, fmt.Errorf("cannot list locates: %w", err)
 	}

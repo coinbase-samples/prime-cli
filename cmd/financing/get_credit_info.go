@@ -40,7 +40,7 @@ var getPortfolioCreditInfoCmd = &cobra.Command{
 			return err
 		}
 
-		request := &prime.GetPortfolioCreditInformationRequest{
+		request := &prime.GetPortfolioCreditInfoRequest{
 			PortfolioId: portfolioId,
 		}
 
@@ -62,13 +62,13 @@ var getPortfolioCreditInfoCmd = &cobra.Command{
 
 func getPortfolioCreditInfo(
 	svc prime.FinancingService,
-	req *prime.GetPortfolioCreditInformationRequest,
-) (*prime.GetPortfolioCreditInformationResponse, error) {
+	req *prime.GetPortfolioCreditInfoRequest,
+) (*prime.GetPortfolioCreditInfoResponse, error) {
 
 	ctx, cancel := utils.GetContextWithTimeout()
 	defer cancel()
 
-	response, err := svc.GetPortfolioCreditInformation(ctx, req)
+	response, err := svc.GetPortfolioCreditInfo(ctx, req)
 	if err != nil {
 		return nil, fmt.Errorf("cannot get portfolio credit information: %w", err)
 	}
