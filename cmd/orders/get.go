@@ -54,7 +54,7 @@ var getOrderCmd = &cobra.Command{
 			return fmt.Errorf("cannot get order: %w", err)
 		}
 
-		jsonResponse, err := utils.FormatResponseAsJson(cmd, response)
+		jsonResponse, err := utils.FormatResponseAsJson(cmd, response.Order)
 		if err != nil {
 			return err
 		}
