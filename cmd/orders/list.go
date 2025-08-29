@@ -56,7 +56,7 @@ var listOrdersCmd = &cobra.Command{
 			return err
 		}
 
-		orderSide, err := cmd.Flags().GetString(utils.OrderSideFlag)
+		orderSide, err := cmd.Flags().GetString(utils.SideFlag)
 		if err != nil {
 			return err
 		}
