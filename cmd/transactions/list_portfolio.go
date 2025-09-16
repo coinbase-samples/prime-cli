@@ -96,6 +96,7 @@ func listPortfolioTransactions(
 		End:         end,
 		Pagination:  pagination,
 	}
+
 	response, err := svc.ListPortfolioTransactions(ctx, request)
 	if err != nil {
 		return nil, fmt.Errorf("cannot list transactions: %w", err)
@@ -108,8 +109,8 @@ func init() {
 	Cmd.AddCommand(listPortfolioTransactionsCmd)
 
 	listPortfolioTransactionsCmd.Flags().StringSlice(utils.TypesFlag, []string{}, "Types of transactions")
+
 	listPortfolioTransactionsCmd.Flags().String(utils.SymbolsFlag, "", "Asset symbols")
-	listPortfolioTransactionsCmd.MarkFlagRequired(utils.SymbolsFlag)
 
 	utils.AddPortfolioIdFlag(listPortfolioTransactionsCmd)
 	utils.AddPaginationFlags(listPortfolioTransactionsCmd, true)
