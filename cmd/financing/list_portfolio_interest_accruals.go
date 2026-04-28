@@ -1,5 +1,5 @@
 /**
- * Copyright 2025-present Coinbase Global, Inc.
+ * Copyright 2026-present Coinbase Global, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,9 +24,9 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var createLocateCmd = &cobra.Command{
-	Use:   "create-locate",
-	Short: "Create a new locate for a portfolio and assset",
+var listPortfolioInterestAccrualsCmd = &cobra.Command{
+	Use:   "list-portfolio-interest-accruals",
+	Short: "Lists portfolio interest accruals between two dates",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		client, err := utils.GetClientFromEnv()
 		if err != nil {
@@ -40,29 +40,23 @@ var createLocateCmd = &cobra.Command{
 			return err
 		}
 
-		symbol, err := cmd.Flags().GetString("symbol")
+		startDate, err := cmd.Flags().GetString("start-date")
 		if err != nil {
 			return err
 		}
 
-		amount, err := cmd.Flags().GetString("amount")
+		endDate, err := cmd.Flags().GetString("end-date")
 		if err != nil {
 			return err
 		}
 
-		locateDate, err := cmd.Flags().GetString("date")
-		if err != nil {
-			return err
-		}
-
-		request := &prime.CreateLocateRequest{
+		request := &prime.ListPortfolioInterestAccrualsRequest{
 			PortfolioId: portfolioId,
-			Symbol:      symbol,
-			Amount:      amount,
-			LocateDate:  locateDate,
+			StartDate:   startDate,
+			EndDate:     endDate,
 		}
 
-		response, err := createLocate(svc, request)
+		response, err := listPortfolioInterestAccruals(svc, request)
 		if err != nil {
 			return err
 		}
@@ -78,33 +72,30 @@ var createLocateCmd = &cobra.Command{
 	},
 }
 
-func createLocate(
+func listPortfolioInterestAccruals(
 	svc prime.FinancingService,
-	req *prime.CreateLocateRequest,
-) (*prime.CreateLocateResponse, error) {
+	req *prime.ListPortfolioInterestAccrualsRequest,
+) (*prime.ListPortfolioInterestAccrualsResponse, error) {
 
 	ctx, cancel := utils.GetContextWithTimeout()
 	defer cancel()
 
-	response, err := svc.CreateLocate(ctx, req)
+	response, err := svc.ListPortfolioInterestAccruals(ctx, req)
 	if err != nil {
-		return nil, fmt.Errorf("cannot create new locate: %w", err)
+		return nil, fmt.Errorf("cannot list portfolio interest accruals: %w", err)
 	}
 
 	return response, nil
 }
 
 func init() {
-	Cmd.AddCommand(createLocateCmd)
+	Cmd.AddCommand(listPortfolioInterestAccrualsCmd)
 
-	createLocateCmd.Flags().String("symbol", "", "The symbol for the asset")
-	createLocateCmd.MarkFlagRequired("symbol")
+	utils.AddPortfolioIdFlag(listPortfolioInterestAccrualsCmd)
 
-	createLocateCmd.Flags().String("amount", "", "The locate amount")
-	createLocateCmd.MarkFlagRequired("amount")
+	listPortfolioInterestAccrualsCmd.Flags().String("start-date", "", "Start date in RFC3339 format")
+	listPortfolioInterestAccrualsCmd.MarkFlagRequired("start-date")
 
-	createLocateCmd.Flags().String("date", "", "The target date of the locate (YYYY-MM-DD)")
-	createLocateCmd.MarkFlagRequired("date")
-
-	utils.AddPortfolioIdFlag(createLocateCmd)
+	listPortfolioInterestAccrualsCmd.Flags().String("end-date", "", "End date in RFC3339 format")
+	listPortfolioInterestAccrualsCmd.MarkFlagRequired("end-date")
 }

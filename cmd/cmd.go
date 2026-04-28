@@ -20,16 +20,19 @@ import (
 
 	"github.com/coinbase-samples/prime-cli/cmd/activities"
 	"github.com/coinbase-samples/prime-cli/cmd/addressbook"
+	"github.com/coinbase-samples/prime-cli/cmd/advancedtransfers"
 	"github.com/coinbase-samples/prime-cli/cmd/allocations"
 	"github.com/coinbase-samples/prime-cli/cmd/assets"
 	"github.com/coinbase-samples/prime-cli/cmd/balances"
 	"github.com/coinbase-samples/prime-cli/cmd/commission"
 	"github.com/coinbase-samples/prime-cli/cmd/financing"
+	"github.com/coinbase-samples/prime-cli/cmd/futures"
 	"github.com/coinbase-samples/prime-cli/cmd/invoices"
 	"github.com/coinbase-samples/prime-cli/cmd/onchainaddressbook"
 	"github.com/coinbase-samples/prime-cli/cmd/orders"
 	"github.com/coinbase-samples/prime-cli/cmd/paymentmethods"
 	"github.com/coinbase-samples/prime-cli/cmd/portfolios"
+	"github.com/coinbase-samples/prime-cli/cmd/positions"
 	"github.com/coinbase-samples/prime-cli/cmd/products"
 	"github.com/coinbase-samples/prime-cli/cmd/staking"
 	"github.com/coinbase-samples/prime-cli/cmd/transactions"
@@ -58,16 +61,19 @@ func init() {
 	rootCmd.PersistentFlags().Bool(utils.FormatFlag, false, "Set to include formatted JSON. Default is false")
 	rootCmd.AddCommand(activities.Cmd)
 	rootCmd.AddCommand(addressbook.Cmd)
+	rootCmd.AddCommand(advancedtransfers.Cmd)
 	rootCmd.AddCommand(allocations.Cmd)
 	rootCmd.AddCommand(assets.Cmd)
 	rootCmd.AddCommand(balances.Cmd)
 	rootCmd.AddCommand(commission.Cmd)
 	rootCmd.AddCommand(financing.Cmd)
+	rootCmd.AddCommand(futures.Cmd)
 	rootCmd.AddCommand(invoices.Cmd)
 	rootCmd.AddCommand(onchainaddressbook.Cmd)
 	rootCmd.AddCommand(orders.Cmd)
 	rootCmd.AddCommand(paymentmethods.Cmd)
 	rootCmd.AddCommand(portfolios.Cmd)
+	rootCmd.AddCommand(positions.Cmd)
 	rootCmd.AddCommand(products.Cmd)
 	rootCmd.AddCommand(transactions.Cmd)
 	rootCmd.AddCommand(users.Cmd)

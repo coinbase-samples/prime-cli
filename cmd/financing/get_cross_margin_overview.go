@@ -1,5 +1,5 @@
 /**
- * Copyright 2025-present Coinbase Global, Inc.
+ * Copyright 2026-present Coinbase Global, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,9 +24,9 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var createLocateCmd = &cobra.Command{
-	Use:   "create-locate",
-	Short: "Create a new locate for a portfolio and assset",
+var getCrossMarginOverviewCmd = &cobra.Command{
+	Use:   "get-cross-margin-overview",
+	Short: "Gets the cross-margin overview for an entity",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		client, err := utils.GetClientFromEnv()
 		if err != nil {
@@ -35,34 +35,16 @@ var createLocateCmd = &cobra.Command{
 
 		svc := prime.NewFinancingService(client)
 
-		portfolioId, err := utils.GetPortfolioId(cmd, client)
+		entityId, err := utils.GetEntityId(cmd, client)
 		if err != nil {
 			return err
 		}
 
-		symbol, err := cmd.Flags().GetString("symbol")
-		if err != nil {
-			return err
+		request := &prime.GetCrossMarginOverviewRequest{
+			EntityId: entityId,
 		}
 
-		amount, err := cmd.Flags().GetString("amount")
-		if err != nil {
-			return err
-		}
-
-		locateDate, err := cmd.Flags().GetString("date")
-		if err != nil {
-			return err
-		}
-
-		request := &prime.CreateLocateRequest{
-			PortfolioId: portfolioId,
-			Symbol:      symbol,
-			Amount:      amount,
-			LocateDate:  locateDate,
-		}
-
-		response, err := createLocate(svc, request)
+		response, err := getCrossMarginOverview(svc, request)
 		if err != nil {
 			return err
 		}
@@ -78,33 +60,24 @@ var createLocateCmd = &cobra.Command{
 	},
 }
 
-func createLocate(
+func getCrossMarginOverview(
 	svc prime.FinancingService,
-	req *prime.CreateLocateRequest,
-) (*prime.CreateLocateResponse, error) {
+	req *prime.GetCrossMarginOverviewRequest,
+) (*prime.GetCrossMarginOverviewResponse, error) {
 
 	ctx, cancel := utils.GetContextWithTimeout()
 	defer cancel()
 
-	response, err := svc.CreateLocate(ctx, req)
+	response, err := svc.GetCrossMarginOverview(ctx, req)
 	if err != nil {
-		return nil, fmt.Errorf("cannot create new locate: %w", err)
+		return nil, fmt.Errorf("cannot get cross margin overview: %w", err)
 	}
 
 	return response, nil
 }
 
 func init() {
-	Cmd.AddCommand(createLocateCmd)
+	Cmd.AddCommand(getCrossMarginOverviewCmd)
 
-	createLocateCmd.Flags().String("symbol", "", "The symbol for the asset")
-	createLocateCmd.MarkFlagRequired("symbol")
-
-	createLocateCmd.Flags().String("amount", "", "The locate amount")
-	createLocateCmd.MarkFlagRequired("amount")
-
-	createLocateCmd.Flags().String("date", "", "The target date of the locate (YYYY-MM-DD)")
-	createLocateCmd.MarkFlagRequired("date")
-
-	utils.AddPortfolioIdFlag(createLocateCmd)
+	utils.AddEntityIdFlag(getCrossMarginOverviewCmd)
 }

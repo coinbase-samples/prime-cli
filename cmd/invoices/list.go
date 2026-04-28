@@ -61,10 +61,15 @@ var listInvoicesCmd = &cobra.Command{
 			billingMonth = int32(billingMonthSlice[0])
 		}
 
+		invoiceStates := make([]model.InvoiceState, 0, len(states))
+		for _, s := range states {
+			invoiceStates = append(invoiceStates, model.InvoiceState(s))
+		}
+
 		return utils.HandleListCmd(
 			cmd,
 			func(paginationParams *model.PaginationParams) (*model.Pagination, error) {
-				response, err := listInvoices(svc, client.Credentials().EntityId, states, billingYear, billingMonth, paginationParams)
+				response, err := listInvoices(svc, client.Credentials().EntityId, invoiceStates, billingYear, billingMonth, paginationParams)
 				if err != nil {
 					return nil, err
 				}
@@ -82,7 +87,7 @@ var listInvoicesCmd = &cobra.Command{
 func listInvoices(
 	svc invoice.InvoiceService,
 	entityId string,
-	states []string,
+	states []model.InvoiceState,
 	billingYear,
 	billingMonth int32,
 	pagination *model.PaginationParams,
