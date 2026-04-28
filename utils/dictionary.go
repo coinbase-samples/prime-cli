@@ -114,4 +114,28 @@ const (
 	SkipBroadcastFlag          = "skip-broadcast"
 	ChainIdFlag                = "chain-id"
 	UrlFlag                    = "url"
+
+	AdvancedTransferIdFlag = "advanced-transfer-id"
+	TransferTypeFlag       = "transfer-type"
+	StatesFlag             = "states"
+
+	SweepIdFlag          = "sweep-id"
+	AutoSweepEnabledFlag = "auto-sweep-enabled"
+
+	PositionTypeFlag = "position-type"
+
+	NewBaseQuantityFlag = "new-base-quantity"
+	NewLimitPriceFlag   = "new-limit-price"
+	NewQuoteValueFlag   = "new-quote-value"
+
+	GranularityFlag = "granularity"
+
+	BaseCurrencyFlag  = "base-currency"
+	QuoteCurrencyFlag = "quote-currency"
+	LocateDateFlag    = "date"
+	StartDateFlag     = "start-date"
+	EndDateFlag       = "end-date"
+
+	ValidatorAddressFlag = "validator-address"
+	StakeProtocolFlag    = "protocol"
 )

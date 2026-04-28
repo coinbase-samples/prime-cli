@@ -1,5 +1,5 @@
 /**
- * Copyright 2025-present Coinbase Global, Inc.
+ * Copyright 2026-present Coinbase Global, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -7,31 +7,33 @@
  *
  *  http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software * distributed under the License is distributed on an "AS IS" BASIS,
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
 
-package wallets
+package advancedtransfers
 
 import (
 	"fmt"
 
 	"github.com/coinbase-samples/prime-cli/utils"
-	"github.com/coinbase-samples/prime-sdk-go/wallets"
-
+	"github.com/coinbase-samples/prime-sdk-go/advancedtransfers"
 	"github.com/spf13/cobra"
 )
 
-var createWalletDepositAddressCmd = &cobra.Command{
-	Use:   "create-deposit-address",
-	Short: "Create a new wallet deposit address.",
+var cancelAdvancedTransferCmd = &cobra.Command{
+	Use:   "cancel",
+	Short: "Cancels an advanced transfer",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		client, err := utils.GetClientFromEnv()
 		if err != nil {
 			return fmt.Errorf("failed to initialize client: %w", err)
 		}
+
+		svc := advancedtransfers.NewAdvancedTransfersService(client)
 
 		portfolioId, err := utils.GetPortfolioId(cmd, client)
 		if err != nil {
@@ -41,17 +43,14 @@ var createWalletDepositAddressCmd = &cobra.Command{
 		ctx, cancel := utils.GetContextWithTimeout()
 		defer cancel()
 
-		request := &wallets.CreateWalletAddressRequest{
-			PortfolioId: portfolioId,
-			WalletId:    utils.GetFlagStringValue(cmd, utils.WalletIdFlag),
-			NetworkId:   utils.GetFlagStringValue(cmd, utils.NetworkIdFlag),
+		request := &advancedtransfers.CancelAdvancedTransferRequest{
+			PortfolioId:        portfolioId,
+			AdvancedTransferId: utils.GetFlagStringValue(cmd, utils.AdvancedTransferIdFlag),
 		}
 
-		service := wallets.NewWalletsService(client)
-
-		response, err := service.CreateWalletAddress(ctx, request)
+		response, err := svc.CancelAdvancedTransfer(ctx, request)
 		if err != nil {
-			return fmt.Errorf("cannot create wallet: %w", err)
+			return fmt.Errorf("cannot cancel advanced transfer: %w", err)
 		}
 
 		jsonResponse, err := utils.FormatResponseAsJson(cmd, response)
@@ -60,15 +59,16 @@ var createWalletDepositAddressCmd = &cobra.Command{
 		}
 
 		fmt.Println(jsonResponse)
+
 		return nil
 	},
 }
 
 func init() {
-	Cmd.AddCommand(createWalletDepositAddressCmd)
+	Cmd.AddCommand(cancelAdvancedTransferCmd)
 
-	utils.AddWalletIdFlag(createWalletDepositAddressCmd)
-	utils.AddPortfolioIdFlag(createWalletDepositAddressCmd)
+	utils.AddPortfolioIdFlag(cancelAdvancedTransferCmd)
+	cancelAdvancedTransferCmd.Flags().String(utils.AdvancedTransferIdFlag, "", "Advanced transfer ID to cancel (Required)")
 
-	createWalletDepositAddressCmd.Flags().String(utils.NetworkIdFlag, "", "The network id. E.g., ethereum-mainnet")
+	cancelAdvancedTransferCmd.MarkFlagRequired(utils.AdvancedTransferIdFlag)
 }
