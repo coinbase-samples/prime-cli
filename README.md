@@ -95,5 +95,5 @@ Finally, to run commands for each endpoint, use the following format to test eac
 ./primectl orders create-preview -b 0.001 -i ETH-USD -s BUY -t MARKET
 ```
 
-As of v0.4.0, the CLI covers the full surface area of [prime-sdk-go](https://github.com/coinbase-samples/prime-sdk-go) v0.6.2, including the `advanced-transfers`, `futures`, and `positions` command groups.
+As of v0.4.0, the CLI covers the full surface area of [prime-sdk-go](https://github.com/coinbase-samples/prime-sdk-go) v0.6.3, including the `advanced-transfers`, `futures`, and `positions` command groups.
 

@@ -25,7 +25,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var primectlVersion = `{"version":"0.4.0"}`
+var primectlVersion = `{"version":"0.4.1"}`
 
 var versionCmd = &cobra.Command{
 	Use:   "version",
