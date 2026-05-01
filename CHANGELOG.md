@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.4.1] - 2026-MAY-01
+
+### Added
+
+- Bumped `prime-sdk-go` to v0.6.3
+
 ## [0.4.0] - 2026-APR-28
 
 ### Added
