@@ -20,8 +20,8 @@ import (
 	"fmt"
 
 	"github.com/coinbase-samples/prime-cli/utils"
-	"github.com/coinbase-samples/prime-sdk-go/model"
-	"github.com/coinbase-samples/prime-sdk-go/wallets"
+	"github.com/coinbase/prime-sdk-go/model"
+	"github.com/coinbase/prime-sdk-go/wallets"
 
 	"github.com/spf13/cobra"
 )
@@ -95,7 +95,7 @@ func listWallets(
 func init() {
 	Cmd.AddCommand(listWalletsCmd)
 
-	listWalletsCmd.Flags().String(utils.TypeFlag, "", "Type of balance (Required)")
+	listWalletsCmd.Flags().String(utils.TypeFlag, "", "Wallet type: VAULT, ONCHAIN, TRADING, or QC (Required)")
 	listWalletsCmd.Flags().StringSlice(utils.SymbolsFlag, []string{}, "List of symbols")
 
 	utils.AddPortfolioIdFlag(listWalletsCmd)
