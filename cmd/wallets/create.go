@@ -19,15 +19,15 @@ import (
 	"fmt"
 
 	"github.com/coinbase-samples/prime-cli/utils"
-	"github.com/coinbase-samples/prime-sdk-go/model"
-	"github.com/coinbase-samples/prime-sdk-go/wallets"
+	"github.com/coinbase/prime-sdk-go/model"
+	"github.com/coinbase/prime-sdk-go/wallets"
 
 	"github.com/spf13/cobra"
 )
 
 var createWalletCmd = &cobra.Command{
 	Use:   "create",
-	Short: "Create a new vault wallet.",
+	Short: "Create a new wallet (VAULT, ONCHAIN, TRADING, or QC).",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		client, err := utils.GetClientFromEnv()
 		if err != nil {

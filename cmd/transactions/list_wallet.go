@@ -20,15 +20,15 @@ import (
 	"time"
 
 	"github.com/coinbase-samples/prime-cli/utils"
-	"github.com/coinbase-samples/prime-sdk-go/model"
-	"github.com/coinbase-samples/prime-sdk-go/transactions"
+	"github.com/coinbase/prime-sdk-go/model"
+	"github.com/coinbase/prime-sdk-go/transactions"
 
 	"github.com/spf13/cobra"
 )
 
 var listWalletTransactionsCmd = &cobra.Command{
 	Use:   "list-wallet",
-	Short: "Lists transaction for a given wallet",
+	Short: "Lists transactions for a given wallet",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		client, err := utils.GetClientFromEnv()
 		if err != nil {

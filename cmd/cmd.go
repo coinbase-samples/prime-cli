@@ -20,6 +20,7 @@ import (
 
 	"github.com/coinbase-samples/prime-cli/cmd/activities"
 	"github.com/coinbase-samples/prime-cli/cmd/addressbook"
+	mcpcmd "github.com/coinbase-samples/prime-cli/cmd/mcp"
 	"github.com/coinbase-samples/prime-cli/cmd/advancedtransfers"
 	"github.com/coinbase-samples/prime-cli/cmd/allocations"
 	"github.com/coinbase-samples/prime-cli/cmd/assets"
@@ -61,6 +62,7 @@ func init() {
 	rootCmd.PersistentFlags().Bool(utils.FormatFlag, false, "Set to include formatted JSON. Default is false")
 	rootCmd.AddCommand(activities.Cmd)
 	rootCmd.AddCommand(addressbook.Cmd)
+	rootCmd.AddCommand(mcpcmd.Cmd)
 	rootCmd.AddCommand(advancedtransfers.Cmd)
 	rootCmd.AddCommand(allocations.Cmd)
 	rootCmd.AddCommand(assets.Cmd)

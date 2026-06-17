@@ -21,7 +21,7 @@ import (
 	"strconv"
 
 	"github.com/coinbase-samples/prime-cli/utils"
-	primeStaking "github.com/coinbase-samples/prime-sdk-go/staking"
+	primeStaking "github.com/coinbase/prime-sdk-go/staking"
 	"github.com/spf13/cobra"
 )
 

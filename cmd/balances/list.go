@@ -20,7 +20,7 @@ import (
 	"fmt"
 
 	"github.com/coinbase-samples/prime-cli/utils"
-	"github.com/coinbase-samples/prime-sdk-go/balances"
+	"github.com/coinbase/prime-sdk-go/balances"
 
 	"github.com/spf13/cobra"
 )
@@ -75,7 +75,7 @@ var listPortfolioBalancesCmd = &cobra.Command{
 func init() {
 	Cmd.AddCommand(listPortfolioBalancesCmd)
 
-	listPortfolioBalancesCmd.Flags().StringArray(utils.TypeFlag, []string{}, "Type of balance")
+	listPortfolioBalancesCmd.Flags().StringArray(utils.TypeFlag, []string{}, "Balance type: TRADING_BALANCES, VAULT_BALANCES, TOTAL_BALANCES, PRIME_CUSTODY_BALANCES, or UNIFIED_TOTAL_BALANCES")
 	listPortfolioBalancesCmd.Flags().StringSlice(utils.SymbolsFlag, []string{}, "List of symbols")
 	utils.AddPortfolioIdFlag(listPortfolioBalancesCmd)
 }

@@ -20,8 +20,8 @@ import (
 	"fmt"
 
 	"github.com/coinbase-samples/prime-cli/utils"
-	"github.com/coinbase-samples/prime-sdk-go/model"
-	"github.com/coinbase-samples/prime-sdk-go/orders"
+	"github.com/coinbase/prime-sdk-go/model"
+	"github.com/coinbase/prime-sdk-go/orders"
 	"github.com/spf13/cobra"
 )
 
@@ -126,7 +126,7 @@ func listOrders(
 func init() {
 	Cmd.AddCommand(listOrdersCmd)
 
-	listOrdersCmd.Flags().StringSlice(utils.OrderStatusesFlag, []string{}, "List of statuses")
+	listOrdersCmd.Flags().StringSlice(utils.OrderStatusesFlag, []string{}, "Filter by order status: OPEN, FILLED, CANCELLED, EXPIRED, FAILED, or PENDING")
 
 	utils.AddProductIdsFlag(listOrdersCmd)
 

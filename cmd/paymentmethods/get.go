@@ -20,14 +20,14 @@ import (
 	"fmt"
 
 	"github.com/coinbase-samples/prime-cli/utils"
-	"github.com/coinbase-samples/prime-sdk-go/paymentmethods"
+	"github.com/coinbase/prime-sdk-go/paymentmethods"
 
 	"github.com/spf13/cobra"
 )
 
 var getEntityPaymentMethodCmd = &cobra.Command{
 	Use:   "get",
-	Short: "Returns entity information from payment method ID",
+	Short: "Get payment method details by payment method ID",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		client, err := utils.GetClientFromEnv()
 		if err != nil {
