@@ -27,7 +27,7 @@ import (
 
 var getWalletDepositInstructionsCmd = &cobra.Command{
 	Use:   "get-deposit-instructions",
-	Short: "Get a wallet's public address given a wallet ID",
+	Short: "Get deposit instructions for a wallet given a wallet ID",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		client, err := utils.GetClientFromEnv()
 		if err != nil {
