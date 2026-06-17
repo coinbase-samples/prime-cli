@@ -20,7 +20,7 @@ import (
 	"fmt"
 
 	"github.com/coinbase-samples/prime-cli/utils"
-	"github.com/coinbase-samples/prime-sdk-go/balances"
+	"github.com/coinbase/prime-sdk-go/balances"
 
 	"github.com/spf13/cobra"
 )
