@@ -22,5 +22,5 @@ import (
 
 var Cmd = &cobra.Command{
 	Use:   "allocations",
-	Short: "The allocations ommands",
+	Short: "The allocations commands",
 }
