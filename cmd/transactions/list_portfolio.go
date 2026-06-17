@@ -21,8 +21,8 @@ import (
 	"time"
 
 	"github.com/coinbase-samples/prime-cli/utils"
-	"github.com/coinbase-samples/prime-sdk-go/model"
-	"github.com/coinbase-samples/prime-sdk-go/transactions"
+	"github.com/coinbase/prime-sdk-go/model"
+	"github.com/coinbase/prime-sdk-go/transactions"
 
 	"github.com/spf13/cobra"
 )
