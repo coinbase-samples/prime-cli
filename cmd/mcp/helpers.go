@@ -72,6 +72,12 @@ func mcpCtx(parent context.Context) (context.Context, context.CancelFunc) {
 	return context.WithTimeout(parent, d)
 }
 
+// fetchAllCtx creates a longer-lived context for fetch_all operations that
+// may need to traverse many pages.
+func fetchAllCtx(parent context.Context) (context.Context, context.CancelFunc) {
+	return context.WithTimeout(parent, 120*time.Second)
+}
+
 func paginationFor(req mcplib.CallToolRequest) *model.PaginationParams {
 	return &model.PaginationParams{
 		Cursor: req.GetString("cursor", ""),

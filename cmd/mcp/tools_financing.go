@@ -46,6 +46,14 @@ func registerFinancingTools(s *server.MCPServer) {
 		mcplib.WithString("portfolio_id",
 			mcplib.Description("Uses credentials default if omitted"),
 		),
+		mcplib.WithString("base_currency",
+			mcplib.Required(),
+			mcplib.Description("Base currency symbol (e.g. BTC)"),
+		),
+		mcplib.WithString("quote_currency",
+			mcplib.Required(),
+			mcplib.Description("Quote currency symbol (e.g. USD)"),
+		),
 	), handleGetPortfolioCreditInfo)
 
 	s.AddTool(mcplib.NewTool("get_cross_margin_overview",
@@ -227,7 +235,9 @@ func handleGetPortfolioCreditInfo(ctx context.Context, req mcplib.CallToolReques
 	defer cancel()
 
 	response, err := svc.GetPortfolioCreditInfo(ctx2, &prime.GetPortfolioCreditInfoRequest{
-		PortfolioId: portfolioId,
+		PortfolioId:   portfolioId,
+		BaseCurrency:  req.GetString("base_currency", ""),
+		QuoteCurrency: req.GetString("quote_currency", ""),
 	})
 	if err != nil {
 		return toolErr("cannot get portfolio credit information: %s", err), nil

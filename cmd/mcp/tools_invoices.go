@@ -48,6 +48,9 @@ func registerInvoiceTools(s *server.MCPServer) {
 		mcplib.WithInteger("limit",
 			mcplib.Description("Number of results per page (default 50)"),
 		),
+		mcplib.WithBoolean("fetch_all",
+			mcplib.Description("Fetch all pages automatically and return combined results. When true, cursor and limit are ignored."),
+		),
 	), handleListInvoices)
 }
 
@@ -81,6 +84,16 @@ func handleListInvoices(ctx context.Context, req mcplib.CallToolRequest) (*mcpli
 	})
 	if err != nil {
 		return toolErr("cannot list invoices: %s", err), nil
+	}
+
+	if req.GetBool("fetch_all", false) {
+		ctx3, cancel3 := fetchAllCtx(ctx)
+		defer cancel3()
+		items, err := response.Iterator().FetchAll(ctx3)
+		if err != nil {
+			return toolErr("failed to fetch all pages: %s", err), nil
+		}
+		return marshalResult(items)
 	}
 
 	return marshalResult(response)

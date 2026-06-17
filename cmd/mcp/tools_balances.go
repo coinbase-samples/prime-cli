@@ -60,6 +60,15 @@ func registerBalanceTools(s *server.MCPServer) {
 		mcplib.WithString("wallet_id",
 			mcplib.Description("Filter by wallet ID"),
 		),
+		mcplib.WithString("cursor",
+			mcplib.Description("Pagination cursor from a previous response"),
+		),
+		mcplib.WithInteger("limit",
+			mcplib.Description("Number of results per page (default 50)"),
+		),
+		mcplib.WithBoolean("fetch_all",
+			mcplib.Description("Fetch all pages automatically and return combined results. When true, cursor and limit are ignored."),
+		),
 	), handleListOnchainBalances)
 
 	s.AddTool(mcplib.NewTool("list_entity_balances",
@@ -79,6 +88,9 @@ func registerBalanceTools(s *server.MCPServer) {
 		),
 		mcplib.WithInteger("limit",
 			mcplib.Description("Number of results per page (default 50)"),
+		),
+		mcplib.WithBoolean("fetch_all",
+			mcplib.Description("Fetch all pages automatically and return combined results. When true, cursor and limit are ignored."),
 		),
 	), handleListEntityBalances)
 }
@@ -101,9 +113,20 @@ func handleListOnchainBalances(ctx context.Context, req mcplib.CallToolRequest) 
 	response, err := svc.ListOnchainWalletBalances(ctx2, &balances.ListOnchainWalletBalancesRequest{
 		PortfolioId: portfolioId,
 		WalletId:    req.GetString("wallet_id", ""),
+		Pagination:  paginationFor(req),
 	})
 	if err != nil {
 		return toolErr("cannot list onchain balances: %s", err), nil
+	}
+
+	if req.GetBool("fetch_all", false) {
+		ctx3, cancel3 := fetchAllCtx(ctx)
+		defer cancel3()
+		items, err := response.Iterator().FetchAll(ctx3)
+		if err != nil {
+			return toolErr("failed to fetch all pages: %s", err), nil
+		}
+		return marshalResult(items)
 	}
 
 	return marshalResult(response)
@@ -190,6 +213,16 @@ func handleListEntityBalances(ctx context.Context, req mcplib.CallToolRequest) (
 	})
 	if err != nil {
 		return toolErr("cannot list entity balances: %s", err), nil
+	}
+
+	if req.GetBool("fetch_all", false) {
+		ctx3, cancel3 := fetchAllCtx(ctx)
+		defer cancel3()
+		items, err := response.Iterator().FetchAll(ctx3)
+		if err != nil {
+			return toolErr("failed to fetch all pages: %s", err), nil
+		}
+		return marshalResult(items)
 	}
 
 	return marshalResult(response)

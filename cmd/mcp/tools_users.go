@@ -20,6 +20,7 @@ import (
 	"context"
 
 	"github.com/coinbase-samples/prime-cli/utils"
+	"github.com/coinbase/prime-sdk-go/model"
 	"github.com/coinbase/prime-sdk-go/users"
 	mcplib "github.com/mark3labs/mcp-go/mcp"
 	"github.com/mark3labs/mcp-go/server"
@@ -37,6 +38,9 @@ func registerUserTools(s *server.MCPServer) {
 		mcplib.WithInteger("limit",
 			mcplib.Description("Number of results per page (default 50)"),
 		),
+		mcplib.WithBoolean("fetch_all",
+			mcplib.Description("Fetch all pages automatically and return combined results. When true, cursor and limit are ignored."),
+		),
 	), handleListPortfolioUsers)
 
 	s.AddTool(mcplib.NewTool("list_entity_users",
@@ -49,6 +53,9 @@ func registerUserTools(s *server.MCPServer) {
 		),
 		mcplib.WithInteger("limit",
 			mcplib.Description("Number of results per page (default 50)"),
+		),
+		mcplib.WithBoolean("fetch_all",
+			mcplib.Description("Fetch all pages automatically and return combined results. When true, cursor and limit are ignored."),
 		),
 	), handleListEntityUsers)
 }
@@ -76,6 +83,23 @@ func handleListPortfolioUsers(ctx context.Context, req mcplib.CallToolRequest) (
 		return toolErr("cannot list portfolio users: %s", err), nil
 	}
 
+	if req.GetBool("fetch_all", false) {
+		ctx3, cancel3 := fetchAllCtx(ctx)
+		defer cancel3()
+		all := response.Users
+		for response.Pagination != nil && response.Pagination.HasNext {
+			response, err = svc.ListPortfolioUsers(ctx3, &users.ListPortfolioUsersRequest{
+				PortfolioId: portfolioId,
+				Pagination:  &model.PaginationParams{Cursor: response.Pagination.NextCursor, Limit: 100},
+			})
+			if err != nil {
+				return toolErr("failed to fetch all pages: %s", err), nil
+			}
+			all = append(all, response.Users...)
+		}
+		return marshalResult(all)
+	}
+
 	return marshalResult(response)
 }
 
@@ -100,6 +124,23 @@ func handleListEntityUsers(ctx context.Context, req mcplib.CallToolRequest) (*mc
 	})
 	if err != nil {
 		return toolErr("cannot list entity users: %s", err), nil
+	}
+
+	if req.GetBool("fetch_all", false) {
+		ctx3, cancel3 := fetchAllCtx(ctx)
+		defer cancel3()
+		all := response.Users
+		for response.Pagination != nil && response.Pagination.HasNext {
+			response, err = svc.ListEntityUsers(ctx3, &users.ListEntityUsersRequest{
+				EntityId:   entityId,
+				Pagination: &model.PaginationParams{Cursor: response.Pagination.NextCursor, Limit: 100},
+			})
+			if err != nil {
+				return toolErr("failed to fetch all pages: %s", err), nil
+			}
+			all = append(all, response.Users...)
+		}
+		return marshalResult(all)
 	}
 
 	return marshalResult(response)

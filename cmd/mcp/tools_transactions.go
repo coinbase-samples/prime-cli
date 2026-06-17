@@ -53,6 +53,9 @@ func registerTransactionTools(s *server.MCPServer) {
 		mcplib.WithInteger("limit",
 			mcplib.Description("Number of results per page (default 50)"),
 		),
+		mcplib.WithBoolean("fetch_all",
+			mcplib.Description("Fetch all pages automatically and return combined results. When true, cursor and limit are ignored."),
+		),
 	), handleListPortfolioTransactions)
 
 	s.AddTool(mcplib.NewTool("get_transaction",
@@ -92,6 +95,9 @@ func registerTransactionTools(s *server.MCPServer) {
 		),
 		mcplib.WithInteger("limit",
 			mcplib.Description("Number of results per page (default 50)"),
+		),
+		mcplib.WithBoolean("fetch_all",
+			mcplib.Description("Fetch all pages automatically and return combined results. When true, cursor and limit are ignored."),
 		),
 	), handleListWalletTransactions)
 
@@ -289,6 +295,16 @@ func handleListPortfolioTransactions(ctx context.Context, req mcplib.CallToolReq
 		return toolErr("cannot list transactions: %s", err), nil
 	}
 
+	if req.GetBool("fetch_all", false) {
+		ctx3, cancel3 := fetchAllCtx(ctx)
+		defer cancel3()
+		items, err := response.Iterator().FetchAll(ctx3)
+		if err != nil {
+			return toolErr("failed to fetch all pages: %s", err), nil
+		}
+		return marshalResult(items)
+	}
+
 	return marshalResult(response)
 }
 
@@ -354,6 +370,16 @@ func handleListWalletTransactions(ctx context.Context, req mcplib.CallToolReques
 	})
 	if err != nil {
 		return toolErr("cannot list wallet transactions: %s", err), nil
+	}
+
+	if req.GetBool("fetch_all", false) {
+		ctx3, cancel3 := fetchAllCtx(ctx)
+		defer cancel3()
+		items, err := response.Iterator().FetchAll(ctx3)
+		if err != nil {
+			return toolErr("failed to fetch all pages: %s", err), nil
+		}
+		return marshalResult(items)
 	}
 
 	return marshalResult(response)

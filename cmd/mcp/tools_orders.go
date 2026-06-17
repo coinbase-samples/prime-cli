@@ -59,6 +59,9 @@ func registerOrderTools(s *server.MCPServer) {
 		mcplib.WithInteger("limit",
 			mcplib.Description("Number of results per page (default 50)"),
 		),
+		mcplib.WithBoolean("fetch_all",
+			mcplib.Description("Fetch all pages automatically and return combined results. When true, cursor and limit are ignored."),
+		),
 	), handleListOrders)
 
 	s.AddTool(mcplib.NewTool("list_open_orders",
@@ -84,6 +87,9 @@ func registerOrderTools(s *server.MCPServer) {
 		),
 		mcplib.WithString("cursor",
 			mcplib.Description("Pagination cursor from a previous response"),
+		),
+		mcplib.WithInteger("limit",
+			mcplib.Description("Number of results per page"),
 		),
 	), handleListOpenOrders)
 
@@ -112,6 +118,9 @@ func registerOrderTools(s *server.MCPServer) {
 		),
 		mcplib.WithInteger("limit",
 			mcplib.Description("Number of results per page (default 50)"),
+		),
+		mcplib.WithBoolean("fetch_all",
+			mcplib.Description("Fetch all pages automatically and return combined results. When true, cursor and limit are ignored."),
 		),
 	), handleListOrderFills)
 
@@ -299,6 +308,9 @@ func registerOrderTools(s *server.MCPServer) {
 		mcplib.WithInteger("limit",
 			mcplib.Description("Number of results per page (default 50)"),
 		),
+		mcplib.WithBoolean("fetch_all",
+			mcplib.Description("Fetch all pages automatically and return combined results. When true, cursor and limit are ignored."),
+		),
 	), handleListPortfolioFills)
 }
 
@@ -339,6 +351,16 @@ func handleListOrders(ctx context.Context, req mcplib.CallToolRequest) (*mcplib.
 	})
 	if err != nil {
 		return toolErr("cannot list orders: %s", err), nil
+	}
+
+	if req.GetBool("fetch_all", false) {
+		ctx3, cancel3 := fetchAllCtx(ctx)
+		defer cancel3()
+		items, err := response.Iterator().FetchAll(ctx3)
+		if err != nil {
+			return toolErr("failed to fetch all pages: %s", err), nil
+		}
+		return marshalResult(items)
 	}
 
 	return marshalResult(response)
@@ -440,6 +462,16 @@ func handleListOrderFills(ctx context.Context, req mcplib.CallToolRequest) (*mcp
 	})
 	if err != nil {
 		return toolErr("cannot list order fills: %s", err), nil
+	}
+
+	if req.GetBool("fetch_all", false) {
+		ctx3, cancel3 := fetchAllCtx(ctx)
+		defer cancel3()
+		items, err := response.Iterator().FetchAll(ctx3)
+		if err != nil {
+			return toolErr("failed to fetch all pages: %s", err), nil
+		}
+		return marshalResult(items)
 	}
 
 	return marshalResult(response)
@@ -763,6 +795,16 @@ func handleListPortfolioFills(ctx context.Context, req mcplib.CallToolRequest) (
 	})
 	if err != nil {
 		return toolErr("cannot list portfolio fills: %s", err), nil
+	}
+
+	if req.GetBool("fetch_all", false) {
+		ctx3, cancel3 := fetchAllCtx(ctx)
+		defer cancel3()
+		items, err := response.Iterator().FetchAll(ctx3)
+		if err != nil {
+			return toolErr("failed to fetch all pages: %s", err), nil
+		}
+		return marshalResult(items)
 	}
 
 	return marshalResult(response)

@@ -37,6 +37,9 @@ func registerPositionTools(s *server.MCPServer) {
 		mcplib.WithInteger("limit",
 			mcplib.Description("Number of results per page (default 50)"),
 		),
+		mcplib.WithBoolean("fetch_all",
+			mcplib.Description("Fetch all pages automatically and return combined results. When true, cursor and limit are ignored."),
+		),
 	), handleListAggregatePositions)
 
 	s.AddTool(mcplib.NewTool("list_positions",
@@ -49,6 +52,9 @@ func registerPositionTools(s *server.MCPServer) {
 		),
 		mcplib.WithInteger("limit",
 			mcplib.Description("Number of results per page (default 50)"),
+		),
+		mcplib.WithBoolean("fetch_all",
+			mcplib.Description("Fetch all pages automatically and return combined results. When true, cursor and limit are ignored."),
 		),
 	), handleListPositions)
 }
@@ -76,6 +82,16 @@ func handleListAggregatePositions(ctx context.Context, req mcplib.CallToolReques
 		return toolErr("cannot list aggregate positions: %s", err), nil
 	}
 
+	if req.GetBool("fetch_all", false) {
+		ctx3, cancel3 := fetchAllCtx(ctx)
+		defer cancel3()
+		items, err := response.Iterator().FetchAll(ctx3)
+		if err != nil {
+			return toolErr("failed to fetch all pages: %s", err), nil
+		}
+		return marshalResult(items)
+	}
+
 	return marshalResult(response)
 }
 
@@ -100,6 +116,16 @@ func handleListPositions(ctx context.Context, req mcplib.CallToolRequest) (*mcpl
 	})
 	if err != nil {
 		return toolErr("cannot list positions: %s", err), nil
+	}
+
+	if req.GetBool("fetch_all", false) {
+		ctx3, cancel3 := fetchAllCtx(ctx)
+		defer cancel3()
+		items, err := response.Iterator().FetchAll(ctx3)
+		if err != nil {
+			return toolErr("failed to fetch all pages: %s", err), nil
+		}
+		return marshalResult(items)
 	}
 
 	return marshalResult(response)

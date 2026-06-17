@@ -45,6 +45,9 @@ func registerAdvancedTransferTools(s *server.MCPServer) {
 		mcplib.WithInteger("limit",
 			mcplib.Description("Number of results per page (default 50)"),
 		),
+		mcplib.WithBoolean("fetch_all",
+			mcplib.Description("Fetch all pages automatically and return combined results. When true, cursor and limit are ignored."),
+		),
 	), handleListAdvancedTransfers)
 
 	s.AddTool(mcplib.NewTool("create_advanced_transfer",
@@ -149,6 +152,16 @@ func handleListAdvancedTransfers(ctx context.Context, req mcplib.CallToolRequest
 	})
 	if err != nil {
 		return toolErr("cannot list advanced transfers: %s", err), nil
+	}
+
+	if req.GetBool("fetch_all", false) {
+		ctx3, cancel3 := fetchAllCtx(ctx)
+		defer cancel3()
+		items, err := response.Iterator().FetchAll(ctx3)
+		if err != nil {
+			return toolErr("failed to fetch all pages: %s", err), nil
+		}
+		return marshalResult(items)
 	}
 
 	return marshalResult(response)

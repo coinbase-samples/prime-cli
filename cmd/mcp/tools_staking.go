@@ -160,6 +160,9 @@ func registerStakingTools(s *server.MCPServer) {
 		mcplib.WithInteger("limit",
 			mcplib.Description("Maximum number of results to return"),
 		),
+		mcplib.WithBoolean("fetch_all",
+			mcplib.Description("Fetch all pages automatically and return combined results. When true, cursor and limit are ignored."),
+		),
 	), handleQueryValidators)
 }
 
@@ -445,6 +448,16 @@ func handleQueryValidators(ctx context.Context, req mcplib.CallToolRequest) (*mc
 	})
 	if err != nil {
 		return toolErr("cannot query transaction validators: %s", err), nil
+	}
+
+	if req.GetBool("fetch_all", false) {
+		ctx3, cancel3 := fetchAllCtx(ctx)
+		defer cancel3()
+		items, err := response.Iterator().FetchAll(ctx3)
+		if err != nil {
+			return toolErr("failed to fetch all pages: %s", err), nil
+		}
+		return marshalResult(items)
 	}
 
 	return marshalResult(response)
