@@ -26,7 +26,7 @@ import (
 
 var createLocateCmd = &cobra.Command{
 	Use:   "create-locate",
-	Short: "Create a new locate for a portfolio and assset",
+	Short: "Create a new locate for a portfolio and asset",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		client, err := utils.GetClientFromEnv()
 		if err != nil {
