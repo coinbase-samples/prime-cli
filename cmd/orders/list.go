@@ -126,7 +126,7 @@ func listOrders(
 func init() {
 	Cmd.AddCommand(listOrdersCmd)
 
-	listOrdersCmd.Flags().StringSlice(utils.OrderStatusesFlag, []string{}, "List of statuses")
+	listOrdersCmd.Flags().StringSlice(utils.OrderStatusesFlag, []string{}, "Filter by order status: OPEN, FILLED, CANCELLED, EXPIRED, FAILED, or PENDING")
 
 	utils.AddProductIdsFlag(listOrdersCmd)
 
