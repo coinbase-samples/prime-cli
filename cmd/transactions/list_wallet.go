@@ -28,7 +28,7 @@ import (
 
 var listWalletTransactionsCmd = &cobra.Command{
 	Use:   "list-wallet",
-	Short: "Lists transaction for a given wallet",
+	Short: "Lists transactions for a given wallet",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		client, err := utils.GetClientFromEnv()
 		if err != nil {
