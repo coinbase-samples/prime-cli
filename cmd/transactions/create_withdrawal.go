@@ -93,7 +93,7 @@ func init() {
 
 	createWithdrawalCmd.Flags().String(utils.SourceWalletIdFlag, "", "ID of the source wallet (Required)")
 	createWithdrawalCmd.Flags().String(utils.SymbolFlag, "", "Symbol of the currency (Required)")
-	createWithdrawalCmd.Flags().String(utils.DestinationTypeFlag, "", "Type of the destination (Required)")
+	createWithdrawalCmd.Flags().String(utils.DestinationTypeFlag, "", "Destination type: DESTINATION_BLOCKCHAIN, DESTINATION_PAYMENT_METHOD, DESTINATION_WALLET, or DESTINATION_COUNTERPARTY (Required)")
 	createWithdrawalCmd.Flags().String(utils.AmountFlag, "", "Amount to withdraw (Required)")
 	createWithdrawalCmd.Flags().String(utils.PaymentMethodIdFlag, "", "ID of the payment method")
 	createWithdrawalCmd.Flags().String(utils.BlockchainAddressFlag, "", "Blockchain address")
