@@ -27,7 +27,7 @@ import (
 
 var createWalletCmd = &cobra.Command{
 	Use:   "create",
-	Short: "Create a new vault wallet.",
+	Short: "Create a new wallet (VAULT, ONCHAIN, TRADING, or QC).",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		client, err := utils.GetClientFromEnv()
 		if err != nil {
