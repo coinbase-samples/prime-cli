@@ -115,8 +115,8 @@ func init() {
 	Cmd.AddCommand(listActivitiesCmd)
 
 	listActivitiesCmd.Flags().StringSlice(utils.SymbolsFlag, []string{}, "List of symbols")
-	listActivitiesCmd.Flags().StringSlice(utils.CategoriesFlag, []string{}, "List of categories")
-	listActivitiesCmd.Flags().StringSlice(utils.StatusesFlag, []string{}, "List of statuses")
+	listActivitiesCmd.Flags().StringSlice(utils.CategoriesFlag, []string{}, "Filter by category: ORDER, TRANSACTION, ACCOUNT, ALLOCATION, or LENDING")
+	listActivitiesCmd.Flags().StringSlice(utils.StatusesFlag, []string{}, "Filter by status: CANCELLED, PROCESSING, COMPLETED, EXPIRED, REJECTED, or FAILED")
 
 	utils.AddStartEndFlags(listActivitiesCmd)
 
