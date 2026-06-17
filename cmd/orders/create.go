@@ -88,10 +88,10 @@ func init() {
 
 	utils.AddOrderSideFlag(createOrderCmd)
 	utils.AddProductIdFlag(createOrderCmd)
-	createOrderCmd.Flags().String(utils.TypeFlag, "", "Type of the order, e.g. MARKET (Required)")
+	createOrderCmd.Flags().String(utils.TypeFlag, "", "Order type: MARKET, LIMIT, TWAP, BLOCK, VWAP, STOP_LIMIT, RFQ, or PEG (Required)")
 	utils.AddBaseQuantityFlag(createOrderCmd)
 	utils.AddQuoteValueFlag(createOrderCmd)
-	createOrderCmd.Flags().String(utils.TimeInForceFlag, "", "Determine order fill strategy")
+	createOrderCmd.Flags().String(utils.TimeInForceFlag, "", "Time in force: GTC (Good-Till-Cancelled), GTD (Good-Till-Date), IOC (Immediate-or-Cancel), or FOK (Fill-or-Kill)")
 	utils.AddLimitPriceFlag(createOrderCmd)
 	createOrderCmd.Flags().String(utils.StartTimeFlag, "", "The start time of the order in UTC (TWAP only)")
 	createOrderCmd.Flags().String(utils.ExpiryTimeFlag, "", "The expiry time of the order in UTC (TWAP and limit GTD only)")
