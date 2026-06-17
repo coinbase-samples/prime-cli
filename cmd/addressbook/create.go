@@ -26,7 +26,7 @@ import (
 
 var createAddressBookEntryCmd = &cobra.Command{
 	Use:   "create",
-	Short: "Create an address address book entry.",
+	Short: "Create an address book entry.",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		client, err := utils.GetClientFromEnv()
 		if err != nil {
