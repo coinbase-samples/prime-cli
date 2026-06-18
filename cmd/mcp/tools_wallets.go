@@ -18,6 +18,7 @@ package mcp
 
 import (
 	"context"
+	"strings"
 
 	"github.com/coinbase-samples/prime-cli/utils"
 	"github.com/coinbase/prime-sdk-go/model"
@@ -28,16 +29,18 @@ import (
 
 func registerWalletTools(s *server.MCPServer) {
 	s.AddTool(mcplib.NewTool("list_wallets",
-		mcplib.WithDescription("List wallets for a portfolio filtered by type"),
+		mcplib.WithDescription("List wallets for a portfolio. When type is omitted, returns all wallet types. Use name_contains to filter by wallet name. Wallet types: TRADING (spot trading), VAULT (cold storage), ONCHAIN (self-custody onchain), QC (prime financing)."),
 		mcplib.WithString("type",
-			mcplib.Required(),
-			mcplib.Description("Wallet type: VAULT, ONCHAIN, TRADING, or QC"),
+			mcplib.Description("Wallet type filter: VAULT, ONCHAIN, TRADING, or QC. Omit to list all types."),
+		),
+		mcplib.WithString("name_contains",
+			mcplib.Description("Filter wallets whose name contains this substring (case-insensitive). Use fetch_all=true to search across all pages."),
 		),
 		mcplib.WithString("portfolio_id",
 			mcplib.Description("Portfolio ID. Uses credentials default if omitted"),
 		),
 		mcplib.WithArray("symbols",
-			mcplib.Description("Filter by asset symbols"),
+			mcplib.Description("Filter by asset symbols (e.g. [\"USDC\", \"ETH\"])"),
 			mcplib.WithStringItems(),
 		),
 		mcplib.WithString("cursor",
@@ -93,7 +96,7 @@ func registerWalletTools(s *server.MCPServer) {
 	), handleCreateWallet)
 
 	s.AddTool(mcplib.NewTool("create_deposit_address",
-		mcplib.WithDescription("Create a new deposit address for a wallet"),
+		mcplib.WithDescription("Create a new deposit address for a wallet. For ETH and USDC, specify network_id to generate an address on a specific network.\n  ETH networks:  ethereum-mainnet, base-mainnet.\n  USDC networks: ethereum-mainnet, base-mainnet, solana-mainnet, arbitrum-mainnet, monad-mainnet, optimism-mainnet, avalanche-mainnet."),
 		mcplib.WithString("wallet_id",
 			mcplib.Required(),
 			mcplib.Description("Wallet ID to create a deposit address for"),
@@ -102,7 +105,7 @@ func registerWalletTools(s *server.MCPServer) {
 			mcplib.Description("Portfolio ID. Uses credentials default if omitted"),
 		),
 		mcplib.WithString("network_id",
-			mcplib.Description("Network ID (e.g. ethereum-mainnet)"),
+			mcplib.Description("Network ID for the deposit address. ETH: ethereum-mainnet, base-mainnet. USDC: ethereum-mainnet, base-mainnet, solana-mainnet, arbitrum-mainnet, monad-mainnet, optimism-mainnet, avalanche-mainnet."),
 		),
 	), handleCreateDepositAddress)
 
@@ -230,10 +233,8 @@ func handleListWallets(ctx context.Context, req mcplib.CallToolRequest) (*mcplib
 		return toolErr("%s", err), nil
 	}
 
-	walletType, err := req.RequireString("type")
-	if err != nil {
-		return toolErr("type is required (VAULT or ONCHAIN)"), nil
-	}
+	walletType := req.GetString("type", "")
+	nameContains := req.GetString("name_contains", "")
 
 	svc := wallets.NewWalletsService(client)
 	ctx2, cancel := mcpCtx(ctx)
@@ -256,10 +257,27 @@ func handleListWallets(ctx context.Context, req mcplib.CallToolRequest) (*mcplib
 		if err != nil {
 			return toolErr("failed to fetch all pages: %s", err), nil
 		}
-		return marshalResult(items)
+		return marshalResult(filterWalletsByName(items, nameContains))
 	}
 
+	if nameContains != "" {
+		response.Wallets = filterWalletsByName(response.Wallets, nameContains)
+	}
 	return marshalResult(response)
+}
+
+func filterWalletsByName(ws []*model.Wallet, nameContains string) []*model.Wallet {
+	if nameContains == "" {
+		return ws
+	}
+	lower := strings.ToLower(nameContains)
+	var result []*model.Wallet
+	for _, w := range ws {
+		if strings.Contains(strings.ToLower(w.Name), lower) {
+			result = append(result, w)
+		}
+	}
+	return result
 }
 
 func handleGetWallet(ctx context.Context, req mcplib.CallToolRequest) (*mcplib.CallToolResult, error) {

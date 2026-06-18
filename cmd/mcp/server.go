@@ -48,6 +48,7 @@ func runMCPServer(_ *cobra.Command, _ []string) error {
 	registerTransactionTools(s)
 	registerUserTools(s)
 	registerWalletTools(s)
+	registerCompositeTools(s)
 
 	return server.ServeStdio(s)
 }
