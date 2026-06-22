@@ -23,6 +23,7 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/coinbase/prime-sdk-go/client"
@@ -97,9 +98,14 @@ func toolErr(format string, a ...any) *mcplib.CallToolResult {
 	return mcplib.NewToolResultError(fmt.Sprintf(format, a...))
 }
 
+// networkDetailsFor splits a compound network ID (e.g. "base-mainnet") into
+// the Id ("base") and Type ("mainnet") fields the API requires.
 func networkDetailsFor(networkId string) *model.NetworkDetails {
 	if networkId == "" {
 		return nil
+	}
+	if idx := strings.LastIndex(networkId, "-"); idx >= 0 {
+		return &model.NetworkDetails{Id: networkId[:idx], Type: networkId[idx+1:]}
 	}
 	return &model.NetworkDetails{Id: networkId}
 }
