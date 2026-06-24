@@ -145,8 +145,11 @@ Tip: append `--format` to any command for pretty-printed JSON output.
 ./primectl financing get-buying-power --portfolio-id "$PORTFOLIO_ID" --base-currency ETH --quote-currency USD
 ./primectl financing get-credit-info --portfolio-id "$PORTFOLIO_ID"
 ./primectl financing get-cross-margin-overview --entity-id "$ENTITY_ID"
+./primectl financing get-cross-margin-prime-overview --entity-id "$ENTITY_ID"
+./primectl financing get-cross-margin-risk-parameters --entity-id "$ENTITY_ID"
 ./primectl financing get-entity-locate-availabilities --entity-id "$ENTITY_ID"
 ./primectl financing get-margin-info --entity-id "$ENTITY_ID"
+./primectl financing get-market-data --entity-id "$ENTITY_ID" --limit 25
 ./primectl financing get-pricing-fees --entity-id "$ENTITY_ID"
 ./primectl financing get-withdrawal-power --portfolio-id "$PORTFOLIO_ID" --symbol USD
 
@@ -162,6 +165,14 @@ Tip: append `--format` to any command for pretty-printed JSON output.
   --symbol ETH \
   --amount 10 \
   --date 2026-04-29
+
+./primectl financing update-funding-settings \
+  --entity-id "$ENTITY_ID" \
+  --designated-funding-portfolio-id "$PORTFOLIO_ID" \
+  --automatic-conversion-enabled \
+  --automatic-loan-enabled \
+  --automatic-excess-return-enabled \
+  --excess-funds-target-amount 1000
 ```
 
 ## futures
@@ -240,6 +251,7 @@ All futures commands accept `--entity-id`. If omitted, the value falls back to t
   --base-quantity 0.01 \
   --limit-price 2000 \
   --time-in-force GOOD_UNTIL_CANCELLED
+# Preview only — does not submit a live order.
 
 ./primectl orders edit \
   --portfolio-id "$PORTFOLIO_ID" \
