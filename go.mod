@@ -3,7 +3,7 @@ module github.com/coinbase-samples/prime-cli
 go 1.25.5
 
 require (
-	github.com/coinbase/prime-sdk-go v0.8.1
+	github.com/coinbase/prime-sdk-go v0.9.0
 	github.com/google/uuid v1.6.0
 	github.com/mark3labs/mcp-go v0.55.0
 	github.com/spf13/cobra v1.9.1

@@ -1,6 +1,6 @@
 # Prime CLI Commands
 
-A copy/paste-friendly reference for every `primectl` command in v0.4.0. Each command is shown as a runnable bash snippet that uses environment variables for the IDs you'll most often substitute.
+A copy/paste-friendly reference for every `primectl` command in v0.5.0. Each command is shown as a runnable bash snippet that uses environment variables for the IDs you'll most often substitute.
 
 > Anything marked `<...>` is a placeholder you should replace before running.
 
@@ -141,14 +141,24 @@ Tip: append `--format` to any command for pretty-printed JSON output.
 
 ## financing
 
+Most financing commands accept `--entity-id`. If omitted, the value falls back to the `entityId` in `PRIME_CREDENTIALS`.
+
 ```bash
 ./primectl financing get-buying-power --portfolio-id "$PORTFOLIO_ID" --base-currency ETH --quote-currency USD
 ./primectl financing get-credit-info --portfolio-id "$PORTFOLIO_ID"
-./primectl financing get-cross-margin-overview --entity-id "$ENTITY_ID"
 ./primectl financing get-entity-locate-availabilities --entity-id "$ENTITY_ID"
 ./primectl financing get-margin-info --entity-id "$ENTITY_ID"
 ./primectl financing get-pricing-fees --entity-id "$ENTITY_ID"
 ./primectl financing get-withdrawal-power --portfolio-id "$PORTFOLIO_ID" --symbol USD
+
+# Cross-margin overview and risk parameters
+./primectl financing get-cross-margin-overview --entity-id "$ENTITY_ID"
+./primectl financing get-cross-margin-prime-overview --entity-id "$ENTITY_ID"
+./primectl financing get-cross-margin-risk-parameters --entity-id "$ENTITY_ID"
+
+# Market data (paginated — use --all to fetch every page)
+./primectl financing get-market-data --entity-id "$ENTITY_ID" --limit 25
+./primectl financing get-market-data --entity-id "$ENTITY_ID" --all
 
 ./primectl financing list-financing-eligible-assets
 ./primectl financing list-locates --portfolio-id "$PORTFOLIO_ID" --date 2026-04-28
@@ -162,6 +172,15 @@ Tip: append `--format` to any command for pretty-printed JSON output.
   --symbol ETH \
   --amount 10 \
   --date 2026-04-29
+
+# Update FCM funding settings (creates a PCS proposal)
+./primectl financing update-funding-settings \
+  --entity-id "$ENTITY_ID" \
+  --designated-funding-portfolio-id "$PORTFOLIO_ID" \
+  --automatic-conversion-enabled \
+  --automatic-loan-enabled \
+  --automatic-excess-return-enabled \
+  --excess-funds-target-amount 1000
 ```
 
 ## futures
@@ -232,6 +251,7 @@ All futures commands accept `--entity-id`. If omitted, the value falls back to t
   --type MARKET \
   --base-quantity 0.001
 
+# Preview only — does not submit a live order (uses /order_preview, not /order)
 ./primectl orders create-preview \
   --portfolio-id "$PORTFOLIO_ID" \
   --product-id ETH-USD \

@@ -61,7 +61,7 @@ var createOrderPreviewCmd = &cobra.Command{
 			Order: order,
 		}
 
-		response, err := ordersService.CreateOrder(ctx, request)
+		response, err := ordersService.CreateOrderPreview(ctx, request)
 		if err != nil {
 			return fmt.Errorf("cannot create order preview: %w", err)
 

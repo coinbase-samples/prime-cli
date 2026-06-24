@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.5.0] - 2026-JUN-24
+
+### Added
+
+- Bumped `prime-sdk-go` to v0.9.0 (module path: `github.com/coinbase/prime-sdk-go`)
+- New financing commands: `get-cross-margin-risk-parameters`, `get-cross-margin-prime-overview`, `get-market-data`, `update-funding-settings`
+- Example script for `orders create-preview`
+
+### Fixed
+
+- `orders create-preview` now calls `CreateOrderPreview` instead of `CreateOrder`, so previews no longer submit live orders
+
 ## [0.4.1] - 2026-MAY-01
 
 ### Added

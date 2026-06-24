@@ -95,7 +95,7 @@ Finally, to run commands for each endpoint, use the following format to test eac
 ./primectl orders create-preview -b 0.001 -i ETH-USD -s BUY -t MARKET
 ```
 
-As of v0.4.0, the CLI covers the full surface area of [prime-sdk-go](https://github.com/coinbase/prime-sdk-go) v0.8.1, including the `advanced-transfers`, `futures`, and `positions` command groups.
+As of v0.5.0, the CLI covers the full surface area of [prime-sdk-go](https://github.com/coinbase/prime-sdk-go) v0.9.0, including the `advanced-transfers`, `futures`, and `positions` command groups.
 
 ## MCP Server
 
@@ -263,7 +263,6 @@ You can inspect and test the server interactively using the [MCP Inspector](http
 ```
 npx @modelcontextprotocol/inspector primectl mcp
 ```
-
 ## Releasing
 
 The Prime CLI is distributed via the [`coinbase-samples/homebrew-tap`](https://github.com/coinbase-samples/homebrew-tap) Homebrew tap. Cutting a new release is a two-repo process: tag the source here, then bump the formula in the tap.
