@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.5.1] - 2026-JUL-24
+
+### Added
+
+- Bumped `prime-sdk-go` to v0.9.1 (module path: `github.com/coinbase/prime-sdk-go`)
+
 ## [0.5.0] - 2026-JUN-24
 
 ### Added
