@@ -95,7 +95,9 @@ Finally, to run commands for each endpoint, use the following format to test eac
 ./primectl orders create-preview -b 0.001 -i ETH-USD -s BUY -t MARKET
 ```
 
-As of v0.5.0, the CLI covers the full surface area of [prime-sdk-go](https://github.com/coinbase/prime-sdk-go) v0.9.0, including the `advanced-transfers`, `futures`, and `positions` command groups.
+As of v0.6.0, the CLI covers the full surface area of [prime-sdk-go](https://github.com/coinbase/prime-sdk-go) v0.12.0, including conversion fees, cross-margin liquidations, trade finance obligations, rewards rates, FCM equity, and international derivatives.
+
+API failures print the Prime error `code`, `subcode`, spec description, and `trace_id` on stderr so you can share the trace with support.
 
 ## MCP Server
 
@@ -131,7 +133,7 @@ If `PRIME_CREDENTIALS` is already set in your shell environment, you can omit th
 
 ### Available tools
 
-The MCP server exposes 98 tools across the Coinbase Prime API:
+The MCP server exposes 113 tools across the Coinbase Prime API:
 
 | Tool | Description |
 |---|---|
@@ -178,6 +180,16 @@ The MCP server exposes 98 tools across the Coinbase Prime API:
 | `list_margin_call_summaries` | List margin call summaries for an entity |
 | `list_margin_conversions` | List margin conversions for a portfolio (deprecated) |
 | `list_portfolio_interest_accruals` | List interest accruals for a portfolio |
+| `get_market_data` | Get paginated market data for an entity |
+| `get_cross_margin_prime_overview` | Get the Prime cross-margin overview for an entity |
+| `get_cross_margin_risk_parameters` | Get cross-margin risk parameters for an entity |
+| `update_funding_settings` | Update FCM funding settings for an entity |
+| `get_conversion_fees` | Get organization stablecoin conversion fee tiers |
+| `get_cross_margin_liquidation` | Get detailed cross-margin liquidation data for an entity |
+| `list_cross_margin_liquidations` | List historical cross-margin liquidations for an entity |
+| `list_trade_finance_obligations` | List trade finance obligations for an entity |
+| `get_entity_rewards_rate` | Get current rewards rate and available tiers for an entity |
+| `get_portfolio_rewards_rate` | Get current rewards rate and available tiers for a portfolio |
 | **Futures (FCM)** | |
 | `get_fcm_balance` | Get FCM balance summary for an entity |
 | `get_fcm_positions` | Get FCM futures positions for an entity |
@@ -189,6 +201,9 @@ The MCP server exposes 98 tools across the Coinbase Prime API:
 | `list_fcm_sweeps` | List futures sweeps for an entity |
 | `schedule_fcm_sweep` | Schedule a futures sweep |
 | `cancel_fcm_sweep` | Cancel a scheduled futures sweep |
+| `get_fcm_equity` | Get FCM equity data for an entity |
+| `get_derivatives_currency_summary` | Get per-currency international derivatives balances for a portfolio |
+| `get_derivative_positions` | Get active derivative positions for a portfolio |
 | **Invoices** | |
 | `list_invoices` | List invoices for an entity |
 | **Onchain Address Book** | |

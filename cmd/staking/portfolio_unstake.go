@@ -20,6 +20,7 @@ import (
 	"fmt"
 
 	"github.com/coinbase-samples/prime-cli/utils"
+	"github.com/coinbase/prime-sdk-go/model"
 	primeStaking "github.com/coinbase/prime-sdk-go/staking"
 	"github.com/spf13/cobra"
 )
@@ -46,10 +47,11 @@ var portfolioUnstakeCmd = &cobra.Command{
 		}
 
 		request := &primeStaking.PortfolioUnstakeRequest{
-			PortfolioId:    portfolioId,
-			IdempotencyKey: idempotencyKey,
-			CurrencySymbol: utils.GetFlagStringValue(cmd, utils.SymbolFlag),
-			Amount:         utils.GetFlagStringValue(cmd, utils.AmountFlag),
+			PortfolioId:       portfolioId,
+			IdempotencyKey:    idempotencyKey,
+			CurrencySymbol:    utils.GetFlagStringValue(cmd, utils.SymbolFlag),
+			Amount:            utils.GetFlagStringValue(cmd, utils.AmountFlag),
+			ValidatorProvider: model.ValidatorProvider(utils.GetFlagStringValue(cmd, utils.ValidatorProviderFlag)),
 		}
 
 		ctx, cancel := utils.GetContextWithTimeout()
@@ -77,6 +79,7 @@ func init() {
 	utils.AddIdempotencyKeyFlag(portfolioUnstakeCmd)
 
 	portfolioUnstakeCmd.Flags().String(utils.SymbolFlag, "", "Currency symbol to unstake (e.g. ETH)")
-	portfolioUnstakeCmd.Flags().String(utils.AmountFlag, "", "Amount to unstake")
+	portfolioUnstakeCmd.Flags().String(utils.AmountFlag, "", "Amount to unstake. Optional when using --validator-provider")
 	portfolioUnstakeCmd.Flags().String(utils.StakeProtocolFlag, "", "Optional staking protocol identifier")
+	portfolioUnstakeCmd.Flags().String(utils.ValidatorProviderFlag, "", "ETH validator provider (e.g. VALIDATOR_PROVIDER_COINBASE_CLOUD)")
 }

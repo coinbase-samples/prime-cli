@@ -51,6 +51,8 @@ var editOrderCmd = &cobra.Command{
 			BaseQuantity:  utils.GetFlagStringValue(cmd, utils.NewBaseQuantityFlag),
 			QuoteValue:    utils.GetFlagStringValue(cmd, utils.NewQuoteValueFlag),
 			LimitPrice:    utils.GetFlagStringValue(cmd, utils.NewLimitPriceFlag),
+			Offset:        utils.GetFlagStringValue(cmd, utils.OffsetFlag),
+			WigLevel:      utils.GetFlagStringValue(cmd, utils.WigLevelFlag),
 		}
 
 		response, err := ordersService.EditOrder(ctx, request)
@@ -80,6 +82,8 @@ func init() {
 	editOrderCmd.Flags().String(utils.NewBaseQuantityFlag, "", "Updated order size in base asset units")
 	editOrderCmd.Flags().String(utils.NewQuoteValueFlag, "", "Updated order size in quote asset units")
 	editOrderCmd.Flags().String(utils.NewLimitPriceFlag, "", "Updated limit price")
+	editOrderCmd.Flags().String(utils.OffsetFlag, "", "Peg offset for PEG orders")
+	editOrderCmd.Flags().String(utils.WigLevelFlag, "", "WIG level for PEG orders")
 
 	utils.AddPortfolioIdFlag(editOrderCmd)
 }

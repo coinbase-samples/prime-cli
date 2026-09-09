@@ -24,7 +24,7 @@ import (
 func runMCPServer(_ *cobra.Command, _ []string) error {
 	s := server.NewMCPServer(
 		"coinbase-prime",
-		"0.4.2",
+		"0.6.0",
 		server.WithToolCapabilities(false),
 	)
 

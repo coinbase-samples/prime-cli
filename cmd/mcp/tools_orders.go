@@ -227,6 +227,12 @@ func registerOrderTools(s *server.MCPServer) {
 		mcplib.WithString("client_order_id",
 			mcplib.Description("Updated client order ID"),
 		),
+		mcplib.WithString("offset",
+			mcplib.Description("Peg offset for PEG orders"),
+		),
+		mcplib.WithString("wig_level",
+			mcplib.Description("WIG level for PEG orders"),
+		),
 	), handleEditOrder)
 
 	s.AddTool(mcplib.NewTool("get_order_edit_history",
@@ -637,6 +643,8 @@ func handleEditOrder(ctx context.Context, req mcplib.CallToolRequest) (*mcplib.C
 		BaseQuantity:  req.GetString("new_base_quantity", ""),
 		QuoteValue:    req.GetString("new_quote_value", ""),
 		LimitPrice:    req.GetString("new_limit_price", ""),
+		Offset:        req.GetString("offset", ""),
+		WigLevel:      req.GetString("wig_level", ""),
 	})
 	if err != nil {
 		return toolErr("cannot edit order: %s", err), nil

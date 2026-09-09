@@ -73,6 +73,9 @@ var createWithdrawalCmd = &cobra.Command{
 			PaymentMethod:     &transactions.CreateWalletWithdrawalPaymentMethod{Id: paymentMethodId},
 			BlockchainAddress: &model.BlockchainAddress{Address: address, AccountIdentifier: accountIdentifier},
 		}
+		if counterparty := utils.GetFlagStringValue(cmd, utils.CounterpartyFlag); counterparty != "" {
+			request.Counterparty = &model.CounterpartyDestination{CounterpartyId: counterparty}
+		}
 		response, err := transactionsService.CreateWalletWithdrawal(ctx, request)
 		if err != nil {
 			return fmt.Errorf("cannot create withdrawal: %w", err)
@@ -98,6 +101,7 @@ func init() {
 	createWithdrawalCmd.Flags().String(utils.PaymentMethodIdFlag, "", "ID of the payment method")
 	createWithdrawalCmd.Flags().String(utils.BlockchainAddressFlag, "", "Blockchain address")
 	createWithdrawalCmd.Flags().String(utils.AccountIdentifierFlag, "", "Account identifier")
+	createWithdrawalCmd.Flags().String(utils.CounterpartyFlag, "", "Counterparty ID for DESTINATION_COUNTERPARTY withdrawals")
 	utils.AddPortfolioIdFlag(createWithdrawalCmd)
 	utils.AddIdempotencyKeyFlag(createWithdrawalCmd)
 

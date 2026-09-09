@@ -16,11 +16,11 @@
 package cmd
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/coinbase-samples/prime-cli/cmd/activities"
 	"github.com/coinbase-samples/prime-cli/cmd/addressbook"
-	mcpcmd "github.com/coinbase-samples/prime-cli/cmd/mcp"
 	"github.com/coinbase-samples/prime-cli/cmd/advancedtransfers"
 	"github.com/coinbase-samples/prime-cli/cmd/allocations"
 	"github.com/coinbase-samples/prime-cli/cmd/assets"
@@ -29,6 +29,7 @@ import (
 	"github.com/coinbase-samples/prime-cli/cmd/financing"
 	"github.com/coinbase-samples/prime-cli/cmd/futures"
 	"github.com/coinbase-samples/prime-cli/cmd/invoices"
+	mcpcmd "github.com/coinbase-samples/prime-cli/cmd/mcp"
 	"github.com/coinbase-samples/prime-cli/cmd/onchainaddressbook"
 	"github.com/coinbase-samples/prime-cli/cmd/orders"
 	"github.com/coinbase-samples/prime-cli/cmd/paymentmethods"
@@ -50,8 +51,10 @@ var rootCmd = &cobra.Command{
 }
 
 func Execute() {
+	rootCmd.SilenceErrors = true
 	err := rootCmd.Execute()
 	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error: %s\n", utils.FormatCLIError(err))
 		os.Exit(1)
 	}
 }

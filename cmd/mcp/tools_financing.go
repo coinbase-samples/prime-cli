@@ -21,6 +21,7 @@ import (
 
 	"github.com/coinbase-samples/prime-cli/utils"
 	prime "github.com/coinbase/prime-sdk-go/financing"
+	"github.com/coinbase/prime-sdk-go/model"
 	mcplib "github.com/mark3labs/mcp-go/mcp"
 	"github.com/mark3labs/mcp-go/server"
 )
@@ -190,6 +191,119 @@ func registerFinancingTools(s *server.MCPServer) {
 			mcplib.Description("End date in RFC3339 format"),
 		),
 	), handleListPortfolioInterestAccruals)
+
+	s.AddTool(mcplib.NewTool("get_market_data",
+		mcplib.WithDescription("Get paginated market data for an entity"),
+		mcplib.WithString("entity_id",
+			mcplib.Description("Uses credentials default if omitted"),
+		),
+		mcplib.WithString("cursor",
+			mcplib.Description("Pagination cursor from a previous response"),
+		),
+		mcplib.WithInteger("limit",
+			mcplib.Description("Maximum number of results to return"),
+		),
+		mcplib.WithBoolean("fetch_all",
+			mcplib.Description("Fetch all pages automatically and return combined results. When true, cursor and limit are ignored."),
+		),
+	), handleGetMarketData)
+
+	s.AddTool(mcplib.NewTool("get_cross_margin_prime_overview",
+		mcplib.WithDescription("Get the Prime cross-margin overview for an entity"),
+		mcplib.WithString("entity_id",
+			mcplib.Description("Uses credentials default if omitted"),
+		),
+	), handleGetCrossMarginPrimeOverview)
+
+	s.AddTool(mcplib.NewTool("get_cross_margin_risk_parameters",
+		mcplib.WithDescription("Get cross-margin risk parameters for an entity"),
+		mcplib.WithString("entity_id",
+			mcplib.Description("Uses credentials default if omitted"),
+		),
+	), handleGetCrossMarginRiskParameters)
+
+	s.AddTool(mcplib.NewTool("update_funding_settings",
+		mcplib.WithDescription("Update FCM funding settings for an entity (creates a PCS proposal)"),
+		mcplib.WithString("entity_id",
+			mcplib.Description("Uses credentials default if omitted"),
+		),
+		mcplib.WithString("designated_funding_portfolio_id",
+			mcplib.Required(),
+			mcplib.Description("Derivatives funding portfolio ID"),
+		),
+		mcplib.WithBoolean("automatic_conversion_enabled",
+			mcplib.Description("Convert USDC to USD automatically to meet FCM margin calls"),
+		),
+		mcplib.WithBoolean("automatic_loan_enabled",
+			mcplib.Description("Allow Coinbase affiliates to initiate loans to meet FCM margin calls"),
+		),
+		mcplib.WithBoolean("automatic_excess_return_enabled",
+			mcplib.Description("Sweep FCM balance above margin requirements back to the derivatives funding portfolio"),
+		),
+		mcplib.WithString("excess_funds_target_amount",
+			mcplib.Description("Target amount to maintain in the futures account above margin requirements"),
+		),
+	), handleUpdateFundingSettings)
+
+	s.AddTool(mcplib.NewTool("get_conversion_fees",
+		mcplib.WithDescription("Get organization stablecoin conversion fee tiers and month-to-date net conversion volume"),
+	), handleGetConversionFees)
+
+	s.AddTool(mcplib.NewTool("get_cross_margin_liquidation",
+		mcplib.WithDescription("Get detailed cross-margin liquidation data for an entity"),
+		mcplib.WithString("entity_id",
+			mcplib.Description("Uses credentials default if omitted"),
+		),
+		mcplib.WithString("liquidation_id",
+			mcplib.Description("Optional liquidation ID"),
+		),
+	), handleGetCrossMarginLiquidation)
+
+	s.AddTool(mcplib.NewTool("list_cross_margin_liquidations",
+		mcplib.WithDescription("List historical cross-margin liquidations for an entity"),
+		mcplib.WithString("entity_id",
+			mcplib.Description("Uses credentials default if omitted"),
+		),
+		mcplib.WithString("status",
+			mcplib.Description("Filter by liquidation status"),
+		),
+		mcplib.WithString("start_time",
+			mcplib.Description("Start time in RFC3339 format"),
+		),
+		mcplib.WithString("end_time",
+			mcplib.Description("End time in RFC3339 format"),
+		),
+		mcplib.WithString("cursor",
+			mcplib.Description("Pagination cursor from a previous response"),
+		),
+		mcplib.WithInteger("limit",
+			mcplib.Description("Maximum number of results to return"),
+		),
+		mcplib.WithBoolean("fetch_all",
+			mcplib.Description("Fetch all pages automatically and return combined results. When true, cursor and limit are ignored."),
+		),
+	), handleListCrossMarginLiquidations)
+
+	s.AddTool(mcplib.NewTool("list_trade_finance_obligations",
+		mcplib.WithDescription("List trade finance obligations for an entity"),
+		mcplib.WithString("entity_id",
+			mcplib.Description("Uses credentials default if omitted"),
+		),
+	), handleListTradeFinanceObligations)
+
+	s.AddTool(mcplib.NewTool("get_entity_rewards_rate",
+		mcplib.WithDescription("Get current rewards rate and available tiers for an entity"),
+		mcplib.WithString("entity_id",
+			mcplib.Description("Uses credentials default if omitted"),
+		),
+	), handleGetEntityRewardsRate)
+
+	s.AddTool(mcplib.NewTool("get_portfolio_rewards_rate",
+		mcplib.WithDescription("Get current rewards rate and available tiers for a portfolio"),
+		mcplib.WithString("portfolio_id",
+			mcplib.Description("Uses credentials default if omitted"),
+		),
+	), handleGetPortfolioRewardsRate)
 }
 
 func handleGetBuyingPower(ctx context.Context, req mcplib.CallToolRequest) (*mcplib.CallToolResult, error) {
@@ -549,6 +663,280 @@ func handleListPortfolioInterestAccruals(ctx context.Context, req mcplib.CallToo
 	})
 	if err != nil {
 		return toolErr("cannot list portfolio interest accruals: %s", err), nil
+	}
+
+	return marshalResult(response)
+}
+
+func handleGetMarketData(ctx context.Context, req mcplib.CallToolRequest) (*mcplib.CallToolResult, error) {
+	client, err := utils.GetClientFromEnv()
+	if err != nil {
+		return toolErr("failed to initialize client: %s", err), nil
+	}
+
+	entityId, err := resolveEntityId(client, req)
+	if err != nil {
+		return toolErr("%s", err), nil
+	}
+
+	svc := prime.NewFinancingService(client)
+	ctx2, cancel := mcpCtx(ctx)
+	defer cancel()
+
+	response, err := svc.GetMarketData(ctx2, &prime.GetMarketDataRequest{
+		EntityId:   entityId,
+		Pagination: paginationFor(req),
+	})
+	if err != nil {
+		return toolErr("cannot get market data: %s", err), nil
+	}
+
+	if req.GetBool("fetch_all", false) {
+		ctx3, cancel3 := fetchAllCtx(ctx)
+		defer cancel3()
+		items, err := response.Iterator().FetchAll(ctx3)
+		if err != nil {
+			return toolErr("failed to fetch all pages: %s", err), nil
+		}
+		return marshalResult(items)
+	}
+
+	return marshalResult(response)
+}
+
+func handleGetCrossMarginPrimeOverview(ctx context.Context, req mcplib.CallToolRequest) (*mcplib.CallToolResult, error) {
+	client, err := utils.GetClientFromEnv()
+	if err != nil {
+		return toolErr("failed to initialize client: %s", err), nil
+	}
+
+	entityId, err := resolveEntityId(client, req)
+	if err != nil {
+		return toolErr("%s", err), nil
+	}
+
+	svc := prime.NewFinancingService(client)
+	ctx2, cancel := mcpCtx(ctx)
+	defer cancel()
+
+	response, err := svc.GetCrossMarginPrimeOverview(ctx2, &prime.GetCrossMarginPrimeOverviewRequest{
+		EntityId: entityId,
+	})
+	if err != nil {
+		return toolErr("cannot get cross margin prime overview: %s", err), nil
+	}
+
+	return marshalResult(response)
+}
+
+func handleGetCrossMarginRiskParameters(ctx context.Context, req mcplib.CallToolRequest) (*mcplib.CallToolResult, error) {
+	client, err := utils.GetClientFromEnv()
+	if err != nil {
+		return toolErr("failed to initialize client: %s", err), nil
+	}
+
+	entityId, err := resolveEntityId(client, req)
+	if err != nil {
+		return toolErr("%s", err), nil
+	}
+
+	svc := prime.NewFinancingService(client)
+	ctx2, cancel := mcpCtx(ctx)
+	defer cancel()
+
+	response, err := svc.GetCrossMarginRiskParameters(ctx2, &prime.GetCrossMarginRiskParametersRequest{
+		EntityId: entityId,
+	})
+	if err != nil {
+		return toolErr("cannot get cross margin risk parameters: %s", err), nil
+	}
+
+	return marshalResult(response)
+}
+
+func handleUpdateFundingSettings(ctx context.Context, req mcplib.CallToolRequest) (*mcplib.CallToolResult, error) {
+	client, err := utils.GetClientFromEnv()
+	if err != nil {
+		return toolErr("failed to initialize client: %s", err), nil
+	}
+
+	entityId, err := resolveEntityId(client, req)
+	if err != nil {
+		return toolErr("%s", err), nil
+	}
+
+	svc := prime.NewFinancingService(client)
+	ctx2, cancel := mcpCtx(ctx)
+	defer cancel()
+
+	response, err := svc.UpdateFundingSettings(ctx2, &prime.UpdateFundingSettingsRequest{
+		EntityId:                     entityId,
+		DesignatedFundingPortfolioId: req.GetString("designated_funding_portfolio_id", ""),
+		AutomaticConversionEnabled:   req.GetBool("automatic_conversion_enabled", false),
+		AutomaticLoanEnabled:         req.GetBool("automatic_loan_enabled", false),
+		AutomaticExcessReturnEnabled: req.GetBool("automatic_excess_return_enabled", false),
+		ExcessFundsTargetAmount:      req.GetString("excess_funds_target_amount", ""),
+	})
+	if err != nil {
+		return toolErr("cannot update funding settings: %s", err), nil
+	}
+
+	return marshalResult(response)
+}
+
+func handleGetConversionFees(ctx context.Context, req mcplib.CallToolRequest) (*mcplib.CallToolResult, error) {
+	client, err := utils.GetClientFromEnv()
+	if err != nil {
+		return toolErr("failed to initialize client: %s", err), nil
+	}
+
+	svc := prime.NewFinancingService(client)
+	ctx2, cancel := mcpCtx(ctx)
+	defer cancel()
+
+	response, err := svc.GetConversionFees(ctx2, &prime.GetConversionFeesRequest{})
+	if err != nil {
+		return toolErr("cannot get conversion fees: %s", err), nil
+	}
+
+	return marshalResult(response)
+}
+
+func handleGetCrossMarginLiquidation(ctx context.Context, req mcplib.CallToolRequest) (*mcplib.CallToolResult, error) {
+	client, err := utils.GetClientFromEnv()
+	if err != nil {
+		return toolErr("failed to initialize client: %s", err), nil
+	}
+
+	entityId, err := resolveEntityId(client, req)
+	if err != nil {
+		return toolErr("%s", err), nil
+	}
+
+	svc := prime.NewFinancingService(client)
+	ctx2, cancel := mcpCtx(ctx)
+	defer cancel()
+
+	response, err := svc.GetCrossMarginLiquidation(ctx2, &prime.GetCrossMarginLiquidationRequest{
+		EntityId:      entityId,
+		LiquidationId: req.GetString("liquidation_id", ""),
+	})
+	if err != nil {
+		return toolErr("cannot get cross margin liquidation: %s", err), nil
+	}
+
+	return marshalResult(response)
+}
+
+func handleListCrossMarginLiquidations(ctx context.Context, req mcplib.CallToolRequest) (*mcplib.CallToolResult, error) {
+	client, err := utils.GetClientFromEnv()
+	if err != nil {
+		return toolErr("failed to initialize client: %s", err), nil
+	}
+
+	entityId, err := resolveEntityId(client, req)
+	if err != nil {
+		return toolErr("%s", err), nil
+	}
+
+	svc := prime.NewFinancingService(client)
+	ctx2, cancel := mcpCtx(ctx)
+	defer cancel()
+
+	response, err := svc.ListCrossMarginLiquidations(ctx2, &prime.ListCrossMarginLiquidationsRequest{
+		EntityId:   entityId,
+		Status:     model.XMLiquidationStatus(req.GetString("status", "")),
+		StartTime:  req.GetString("start_time", ""),
+		EndTime:    req.GetString("end_time", ""),
+		Pagination: paginationFor(req),
+	})
+	if err != nil {
+		return toolErr("cannot list cross margin liquidations: %s", err), nil
+	}
+
+	if req.GetBool("fetch_all", false) {
+		ctx3, cancel3 := fetchAllCtx(ctx)
+		defer cancel3()
+		items, err := response.Iterator().FetchAll(ctx3)
+		if err != nil {
+			return toolErr("failed to fetch all pages: %s", err), nil
+		}
+		return marshalResult(items)
+	}
+
+	return marshalResult(response)
+}
+
+func handleListTradeFinanceObligations(ctx context.Context, req mcplib.CallToolRequest) (*mcplib.CallToolResult, error) {
+	client, err := utils.GetClientFromEnv()
+	if err != nil {
+		return toolErr("failed to initialize client: %s", err), nil
+	}
+
+	entityId, err := resolveEntityId(client, req)
+	if err != nil {
+		return toolErr("%s", err), nil
+	}
+
+	svc := prime.NewFinancingService(client)
+	ctx2, cancel := mcpCtx(ctx)
+	defer cancel()
+
+	response, err := svc.ListTradeFinanceObligations(ctx2, &prime.ListTradeFinanceObligationsRequest{
+		EntityId: entityId,
+	})
+	if err != nil {
+		return toolErr("cannot list trade finance obligations: %s", err), nil
+	}
+
+	return marshalResult(response)
+}
+
+func handleGetEntityRewardsRate(ctx context.Context, req mcplib.CallToolRequest) (*mcplib.CallToolResult, error) {
+	client, err := utils.GetClientFromEnv()
+	if err != nil {
+		return toolErr("failed to initialize client: %s", err), nil
+	}
+
+	entityId, err := resolveEntityId(client, req)
+	if err != nil {
+		return toolErr("%s", err), nil
+	}
+
+	svc := prime.NewFinancingService(client)
+	ctx2, cancel := mcpCtx(ctx)
+	defer cancel()
+
+	response, err := svc.GetEntityRewardsRate(ctx2, &prime.GetEntityRewardsRateRequest{
+		EntityId: entityId,
+	})
+	if err != nil {
+		return toolErr("cannot get entity rewards rate: %s", err), nil
+	}
+
+	return marshalResult(response)
+}
+
+func handleGetPortfolioRewardsRate(ctx context.Context, req mcplib.CallToolRequest) (*mcplib.CallToolResult, error) {
+	client, err := utils.GetClientFromEnv()
+	if err != nil {
+		return toolErr("failed to initialize client: %s", err), nil
+	}
+
+	portfolioId, err := resolvePortfolioId(client, req)
+	if err != nil {
+		return toolErr("%s", err), nil
+	}
+
+	svc := prime.NewFinancingService(client)
+	ctx2, cancel := mcpCtx(ctx)
+	defer cancel()
+
+	response, err := svc.GetPortfolioRewardsRate(ctx2, &prime.GetPortfolioRewardsRateRequest{
+		PortfolioId: portfolioId,
+	})
+	if err != nil {
+		return toolErr("cannot get portfolio rewards rate: %s", err), nil
 	}
 
 	return marshalResult(response)

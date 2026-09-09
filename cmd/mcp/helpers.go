@@ -26,6 +26,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/coinbase-samples/prime-cli/utils"
 	"github.com/coinbase/prime-sdk-go/client"
 	"github.com/coinbase/prime-sdk-go/model"
 	mcplib "github.com/mark3labs/mcp-go/mcp"
@@ -94,8 +95,24 @@ func marshalResult(v any) (*mcplib.CallToolResult, error) {
 	return mcplib.NewToolResultText(string(data)), nil
 }
 
-func toolErr(format string, a ...any) *mcplib.CallToolResult {
-	return mcplib.NewToolResultError(fmt.Sprintf(format, a...))
+func toolErr(format string, args ...any) *mcplib.CallToolResult {
+	message := fmt.Sprintf(format, withFormattedErrors(args)...)
+	return mcplib.NewToolResultError(message)
+}
+
+// withFormattedErrors replaces error values with FormatCLIError strings so API
+// failures include trace_id and the spec subcode description.
+func withFormattedErrors(args []any) []any {
+	out := make([]any, len(args))
+	for i, arg := range args {
+		err, isError := arg.(error)
+		if isError {
+			out[i] = utils.FormatCLIError(err)
+			continue
+		}
+		out[i] = arg
+	}
+	return out
 }
 
 // networkDetailsFor splits a compound network ID (e.g. "base-mainnet") into
