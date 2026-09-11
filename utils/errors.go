@@ -23,7 +23,7 @@ import (
 )
 
 // FormatCLIError returns a user-facing error string. Prime API errors include
-// trace_id and the spec subcode/code description via APIError.Format().
+// trace_id and the spec subcode/code description via ApiError.Format().
 func FormatCLIError(err error) string {
 	if err == nil {
 		return ""

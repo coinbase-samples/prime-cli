@@ -25,7 +25,7 @@ import (
 	primeerrors "github.com/coinbase/prime-sdk-go/model/errors"
 )
 
-func TestFormatCLIError_NonAPIErrorUnchanged(t *testing.T) {
+func TestFormatCLIError_NonApiErrorUnchanged(t *testing.T) {
 	err := errors.New("cannot unmarshal credentials")
 	if got := FormatCLIError(err); got != err.Error() {
 		t.Fatalf("got %q, want %q", got, err.Error())
@@ -38,8 +38,8 @@ func TestFormatCLIError_Nil(t *testing.T) {
 	}
 }
 
-func TestFormatCLIError_WrappedAPIErrorIncludesTraceAndDescription(t *testing.T) {
-	apiErr := &primeerrors.APIError{
+func TestFormatCLIError_WrappedApiErrorIncludesTraceAndDescription(t *testing.T) {
+	apiErr := &primeerrors.ApiError{
 		Response: primeerrors.Response{
 			Code:    primeerrors.ErrorCodeValidationError,
 			Message: "invalid entity",

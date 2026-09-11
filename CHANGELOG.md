@@ -4,7 +4,7 @@
 
 ### Added
 
-- Bumped `prime-sdk-go` to v0.12.0 (local `replace` to `../prime-sdk-go` until the tag is published)
+- Bumped `prime-sdk-go` to v0.12.0
 - New financing commands: `get-conversion-fees`, `get-cross-margin-liquidation`, `list-cross-margin-liquidations`, `list-trade-finance-obligations`, `get-entity-rewards-rate`, `get-portfolio-rewards-rate`
 - New futures commands: `get-equity`, `get-derivatives-currency-summary`, `get-derivative-positions`
 - MCP tools for the new endpoints, plus backfill for `get_market_data`, `get_cross_margin_prime_overview`, `get_cross_margin_risk_parameters`, `update_funding_settings`

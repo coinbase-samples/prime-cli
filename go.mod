@@ -10,8 +10,6 @@ require (
 	golang.org/x/term v0.43.0
 )
 
-replace github.com/coinbase/prime-sdk-go => ../prime-sdk-go
-
 require (
 	github.com/coinbase/core-go v0.4.0 // indirect
 	github.com/google/jsonschema-go v0.4.2 // indirect
