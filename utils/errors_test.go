@@ -25,20 +25,20 @@ import (
 	primeerrors "github.com/coinbase/prime-sdk-go/model/errors"
 )
 
-func TestFormatCLIError_NonApiErrorUnchanged(t *testing.T) {
+func TestFormatCliError_NonApiErrorUnchanged(t *testing.T) {
 	err := errors.New("cannot unmarshal credentials")
-	if got := FormatCLIError(err); got != err.Error() {
+	if got := FormatCliError(err); got != err.Error() {
 		t.Fatalf("got %q, want %q", got, err.Error())
 	}
 }
 
-func TestFormatCLIError_Nil(t *testing.T) {
-	if got := FormatCLIError(nil); got != "" {
+func TestFormatCliError_Nil(t *testing.T) {
+	if got := FormatCliError(nil); got != "" {
 		t.Fatalf("got %q, want empty", got)
 	}
 }
 
-func TestFormatCLIError_WrappedApiErrorIncludesTraceAndDescription(t *testing.T) {
+func TestFormatCliError_WrappedApiErrorIncludesTraceAndDescription(t *testing.T) {
 	apiErr := &primeerrors.ApiError{
 		Response: primeerrors.Response{
 			Code:    primeerrors.ErrorCodeValidationError,
@@ -51,7 +51,7 @@ func TestFormatCLIError_WrappedApiErrorIncludesTraceAndDescription(t *testing.T)
 	}
 	wrapped := fmt.Errorf("cannot get FCM balance: %w", apiErr)
 
-	got := FormatCLIError(wrapped)
+	got := FormatCliError(wrapped)
 	if !strings.Contains(got, "cannot get FCM balance:") {
 		t.Fatalf("missing wrap prefix: %q", got)
 	}

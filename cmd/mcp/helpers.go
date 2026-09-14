@@ -100,14 +100,14 @@ func toolErr(format string, args ...any) *mcplib.CallToolResult {
 	return mcplib.NewToolResultError(message)
 }
 
-// withFormattedErrors replaces error values with FormatCLIError strings so API
+// withFormattedErrors replaces error values with FormatCliError strings so API
 // failures include trace_id and the spec subcode description.
 func withFormattedErrors(args []any) []any {
 	out := make([]any, len(args))
 	for i, arg := range args {
 		err, isError := arg.(error)
 		if isError {
-			out[i] = utils.FormatCLIError(err)
+			out[i] = utils.FormatCliError(err)
 			continue
 		}
 		out[i] = arg

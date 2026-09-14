@@ -284,7 +284,7 @@ The Prime CLI is distributed via the [`coinbase-samples/homebrew-tap`](https://g
 
 ### 1. Bump the version in this repo
 
-1. Update the version string in `cmd/version.go` (`primectlVersion`) to the new semver, e.g. `0.5.0`.
+1. Update `utils.Version` in `utils/version.go` to the new semver, e.g. `0.6.0`. That value is used by `primectl version` and the MCP server.
 2. Add a new entry at the top of `CHANGELOG.md` following the existing `Added` / `Fixed` format.
 3. If user-facing commands changed, refresh `README.md` and `COMMANDS.md`.
 4. Open a PR, get it reviewed, and merge to `main`.

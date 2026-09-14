@@ -16,26 +16,6 @@
 
 package utils
 
-import (
-	"strings"
-
-	primeerrors "github.com/coinbase/prime-sdk-go/model/errors"
-)
-
-// FormatCliError returns a user-facing error string. Prime API errors include
-// trace_id and the spec subcode/code description via ApiError.Format().
-func FormatCliError(err error) string {
-	if err == nil {
-		return ""
-	}
-	apiErr, ok := primeerrors.From(err)
-	if !ok {
-		return err.Error()
-	}
-	formatted := apiErr.Format()
-	full := err.Error()
-	if old := apiErr.Error(); strings.Contains(full, old) {
-		return strings.Replace(full, old, formatted, 1)
-	}
-	return full + " (" + formatted + ")"
-}
+// Version is the primectl (and MCP server) version. Update this string when
+// cutting a release; cmd/version.go and cmd/mcp/server.go both read it.
+const Version = "0.6.0"

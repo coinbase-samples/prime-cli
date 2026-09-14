@@ -54,7 +54,7 @@ func Execute() {
 	rootCmd.SilenceErrors = true
 	err := rootCmd.Execute()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error: %s\n", utils.FormatCLIError(err))
+		fmt.Fprintf(os.Stderr, "Error: %s\n", utils.FormatCliError(err))
 		os.Exit(1)
 	}
 }
