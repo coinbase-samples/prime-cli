@@ -20,6 +20,7 @@ import (
 	"context"
 
 	"github.com/coinbase-samples/prime-cli/utils"
+	"github.com/coinbase/prime-sdk-go/model"
 	primeStaking "github.com/coinbase/prime-sdk-go/staking"
 	mcplib "github.com/mark3labs/mcp-go/mcp"
 	"github.com/mark3labs/mcp-go/server"
@@ -40,6 +41,9 @@ func registerStakingTools(s *server.MCPServer) {
 		mcplib.WithString("idempotency_key",
 			mcplib.Description("Auto-generated if omitted"),
 		),
+		mcplib.WithString("metadata_external_id",
+			mcplib.Description("Optional client-generated external ID for the stake request"),
+		),
 	), handleStake)
 
 	s.AddTool(mcplib.NewTool("unstake",
@@ -55,6 +59,9 @@ func registerStakingTools(s *server.MCPServer) {
 		),
 		mcplib.WithString("idempotency_key",
 			mcplib.Description("Auto-generated if omitted"),
+		),
+		mcplib.WithString("metadata_external_id",
+			mcplib.Description("Optional client-generated external ID for the unstake request"),
 		),
 	), handleUnstake)
 
@@ -135,10 +142,13 @@ func registerStakingTools(s *server.MCPServer) {
 			mcplib.Description("Currency symbol to unstake (e.g. ETH)"),
 		),
 		mcplib.WithString("amount",
-			mcplib.Description("Amount to unstake"),
+			mcplib.Description("Amount to unstake. Optional when using validator_provider"),
 		),
 		mcplib.WithString("stake_protocol",
 			mcplib.Description("Optional staking protocol identifier"),
+		),
+		mcplib.WithString("validator_provider",
+			mcplib.Description("ETH validator provider (e.g. VALIDATOR_PROVIDER_COINBASE_CLOUD)"),
 		),
 		mcplib.WithString("idempotency_key",
 			mcplib.Description("Auto-generated if omitted"),
@@ -192,6 +202,10 @@ func handleStake(ctx context.Context, req mcplib.CallToolRequest) (*mcplib.CallT
 		request.Inputs = primeStaking.CreateStakeInputs{Amount: amount}
 	}
 
+	if externalId := req.GetString("metadata_external_id", ""); externalId != "" {
+		request.Metadata = &model.WalletStakingMetadata{ExternalId: externalId}
+	}
+
 	svc := primeStaking.NewStakingService(client)
 	ctx2, cancel := mcpCtx(ctx)
 	defer cancel()
@@ -228,6 +242,10 @@ func handleUnstake(ctx context.Context, req mcplib.CallToolRequest) (*mcplib.Cal
 
 	if amount := req.GetString("amount", ""); amount != "" {
 		request.Inputs = primeStaking.CreateUnstakeInputs{Amount: amount}
+	}
+
+	if externalId := req.GetString("metadata_external_id", ""); externalId != "" {
+		request.Metadata = &model.WalletStakingMetadata{ExternalId: externalId}
 	}
 
 	svc := primeStaking.NewStakingService(client)
@@ -413,10 +431,11 @@ func handlePortfolioUnstake(ctx context.Context, req mcplib.CallToolRequest) (*m
 	defer cancel()
 
 	response, err := svc.PortfolioUnstake(ctx2, &primeStaking.PortfolioUnstakeRequest{
-		PortfolioId:    portfolioId,
-		IdempotencyKey: idempotencyKey,
-		CurrencySymbol: req.GetString("symbol", ""),
-		Amount:         req.GetString("amount", ""),
+		PortfolioId:       portfolioId,
+		IdempotencyKey:    idempotencyKey,
+		CurrencySymbol:    req.GetString("symbol", ""),
+		Amount:            req.GetString("amount", ""),
+		ValidatorProvider: model.ValidatorProvider(req.GetString("validator_provider", "")),
 	})
 	if err != nil {
 		return toolErr("cannot initiate portfolio unstake: %s", err), nil

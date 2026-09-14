@@ -20,6 +20,7 @@ import (
 	"fmt"
 
 	"github.com/coinbase-samples/prime-cli/utils"
+	"github.com/coinbase/prime-sdk-go/model"
 	primeStaking "github.com/coinbase/prime-sdk-go/staking"
 	"github.com/spf13/cobra"
 )
@@ -56,6 +57,10 @@ var createStakeCmd = &cobra.Command{
 			request.Inputs = primeStaking.CreateStakeInputs{Amount: amount}
 		}
 
+		if externalId := utils.GetFlagStringValue(cmd, utils.MetadataExternalIdFlag); externalId != "" {
+			request.Metadata = &model.WalletStakingMetadata{ExternalId: externalId}
+		}
+
 		ctx, cancel := utils.GetContextWithTimeout()
 		defer cancel()
 
@@ -82,4 +87,5 @@ func init() {
 	utils.AddIdempotencyKeyFlag(createStakeCmd)
 
 	createStakeCmd.Flags().String(utils.AmountFlag, "", "Optional amount to stake. If omitted, the wallet will stake or unstake the maximum amount available")
+	createStakeCmd.Flags().String(utils.MetadataExternalIdFlag, "", "Optional client-generated external ID for the stake request")
 }

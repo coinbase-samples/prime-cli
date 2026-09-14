@@ -17,6 +17,7 @@
 package mcp
 
 import (
+	"github.com/coinbase-samples/prime-cli/utils"
 	"github.com/mark3labs/mcp-go/server"
 	"github.com/spf13/cobra"
 )
@@ -24,7 +25,7 @@ import (
 func runMCPServer(_ *cobra.Command, _ []string) error {
 	s := server.NewMCPServer(
 		"coinbase-prime",
-		"0.4.2",
+		utils.Version,
 		server.WithToolCapabilities(false),
 	)
 

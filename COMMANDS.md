@@ -1,6 +1,6 @@
 # Prime CLI Commands
 
-A copy/paste-friendly reference for every `primectl` command in v0.5.0. Each command is shown as a runnable bash snippet that uses environment variables for the IDs you'll most often substitute.
+A copy/paste-friendly reference for every `primectl` command in v0.6.0. Each command is shown as a runnable bash snippet that uses environment variables for the IDs you'll most often substitute.
 
 > Anything marked `<...>` is a placeholder you should replace before running.
 
@@ -181,6 +181,21 @@ Most financing commands accept `--entity-id`. If omitted, the value falls back t
   --automatic-loan-enabled \
   --automatic-excess-return-enabled \
   --excess-funds-target-amount 1000
+
+# Conversion fees (org-level; no entity/portfolio flag)
+./primectl financing get-conversion-fees
+
+# Cross-margin liquidations
+./primectl financing get-cross-margin-liquidation --entity-id "$ENTITY_ID"
+./primectl financing get-cross-margin-liquidation --entity-id "$ENTITY_ID" --liquidation-id <liquidation-id>
+./primectl financing list-cross-margin-liquidations --entity-id "$ENTITY_ID" --all
+./primectl financing list-cross-margin-liquidations --entity-id "$ENTITY_ID" --status XM_LIQUIDATION_STATUS_LIQUIDATED --start-time 2026-01-01T00:00:00Z --end-time 2026-09-09T00:00:00Z
+
+./primectl financing list-trade-finance-obligations --entity-id "$ENTITY_ID"
+
+# Rewards rate (beta)
+./primectl financing get-entity-rewards-rate --entity-id "$ENTITY_ID"
+./primectl financing get-portfolio-rewards-rate --portfolio-id "$PORTFOLIO_ID"
 ```
 
 ## futures
@@ -199,6 +214,13 @@ All futures commands accept `--entity-id`. If omitted, the value falls back to t
 ./primectl futures schedule-sweep   --entity-id "$ENTITY_ID" --amount 1000 --currency USD
 ./primectl futures cancel-sweep     --entity-id "$ENTITY_ID"
 ./primectl futures set-settings     --entity-id "$ENTITY_ID" --target-derivatives-excess 0.10
+
+./primectl futures get-equity --entity-id "$ENTITY_ID"
+
+# International derivatives (portfolio-scoped)
+./primectl futures get-derivatives-currency-summary --portfolio-id "$PORTFOLIO_ID"
+./primectl futures get-derivative-positions --portfolio-id "$PORTFOLIO_ID"
+./primectl futures get-derivative-positions --portfolio-id "$PORTFOLIO_ID" --product-id <product-id>
 ```
 
 ## invoices
@@ -267,6 +289,13 @@ All futures commands accept `--entity-id`. If omitted, the value falls back to t
   --new-base-quantity 0.02 \
   --new-limit-price 2050
 
+./primectl orders edit \
+  --portfolio-id "$PORTFOLIO_ID" \
+  --order-id <order-id> \
+  --new-base-quantity 0.02 \
+  --offset 0.01 \
+  --wig-level 0.5
+
 ./primectl orders create-quote \
   --portfolio-id "$PORTFOLIO_ID" \
   --product-id ETH-USD \
@@ -319,7 +348,9 @@ All futures commands accept `--entity-id`. If omitted, the value falls back to t
 
 ```bash
 ./primectl staking stake                    --portfolio-id "$PORTFOLIO_ID" --wallet-id "$WALLET_ID"
+./primectl staking stake                    --portfolio-id "$PORTFOLIO_ID" --wallet-id "$WALLET_ID" --metadata-external-id my-stake-1
 ./primectl staking unstake                  --portfolio-id "$PORTFOLIO_ID" --wallet-id "$WALLET_ID" --amount 1.0
+./primectl staking unstake                  --portfolio-id "$PORTFOLIO_ID" --wallet-id "$WALLET_ID" --amount 1.0 --metadata-external-id my-unstake-1
 ./primectl staking claim-rewards            --portfolio-id "$PORTFOLIO_ID" --wallet-id "$WALLET_ID"
 ./primectl staking get-status               --portfolio-id "$PORTFOLIO_ID" --wallet-id "$WALLET_ID"
 ./primectl staking preview-unstake          --portfolio-id "$PORTFOLIO_ID" --wallet-id "$WALLET_ID" --amount 1.0
@@ -327,6 +358,7 @@ All futures commands accept `--entity-id`. If omitted, the value falls back to t
 
 ./primectl staking portfolio-stake-initiate --portfolio-id "$PORTFOLIO_ID" --symbol ETH --amount 1.0
 ./primectl staking portfolio-unstake        --portfolio-id "$PORTFOLIO_ID" --symbol ETH --amount 1.0
+./primectl staking portfolio-unstake        --portfolio-id "$PORTFOLIO_ID" --symbol ETH --validator-provider VALIDATOR_PROVIDER_COINBASE_CLOUD
 
 ./primectl staking query-validators \
   --portfolio-id "$PORTFOLIO_ID" \
@@ -354,6 +386,14 @@ All futures commands accept `--entity-id`. If omitted, the value falls back to t
   --amount 1.0 \
   --destination-type DESTINATION_BLOCKCHAIN \
   --blockchain-address 0xabc123...
+
+./primectl transactions create-withdrawal \
+  --portfolio-id "$PORTFOLIO_ID" \
+  --source-wallet-id "$WALLET_ID" \
+  --symbol ETH \
+  --amount 1.0 \
+  --destination-type DESTINATION_COUNTERPARTY \
+  --counterparty <counterparty-id>
 
 ./primectl transactions create-conversion \
   --portfolio-id "$PORTFOLIO_ID" \

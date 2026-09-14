@@ -138,4 +138,10 @@ const (
 
 	ValidatorAddressFlag = "validator-address"
 	StakeProtocolFlag    = "protocol"
+
+	OffsetFlag             = "offset"
+	WigLevelFlag           = "wig-level"
+	ValidatorProviderFlag  = "validator-provider"
+	MetadataExternalIdFlag = "metadata-external-id"
+	CounterpartyFlag       = "counterparty"
 )

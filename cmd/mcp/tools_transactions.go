@@ -160,6 +160,9 @@ func registerTransactionTools(s *server.MCPServer) {
 		mcplib.WithString("payment_method_id",
 			mcplib.Description("Payment method ID. Required when destination_type=DESTINATION_PAYMENT_METHOD. Use list_payment_methods to find IDs."),
 		),
+		mcplib.WithString("counterparty",
+			mcplib.Description("Counterparty ID. Required when destination_type=DESTINATION_COUNTERPARTY."),
+		),
 		mcplib.WithString("idempotency_key",
 			mcplib.Description("Auto-generated if omitted"),
 		),
@@ -480,7 +483,7 @@ func handleCreateWithdrawal(ctx context.Context, req mcplib.CallToolRequest) (*m
 	ctx2, cancel := mcpCtx(ctx)
 	defer cancel()
 
-	response, err := svc.CreateWalletWithdrawal(ctx2, &transactions.CreateWalletWithdrawalRequest{
+	withdrawalReq := &transactions.CreateWalletWithdrawalRequest{
 		PortfolioId:     portfolioId,
 		SourceWalletId:  sourceWalletId,
 		Symbol:          symbol,
@@ -495,7 +498,12 @@ func handleCreateWithdrawal(ctx context.Context, req mcplib.CallToolRequest) (*m
 			AccountIdentifier: req.GetString("account_identifier", ""),
 			Network:           networkDetailsFor(req.GetString("network_id", "")),
 		},
-	})
+	}
+	if counterparty := req.GetString("counterparty", ""); counterparty != "" {
+		withdrawalReq.Counterparty = &model.CounterpartyDestination{CounterpartyId: counterparty}
+	}
+
+	response, err := svc.CreateWalletWithdrawal(ctx2, withdrawalReq)
 	if err != nil {
 		return toolErr("cannot create withdrawal: %s", err), nil
 	}

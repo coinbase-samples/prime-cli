@@ -1,0 +1,83 @@
+/**
+ * Copyright 2026-present Coinbase Global, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package financing
+
+import (
+	"fmt"
+
+	"github.com/coinbase-samples/prime-cli/utils"
+	prime "github.com/coinbase/prime-sdk-go/financing"
+	"github.com/spf13/cobra"
+)
+
+var getPortfolioRewardsRateCmd = &cobra.Command{
+	Use:   "get-portfolio-rewards-rate",
+	Short: "Gets current rewards rate and available tiers for a portfolio",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		client, err := utils.GetClientFromEnv()
+		if err != nil {
+			return fmt.Errorf("failed to initialize client: %w", err)
+		}
+
+		svc := prime.NewFinancingService(client)
+
+		portfolioId, err := utils.GetPortfolioId(cmd, client)
+		if err != nil {
+			return err
+		}
+
+		request := &prime.GetPortfolioRewardsRateRequest{
+			PortfolioId: portfolioId,
+		}
+
+		response, err := getPortfolioRewardsRate(svc, request)
+		if err != nil {
+			return err
+		}
+
+		jsonResponse, err := utils.FormatResponseAsJson(cmd, response)
+		if err != nil {
+			return err
+		}
+
+		fmt.Println(jsonResponse)
+
+		return nil
+	},
+}
+
+func getPortfolioRewardsRate(
+	svc prime.FinancingService,
+	req *prime.GetPortfolioRewardsRateRequest,
+) (*prime.GetPortfolioRewardsRateResponse, error) {
+
+	ctx, cancel := utils.GetContextWithTimeout()
+	defer cancel()
+
+	response, err := svc.GetPortfolioRewardsRate(ctx, req)
+	if err != nil {
+		return nil, fmt.Errorf("cannot get portfolio rewards rate: %w", err)
+	}
+
+	return response, nil
+}
+
+func init() {
+	Cmd.AddCommand(getPortfolioRewardsRateCmd)
+
+	utils.AddPortfolioIdFlag(getPortfolioRewardsRateCmd)
+}

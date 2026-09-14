@@ -109,6 +109,30 @@ func registerFuturesTools(s *server.MCPServer) {
 			mcplib.Description("Uses credentials default if omitted"),
 		),
 	), handleCancelFcmSweep)
+
+	s.AddTool(mcplib.NewTool("get_fcm_equity",
+		mcplib.WithDescription("Get FCM equity data for an entity"),
+		mcplib.WithString("entity_id",
+			mcplib.Description("Uses credentials default if omitted"),
+		),
+	), handleGetFcmEquity)
+
+	s.AddTool(mcplib.NewTool("get_derivatives_currency_summary",
+		mcplib.WithDescription("Get per-currency international derivatives balances for a portfolio"),
+		mcplib.WithString("portfolio_id",
+			mcplib.Description("Uses credentials default if omitted"),
+		),
+	), handleGetDerivativesCurrencySummary)
+
+	s.AddTool(mcplib.NewTool("get_derivative_positions",
+		mcplib.WithDescription("Get active derivative positions for a portfolio"),
+		mcplib.WithString("portfolio_id",
+			mcplib.Description("Uses credentials default if omitted"),
+		),
+		mcplib.WithString("product_id",
+			mcplib.Description("Optional product ID to filter positions"),
+		),
+	), handleGetDerivativePositions)
 }
 
 func handleGetFcmBalance(ctx context.Context, req mcplib.CallToolRequest) (*mcplib.CallToolResult, error) {
@@ -360,6 +384,82 @@ func handleCancelFcmSweep(ctx context.Context, req mcplib.CallToolRequest) (*mcp
 	})
 	if err != nil {
 		return toolErr("cannot cancel FCM sweep: %s", err), nil
+	}
+
+	return marshalResult(response)
+}
+
+func handleGetFcmEquity(ctx context.Context, req mcplib.CallToolRequest) (*mcplib.CallToolResult, error) {
+	client, err := utils.GetClientFromEnv()
+	if err != nil {
+		return toolErr("failed to initialize client: %s", err), nil
+	}
+
+	entityId, err := resolveEntityId(client, req)
+	if err != nil {
+		return toolErr("%s", err), nil
+	}
+
+	svc := futures.NewFuturesService(client)
+	ctx2, cancel := mcpCtx(ctx)
+	defer cancel()
+
+	response, err := svc.GetFcmEquity(ctx2, &futures.GetFcmEquityRequest{
+		EntityId: entityId,
+	})
+	if err != nil {
+		return toolErr("cannot get FCM equity: %s", err), nil
+	}
+
+	return marshalResult(response)
+}
+
+func handleGetDerivativesCurrencySummary(ctx context.Context, req mcplib.CallToolRequest) (*mcplib.CallToolResult, error) {
+	client, err := utils.GetClientFromEnv()
+	if err != nil {
+		return toolErr("failed to initialize client: %s", err), nil
+	}
+
+	portfolioId, err := resolvePortfolioId(client, req)
+	if err != nil {
+		return toolErr("%s", err), nil
+	}
+
+	svc := futures.NewFuturesService(client)
+	ctx2, cancel := mcpCtx(ctx)
+	defer cancel()
+
+	response, err := svc.GetDerivativesCurrencySummary(ctx2, &futures.GetDerivativesCurrencySummaryRequest{
+		PortfolioId: portfolioId,
+	})
+	if err != nil {
+		return toolErr("cannot get derivatives currency summary: %s", err), nil
+	}
+
+	return marshalResult(response)
+}
+
+func handleGetDerivativePositions(ctx context.Context, req mcplib.CallToolRequest) (*mcplib.CallToolResult, error) {
+	client, err := utils.GetClientFromEnv()
+	if err != nil {
+		return toolErr("failed to initialize client: %s", err), nil
+	}
+
+	portfolioId, err := resolvePortfolioId(client, req)
+	if err != nil {
+		return toolErr("%s", err), nil
+	}
+
+	svc := futures.NewFuturesService(client)
+	ctx2, cancel := mcpCtx(ctx)
+	defer cancel()
+
+	response, err := svc.GetDerivativePositions(ctx2, &futures.GetDerivativePositionsRequest{
+		PortfolioId: portfolioId,
+		ProductId:   req.GetString("product_id", ""),
+	})
+	if err != nil {
+		return toolErr("cannot get derivative positions: %s", err), nil
 	}
 
 	return marshalResult(response)

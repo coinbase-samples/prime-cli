@@ -17,7 +17,6 @@
 package cmd
 
 import (
-	"encoding/json"
 	"fmt"
 
 	"github.com/coinbase-samples/prime-cli/utils"
@@ -25,17 +24,13 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var primectlVersion = `{"version":"0.5.1"}`
-
 var versionCmd = &cobra.Command{
 	Use:   "version",
 	Short: "Get the version of primectl",
 	RunE: func(cmd *cobra.Command, args []string) error {
 
-		var doc map[string]interface{}
-
-		if err := json.Unmarshal([]byte(primectlVersion), &doc); err != nil {
-			return fmt.Errorf("cannot marshal version: %w", err)
+		doc := map[string]interface{}{
+			"version": utils.Version,
 		}
 
 		jsonResponse, err := utils.FormatResponseAsJson(cmd, doc)
