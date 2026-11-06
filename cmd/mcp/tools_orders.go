@@ -273,6 +273,9 @@ func registerOrderTools(s *server.MCPServer) {
 		mcplib.WithString("settle_currency",
 			mcplib.Description("Settlement currency"),
 		),
+		mcplib.WithBoolean("is_buy_exact",
+			mcplib.Description("Charge fees on top of quote_value instead of carving them out of it. Only valid for BUY quotes sized in quote_value on SPOT products"),
+		),
 	), handleCreateQuote)
 
 	s.AddTool(mcplib.NewTool("accept_quote",
@@ -718,6 +721,7 @@ func handleCreateQuote(ctx context.Context, req mcplib.CallToolRequest) (*mcplib
 		QuoteValue:     req.GetString("quote_value", ""),
 		LimitPrice:     req.GetString("limit_price", ""),
 		SettleCurrency: req.GetString("settle_currency", ""),
+		IsBuyExact:     req.GetBool("is_buy_exact", false),
 	})
 	if err != nil {
 		return toolErr("cannot create quote: %s", err), nil

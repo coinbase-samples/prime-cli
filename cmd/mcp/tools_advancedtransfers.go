@@ -68,7 +68,7 @@ func registerAdvancedTransferTools(s *server.MCPServer) {
 			mcplib.Description("Currency symbol for the transfer"),
 		),
 		mcplib.WithString("idempotency_key",
-			mcplib.Description("Auto-generated if omitted"),
+			mcplib.Description("Optional. Sent with the request so a repeated key returns the original transfer, and used as the fund movement ID. A fund movement ID is auto-generated if omitted"),
 		),
 		mcplib.WithString("source_type",
 			mcplib.Description("Source location type, e.g. WALLET, COUNTERPARTY_ID"),
@@ -178,7 +178,11 @@ func handleCreateAdvancedTransfer(ctx context.Context, req mcplib.CallToolReques
 		return toolErr("%s", err), nil
 	}
 
-	idempotencyKey := req.GetString("idempotency_key", "")
+	// Only forward a caller-supplied key on the request: a repeated key returns
+	// the original transfer, and omitting it always creates a new transfer.
+	requestIdempotencyKey := req.GetString("idempotency_key", "")
+
+	idempotencyKey := requestIdempotencyKey
 	if idempotencyKey == "" {
 		idempotencyKey = utils.NewUuidStr()
 	}
@@ -234,6 +238,7 @@ func handleCreateAdvancedTransfer(ctx context.Context, req mcplib.CallToolReques
 	response, err := svc.CreateAdvancedTransfer(ctx2, &advancedtransfers.CreateAdvancedTransferRequest{
 		PortfolioId:      portfolioId,
 		AdvancedTransfer: transfer,
+		IdempotencyKey:   requestIdempotencyKey,
 	})
 	if err != nil {
 		return toolErr("cannot create advanced transfer: %s", err), nil

@@ -1,6 +1,6 @@
 # Prime CLI Commands
 
-A copy/paste-friendly reference for every `primectl` command in v0.6.0. Each command is shown as a runnable bash snippet that uses environment variables for the IDs you'll most often substitute.
+A copy/paste-friendly reference for every `primectl` command in v0.7.0. Each command is shown as a runnable bash snippet that uses environment variables for the IDs you'll most often substitute.
 
 > Anything marked `<...>` is a placeholder you should replace before running.
 
@@ -82,6 +82,18 @@ Tip: append `--format` to any command for pretty-printed JSON output.
   --trade-date 2026-04-28 \
   --settlement-date 2026-04-30 \
   --settlement-time 16:00:00Z
+
+# Retry-safe create: repeating the same key returns the original transfer
+./primectl advanced-transfers create \
+  --portfolio-id "$PORTFOLIO_ID" \
+  --idempotency-key <your-uuid> \
+  --transfer-type ADVANCED_TRANSFER_TYPE_BLIND_MATCH \
+  --amount 1.0 \
+  --currency ETH \
+  --source-type WALLET \
+  --source-value "$WALLET_ID" \
+  --target-type COUNTERPARTY_ID \
+  --target-value <counterparty-id>
 
 ./primectl advanced-transfers cancel \
   --portfolio-id "$PORTFOLIO_ID" \
@@ -304,6 +316,15 @@ All futures commands accept `--entity-id`. If omitted, the value falls back to t
   --limit-price 2000 \
   --settle-currency USD
 
+# Buy exact: fees are charged on top of --quote-value (BUY quotes sized in quote value, SPOT only)
+./primectl orders create-quote \
+  --portfolio-id "$PORTFOLIO_ID" \
+  --product-id ETH-USD \
+  --side BUY \
+  --quote-value 1000 \
+  --limit-price 2000 \
+  --is-buy-exact
+
 ./primectl orders accept-quote \
   --portfolio-id "$PORTFOLIO_ID" \
   --quote-id <quote-id>
@@ -467,6 +488,68 @@ All futures commands accept `--entity-id`. If omitted, the value falls back to t
   --all
 ```
 
+## webhooks
+
+Webhook endpoints are in beta. `create-subscription` and `rotate-hmac-secret` return the HMAC secret only once, so store it in a secret manager right away. Enum flags accept the short form (for example `--period 7D`, `--status-filter FAILED`, `--auth-type HMAC`).
+
+```bash
+# Discover the event types you can subscribe to
+./primectl webhooks get-event-types
+
+./primectl webhooks create-subscription \
+  --portfolio-id "$PORTFOLIO_ID" \
+  --event-types prime.transaction.created,prime.transaction.updated \
+  --target-url https://example.com/webhooks \
+  --description "Transaction events"
+
+# OAuth delivery with custom headers (repeat --custom-header for each header)
+./primectl webhooks create-subscription \
+  --portfolio-id "$PORTFOLIO_ID" \
+  --event-types prime.transaction.created \
+  --target-url https://example.com/webhooks \
+  --auth-type OAUTH \
+  --oauth-token-url https://auth.example.com/token \
+  --oauth-client-id <client-id> \
+  --oauth-client-secret <client-secret> \
+  --oauth-scopes webhooks:write \
+  --custom-header X-Env=prod
+
+./primectl webhooks list-subscriptions --portfolio-id "$PORTFOLIO_ID" --all
+./primectl webhooks list-subscriptions --portfolio-id "$PORTFOLIO_ID" --include-disabled --event-type-filter prime.transaction.created
+./primectl webhooks get-subscription --portfolio-id "$PORTFOLIO_ID" --subscription-id <subscription-id>
+
+# Only the flags you set are updated; the current version is fetched automatically
+./primectl webhooks update-subscription \
+  --portfolio-id "$PORTFOLIO_ID" \
+  --subscription-id <subscription-id> \
+  --target-url https://example.com/new-webhooks
+./primectl webhooks update-subscription --subscription-id <subscription-id> --is-enabled=false
+
+./primectl webhooks delete-subscription --portfolio-id "$PORTFOLIO_ID" --subscription-id <subscription-id>
+
+./primectl webhooks rotate-hmac-secret --portfolio-id "$PORTFOLIO_ID" --subscription-id <subscription-id>
+./primectl webhooks rotate-hmac-secret --subscription-id <subscription-id> --revoke-previous-immediately
+
+./primectl webhooks send-simulation \
+  --portfolio-id "$PORTFOLIO_ID" \
+  --subscription-id <subscription-id> \
+  --event-type prime.transaction.created
+
+./primectl webhooks get-delivery-logs --portfolio-id "$PORTFOLIO_ID" --subscription-id <subscription-id> --all
+./primectl webhooks get-delivery-logs --subscription-id <subscription-id> --status-filter FAILED --cursor <next-cursor>
+
+./primectl webhooks get-delivery-attempts \
+  --portfolio-id "$PORTFOLIO_ID" \
+  --subscription-id <subscription-id> \
+  --event-id <event-id>
+
+./primectl webhooks get-subscription-stats --portfolio-id "$PORTFOLIO_ID" --subscription-id <subscription-id> --period 7D
+./primectl webhooks get-owner-stats --portfolio-id "$PORTFOLIO_ID" --period 24H
+
+./primectl webhooks replay-event --portfolio-id "$PORTFOLIO_ID" --event-id <event-id>
+./primectl webhooks replay-event --event-id <event-id> --subscription-id <subscription-id>
+```
+
 ---
 
 ## Common flags reference
@@ -477,6 +560,7 @@ All futures commands accept `--entity-id`. If omitted, the value falls back to t
 - `--idempotency-key` — supply your own UUID for retry-safe writes; auto-generated if blank.
 - `--client-order-id` / `--client-quote-id` — your own client-side ID; auto-generated if blank.
 - Pagination (lists that return `Pagination`): `--limit`, `--sort-direction`, `--all` (drain all pages), `--interactive` (page on key-press).
+- Cursor pagination (`webhooks list-subscriptions` and `webhooks get-delivery-logs`): `--cursor` (the `next_cursor` from the previous response) and `--all`.
 - Time ranges: `--start` / `--end` use RFC3339 (e.g. `2026-04-28T00:00:00Z`). The financing date filters use `--start-date` / `--end-date`.
 
 ## Tips
