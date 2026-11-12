@@ -113,6 +113,9 @@ var createAdvancedTransferCmd = &cobra.Command{
 		request := &advancedtransfers.CreateAdvancedTransferRequest{
 			PortfolioId:      portfolioId,
 			AdvancedTransfer: transfer,
+			// Only forwarded when supplied: a repeated key returns the stored
+			// transfer, and omitting it always creates a new transfer.
+			IdempotencyKey: utils.GetFlagStringValue(cmd, utils.IdempotencyKeyFlag),
 		}
 
 		ctx, cancel := utils.GetContextWithTimeout()
@@ -150,7 +153,11 @@ func init() {
 	Cmd.AddCommand(createAdvancedTransferCmd)
 
 	utils.AddPortfolioIdFlag(createAdvancedTransferCmd)
-	utils.AddIdempotencyKeyFlag(createAdvancedTransferCmd)
+	createAdvancedTransferCmd.Flags().String(
+		utils.IdempotencyKeyFlag,
+		"",
+		"Optional idempotency key. Sent with the request so a repeated key returns the original transfer, and used as the fund movement ID when --fund-movement-id is blank",
+	)
 
 	createAdvancedTransferCmd.Flags().String(utils.TransferTypeFlag, "", "Advanced transfer type, e.g. ADVANCED_TRANSFER_TYPE_BLIND_MATCH (Required)")
 	createAdvancedTransferCmd.Flags().String(utils.AmountFlag, "", "Amount to transfer (Required)")

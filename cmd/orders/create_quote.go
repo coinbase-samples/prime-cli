@@ -55,6 +55,7 @@ var createQuoteCmd = &cobra.Command{
 			QuoteValue:     utils.GetFlagStringValue(cmd, utils.QuoteValueFlag),
 			LimitPrice:     utils.GetFlagStringValue(cmd, utils.LimitPriceFlag),
 			SettleCurrency: utils.GetFlagStringValue(cmd, utils.SettleCurrencyFlag),
+			IsBuyExact:     utils.GetFlagBoolValue(cmd, utils.IsBuyExactFlag),
 		}
 
 		ctx, cancel := utils.GetContextWithTimeout()
@@ -87,6 +88,7 @@ func init() {
 
 	createQuoteCmd.Flags().String(utils.ClientQuoteIdFlag, "", "A client-generated order ID used for reference purposes")
 	createQuoteCmd.Flags().String(utils.SettleCurrencyFlag, "", "The settle currency flag")
+	createQuoteCmd.Flags().Bool(utils.IsBuyExactFlag, false, "Charge fees on top of --quote-value instead of carving them out of it. Only valid for BUY quotes sized in quote value on SPOT products")
 
 	createQuoteCmd.MarkFlagRequired(utils.SideFlag)
 	createQuoteCmd.MarkFlagRequired(utils.ProductIdFlag)

@@ -18,4 +18,4 @@ package utils
 
 // Version is the primectl (and MCP server) version. Update this string when
 // cutting a release; cmd/version.go and cmd/mcp/server.go both read it.
-const Version = "0.6.0"
+const Version = "0.7.0"

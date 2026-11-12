@@ -40,6 +40,7 @@ import (
 	"github.com/coinbase-samples/prime-cli/cmd/transactions"
 	"github.com/coinbase-samples/prime-cli/cmd/users"
 	"github.com/coinbase-samples/prime-cli/cmd/wallets"
+	"github.com/coinbase-samples/prime-cli/cmd/webhooks"
 	"github.com/coinbase-samples/prime-cli/utils"
 
 	"github.com/spf13/cobra"
@@ -83,5 +84,6 @@ func init() {
 	rootCmd.AddCommand(transactions.Cmd)
 	rootCmd.AddCommand(users.Cmd)
 	rootCmd.AddCommand(wallets.Cmd)
+	rootCmd.AddCommand(webhooks.Cmd)
 	rootCmd.AddCommand(staking.Cmd)
 }

@@ -95,7 +95,7 @@ Finally, to run commands for each endpoint, use the following format to test eac
 ./primectl orders create-preview -b 0.001 -i ETH-USD -s BUY -t MARKET
 ```
 
-As of v0.6.0, the CLI covers the full surface area of [prime-sdk-go](https://github.com/coinbase/prime-sdk-go) v0.12.0, including conversion fees, cross-margin liquidations, trade finance obligations, rewards rates, FCM equity, and international derivatives.
+As of v0.7.0, the CLI covers the full surface area of [prime-sdk-go](https://github.com/coinbase/prime-sdk-go) v0.13.0, including webhook subscriptions (beta), conversion fees, cross-margin liquidations, trade finance obligations, rewards rates, FCM equity, and international derivatives.
 
 API failures print the Prime error `code`, `subcode`, spec description, and `trace_id` on stderr so you can share the trace with support.
 
@@ -133,7 +133,7 @@ If `PRIME_CREDENTIALS` is already set in your shell environment, you can omit th
 
 ### Available tools
 
-The MCP server exposes 113 tools across the Coinbase Prime API:
+The MCP server exposes 126 tools across the Coinbase Prime API:
 
 | Tool | Description |
 |---|---|
@@ -268,6 +268,20 @@ The MCP server exposes 113 tools across the Coinbase Prime API:
 | `create_deposit_address` | Create a new deposit address for a wallet |
 | `get_wallet_deposit_instructions` | Get deposit instructions for a wallet |
 | `list_wallet_addresses` | List addresses for a wallet |
+| **Webhooks (beta)** | |
+| `get_webhook_event_types` | List the event types that can be subscribed to |
+| `list_webhook_subscriptions` | List webhook subscriptions for a portfolio |
+| `create_webhook_subscription` | Create a webhook subscription; the HMAC secret is returned only once |
+| `get_webhook_subscription` | Get a webhook subscription |
+| `update_webhook_subscription` | Update a webhook subscription; only the fields you provide are changed |
+| `delete_webhook_subscription` | Delete a webhook subscription |
+| `rotate_webhook_hmac_secret` | Rotate a subscription's HMAC secret; the new secret is returned only once |
+| `send_webhook_simulation` | Send a simulated event to a subscription |
+| `get_webhook_delivery_logs` | List delivery log entries for a subscription |
+| `get_webhook_delivery_attempts` | List delivery attempts for a webhook event |
+| `get_webhook_subscription_stats` | Get delivery statistics for a subscription |
+| `get_webhook_owner_stats` | Get webhook statistics for a portfolio |
+| `replay_webhook_event` | Replay a webhook event |
 
 Most tools that require a `portfolio_id` or `entity_id` will fall back to the values in `PRIME_CREDENTIALS` if those arguments are not provided, so many calls work without any parameters.
 
@@ -284,7 +298,7 @@ The Prime CLI is distributed via the [`coinbase-samples/homebrew-tap`](https://g
 
 ### 1. Bump the version in this repo
 
-1. Update `utils.Version` in `utils/version.go` to the new semver, e.g. `0.6.0`. That value is used by `primectl version` and the MCP server.
+1. Update `utils.Version` in `utils/version.go` to the new semver, e.g. `0.7.0`. That value is used by `primectl version` and the MCP server.
 2. Add a new entry at the top of `CHANGELOG.md` following the existing `Added` / `Fixed` format.
 3. If user-facing commands changed, refresh `README.md` and `COMMANDS.md`.
 4. Open a PR, get it reviewed, and merge to `main`.
