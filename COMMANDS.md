@@ -67,7 +67,7 @@ Tip: append `--format` to any command for pretty-printed JSON output.
 
 ```bash
 ./primectl advanced-transfers list --portfolio-id "$PORTFOLIO_ID" --all
-./primectl advanced-transfers list --portfolio-id "$PORTFOLIO_ID" --states ADVANCED_TRANSFER_STATE_PENDING --transfer-type ADVANCED_TRANSFER_TYPE_BLIND_MATCH
+./primectl advanced-transfers list --portfolio-id "$PORTFOLIO_ID" --states ADVANCED_TRANSFER_STATE_MATCHED --transfer-type ADVANCED_TRANSFER_TYPE_BLIND_MATCH
 
 ./primectl advanced-transfers create \
   --portfolio-id "$PORTFOLIO_ID" \
@@ -490,7 +490,7 @@ All futures commands accept `--entity-id`. If omitted, the value falls back to t
 
 ## webhooks
 
-Webhook endpoints are in beta. `create-subscription` and `rotate-hmac-secret` return the HMAC secret only once, so store it in a secret manager right away. Enum flags accept the short form (for example `--period 7D`, `--status-filter FAILED`, `--auth-type HMAC`).
+Webhook endpoints are in beta. `create-subscription` and `rotate-hmac-secret` return the HMAC secret only once, so store it in a secret manager right away. Enum flags accept the short form (for example `--period 7D`, `--status-filter FAILED`, `--auth-type SIGNATURE_ONLY`). If `--auth-type` is omitted on create, Prime defaults to `SIGNATURE_ONLY`. The previous `HMAC` spelling is accepted as an alias.
 
 ```bash
 # Discover the event types you can subscribe to
@@ -557,7 +557,7 @@ Webhook endpoints are in beta. `create-subscription` and `rotate-hmac-secret` re
 - `--format` — pretty-print JSON output (root-level flag, works on every command).
 - `--portfolio-id` — overrides the `portfolioId` from `PRIME_CREDENTIALS`.
 - `--entity-id` — overrides the `entityId` from `PRIME_CREDENTIALS`.
-- `--idempotency-key` — supply your own UUID for retry-safe writes; auto-generated if blank.
+- `--idempotency-key` — supply your own UUID for retry-safe writes. Most write commands generate one if blank; `advanced-transfers create` sends no request-level key when omitted.
 - `--client-order-id` / `--client-quote-id` — your own client-side ID; auto-generated if blank.
 - Pagination (lists that return `Pagination`): `--limit`, `--sort-direction`, `--all` (drain all pages), `--interactive` (page on key-press).
 - Cursor pagination (`webhooks list-subscriptions` and `webhooks get-delivery-logs`): `--cursor` (the `next_cursor` from the previous response) and `--all`.

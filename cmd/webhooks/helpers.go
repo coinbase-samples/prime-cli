@@ -64,7 +64,6 @@ func withPrefix(prefix, value string) string {
 }
 
 const (
-	authTypePrefix       = "WEBHOOK_AUTH_TYPE_"
 	deliveryStatusPrefix = "WEBHOOK_DELIVERY_STATUS_"
 	statsPeriodPrefix    = "WEBHOOK_STATS_PERIOD_"
 )

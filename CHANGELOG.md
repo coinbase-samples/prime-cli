@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.7.1] - 2026-NOV-20
+
+### Changed
+
+- Bumped `prime-sdk-go` to v0.14.1.
+- Webhook CLI commands and MCP tools now send `SIGNATURE_ONLY` in place of the previous `HMAC` auth type. Omitting the auth type on create still uses the API default.
+- Updated advanced transfer help to document the `MATCHED` state and the UUID requirement for request idempotency keys.
+
 ## [0.7.0] - 2026-NOV-06
 
 ### Added

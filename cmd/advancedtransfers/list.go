@@ -104,6 +104,6 @@ func init() {
 	utils.AddPortfolioIdFlag(listAdvancedTransfersCmd)
 	utils.AddPaginationFlags(listAdvancedTransfersCmd, true)
 
-	listAdvancedTransfersCmd.Flags().StringSlice(utils.StatesFlag, []string{}, "List of advanced transfer states")
+	listAdvancedTransfersCmd.Flags().StringSlice(utils.StatesFlag, []string{}, "Filter by advanced transfer state, e.g. ADVANCED_TRANSFER_STATE_MATCHED (only the first value is used)")
 	listAdvancedTransfersCmd.Flags().String(utils.TransferTypeFlag, "", "Optional transfer type filter")
 }

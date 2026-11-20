@@ -93,3 +93,11 @@ func TestWithPrefix(t *testing.T) {
 		}
 	}
 }
+
+func TestCreateSubscriptionAuthDefault(t *testing.T) {
+	flags := createSubscriptionCmd.Flags()
+	got := utils.ParseWebhookAuthType(flags.Lookup(utils.AuthTypeFlag).DefValue)
+	if got != "" {
+		t.Fatalf("default auth_type = %q, want omitted so Prime chooses the default", got)
+	}
+}

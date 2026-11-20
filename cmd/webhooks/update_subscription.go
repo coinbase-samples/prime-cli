@@ -74,7 +74,7 @@ var updateSubscriptionCmd = &cobra.Command{
 			SubscriptionId:  subscriptionId,
 			EventTypes:      eventTypes,
 			TargetUrl:       utils.GetFlagStringValue(cmd, utils.TargetUrlFlag),
-			AuthType:        model.WebhookAuthType(withPrefix(authTypePrefix, utils.GetFlagStringValue(cmd, utils.AuthTypeFlag))),
+			AuthType:        utils.ParseWebhookAuthType(utils.GetFlagStringValue(cmd, utils.AuthTypeFlag)),
 			OauthConfig:     buildOauthConfig(cmd),
 			CustomHeaders:   headers,
 			Description:     utils.GetFlagStringValue(cmd, utils.DescriptionFlag),
@@ -109,7 +109,7 @@ func init() {
 
 	updateSubscriptionCmd.Flags().StringSlice(utils.EventTypesFlag, nil, "Replacement event types, comma separated")
 	updateSubscriptionCmd.Flags().String(utils.TargetUrlFlag, "", "New target URL")
-	updateSubscriptionCmd.Flags().String(utils.AuthTypeFlag, "", "New auth type")
+	updateSubscriptionCmd.Flags().String(utils.AuthTypeFlag, "", "Auth type: SIGNATURE_ONLY, OAUTH, MTLS or OAUTH_MTLS (the WEBHOOK_AUTH_TYPE_ prefix is optional)")
 	updateSubscriptionCmd.Flags().String(utils.DescriptionFlag, "", "New description")
 	updateSubscriptionCmd.Flags().Bool(utils.IsEnabledFlag, true, "Enable or disable the subscription, e.g. --is-enabled=false")
 	updateSubscriptionCmd.Flags().String(utils.ExpectedVersionFlag, "", "Subscription version the update is based on. Fetched automatically if blank")

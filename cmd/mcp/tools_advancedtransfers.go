@@ -33,7 +33,10 @@ func registerAdvancedTransferTools(s *server.MCPServer) {
 			mcplib.Description("Uses credentials default if omitted"),
 		),
 		mcplib.WithArray("states",
-			mcplib.Description("Filter by states: ADVANCED_TRANSFER_STATE_CREATED, PROCESSING, DONE, CANCELLED, FAILED, EXPIRED"),
+			mcplib.Description("Filter by state (only the first value is used). Valid values: "+
+				"ADVANCED_TRANSFER_STATE_CREATED, ADVANCED_TRANSFER_STATE_MATCHED, ADVANCED_TRANSFER_STATE_PROCESSING, "+
+				"ADVANCED_TRANSFER_STATE_DONE, ADVANCED_TRANSFER_STATE_CANCELLED, ADVANCED_TRANSFER_STATE_FAILED, "+
+				"ADVANCED_TRANSFER_STATE_EXPIRED, ADVANCED_TRANSFER_STATE_REJECTED"),
 			mcplib.WithStringItems(),
 		),
 		mcplib.WithString("transfer_type",
@@ -68,7 +71,7 @@ func registerAdvancedTransferTools(s *server.MCPServer) {
 			mcplib.Description("Currency symbol for the transfer"),
 		),
 		mcplib.WithString("idempotency_key",
-			mcplib.Description("Optional. Sent with the request so a repeated key returns the original transfer, and used as the fund movement ID. A fund movement ID is auto-generated if omitted"),
+			mcplib.Description("Optional UUID. Sent with the request so a repeated key returns the original transfer, and used as the fund movement ID. A fund movement ID is auto-generated if omitted"),
 		),
 		mcplib.WithString("source_type",
 			mcplib.Description("Source location type, e.g. WALLET, COUNTERPARTY_ID"),
