@@ -33,7 +33,10 @@ func registerAdvancedTransferTools(s *server.MCPServer) {
 			mcplib.Description("Uses credentials default if omitted"),
 		),
 		mcplib.WithArray("states",
-			mcplib.Description("Filter by state, e.g. ADVANCED_TRANSFER_STATE_MATCHED (only the first value is used)"),
+			mcplib.Description("Filter by state (only the first value is used). Valid values: "+
+				"ADVANCED_TRANSFER_STATE_CREATED, ADVANCED_TRANSFER_STATE_MATCHED, ADVANCED_TRANSFER_STATE_PROCESSING, "+
+				"ADVANCED_TRANSFER_STATE_DONE, ADVANCED_TRANSFER_STATE_CANCELLED, ADVANCED_TRANSFER_STATE_FAILED, "+
+				"ADVANCED_TRANSFER_STATE_EXPIRED, ADVANCED_TRANSFER_STATE_REJECTED"),
 			mcplib.WithStringItems(),
 		),
 		mcplib.WithString("transfer_type",
