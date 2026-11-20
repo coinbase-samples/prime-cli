@@ -30,7 +30,6 @@ import (
 )
 
 const (
-	webhookAuthTypePrefix       = "WEBHOOK_AUTH_TYPE_"
 	webhookDeliveryStatusPrefix = "WEBHOOK_DELIVERY_STATUS_"
 	webhookStatsPeriodPrefix    = "WEBHOOK_STATS_PERIOD_"
 )
@@ -74,7 +73,7 @@ func registerWebhookTools(s *server.MCPServer) {
 			mcplib.Description("HTTPS URL that receives deliveries"),
 		),
 		mcplib.WithString("auth_type",
-			mcplib.Description("HMAC, OAUTH, MTLS or OAUTH_MTLS (the WEBHOOK_AUTH_TYPE_ prefix is optional)"),
+			mcplib.Description("SIGNATURE_ONLY, OAUTH, MTLS or OAUTH_MTLS (the WEBHOOK_AUTH_TYPE_ prefix is optional). Omit to use SIGNATURE_ONLY"),
 		),
 		mcplib.WithString("oauth_token_url",
 			mcplib.Description("OAuth token URL"),
@@ -129,7 +128,7 @@ func registerWebhookTools(s *server.MCPServer) {
 			mcplib.Description("New target URL"),
 		),
 		mcplib.WithString("auth_type",
-			mcplib.Description("HMAC, OAUTH, MTLS or OAUTH_MTLS (the WEBHOOK_AUTH_TYPE_ prefix is optional)"),
+			mcplib.Description("SIGNATURE_ONLY, OAUTH, MTLS or OAUTH_MTLS (the WEBHOOK_AUTH_TYPE_ prefix is optional)"),
 		),
 		mcplib.WithString("oauth_token_url",
 			mcplib.Description("OAuth token URL"),
@@ -441,7 +440,7 @@ func handleCreateWebhookSubscription(ctx context.Context, req mcplib.CallToolReq
 		PortfolioId:    portfolioId,
 		EventTypes:     eventTypes,
 		TargetUrl:      targetUrl,
-		AuthType:       model.WebhookAuthType(webhookEnum(webhookAuthTypePrefix, req.GetString("auth_type", ""))),
+		AuthType:       utils.ParseWebhookAuthType(req.GetString("auth_type", "")),
 		OauthConfig:    webhookOauthConfig(req),
 		CustomHeaders:  headers,
 		Description:    req.GetString("description", ""),
@@ -543,7 +542,7 @@ func handleUpdateWebhookSubscription(ctx context.Context, req mcplib.CallToolReq
 		SubscriptionId:  subscriptionId,
 		EventTypes:      req.GetStringSlice("event_types", nil),
 		TargetUrl:       req.GetString("target_url", ""),
-		AuthType:        model.WebhookAuthType(webhookEnum(webhookAuthTypePrefix, req.GetString("auth_type", ""))),
+		AuthType:        utils.ParseWebhookAuthType(req.GetString("auth_type", "")),
 		OauthConfig:     webhookOauthConfig(req),
 		CustomHeaders:   headers,
 		Description:     req.GetString("description", ""),

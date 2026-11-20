@@ -20,7 +20,6 @@ import (
 	"fmt"
 
 	"github.com/coinbase-samples/prime-cli/utils"
-	"github.com/coinbase/prime-sdk-go/model"
 	prime "github.com/coinbase/prime-sdk-go/webhooks"
 	"github.com/spf13/cobra"
 )
@@ -46,7 +45,7 @@ var createSubscriptionCmd = &cobra.Command{
 			PortfolioId:    portfolioId,
 			EventTypes:     eventTypes,
 			TargetUrl:      utils.GetFlagStringValue(cmd, utils.TargetUrlFlag),
-			AuthType:       model.WebhookAuthType(withPrefix(authTypePrefix, utils.GetFlagStringValue(cmd, utils.AuthTypeFlag))),
+			AuthType:       utils.ParseWebhookAuthType(utils.GetFlagStringValue(cmd, utils.AuthTypeFlag)),
 			OauthConfig:    buildOauthConfig(cmd),
 			CustomHeaders:  headers,
 			Description:    utils.GetFlagStringValue(cmd, utils.DescriptionFlag),
@@ -75,7 +74,7 @@ func init() {
 
 	createSubscriptionCmd.Flags().StringSlice(utils.EventTypesFlag, nil, "Event types to subscribe to, comma separated (Required)")
 	createSubscriptionCmd.Flags().String(utils.TargetUrlFlag, "", "HTTPS URL that receives deliveries (Required)")
-	createSubscriptionCmd.Flags().String(utils.AuthTypeFlag, "", "Auth type: HMAC, OAUTH, MTLS or OAUTH_MTLS (the WEBHOOK_AUTH_TYPE_ prefix is optional)")
+	createSubscriptionCmd.Flags().String(utils.AuthTypeFlag, "", "Auth type: SIGNATURE_ONLY, OAUTH, MTLS or OAUTH_MTLS (the WEBHOOK_AUTH_TYPE_ prefix is optional). Omit to use SIGNATURE_ONLY")
 	createSubscriptionCmd.Flags().String(utils.DescriptionFlag, "", "Subscription description")
 
 	createSubscriptionCmd.MarkFlagRequired(utils.EventTypesFlag)

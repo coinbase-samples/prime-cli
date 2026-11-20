@@ -156,7 +156,7 @@ func init() {
 	createAdvancedTransferCmd.Flags().String(
 		utils.IdempotencyKeyFlag,
 		"",
-		"Optional idempotency key. Sent with the request so a repeated key returns the original transfer, and used as the fund movement ID when --fund-movement-id is blank",
+		"Optional idempotency key (UUID). Sent with the request so a repeated key returns the original transfer, and used as the fund movement ID when --fund-movement-id is blank",
 	)
 
 	createAdvancedTransferCmd.Flags().String(utils.TransferTypeFlag, "", "Advanced transfer type, e.g. ADVANCED_TRANSFER_TYPE_BLIND_MATCH (Required)")
